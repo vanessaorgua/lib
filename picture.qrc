@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="/butons" >
+    <file>../pict/alarm_32x32.png</file>
+    <file>../pict/exit_32x32.png</file>
+    <file>../pict/logo_32x32.png</file>
+    <file>../pict/thrend_32x32.png</file>
+    <file>../pict/hand_18x20.png</file>
+    <file>../pict/hand_21x26.png</file>
+    <file>../pict/klapan_analog_horiz_off_28x41.png</file>
+    <file>../pict/klapan_analog_vert_off_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_r_off_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_on_28x41.png</file>
+    <file>../pict/klapan_analog_vert_on_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_r_on_28x41.png</file>
+    <file>../pict/setup_32x32.png</file>
+    <file>../pict/klapan_diskrette_vert_off_na_25x46.png</file>
+    <file>../pict/klapan_diskrette_vert_on_na_25x26.png</file>
+    <file>../pict/bool_green_false_48x48.png</file>
+    <file>../pict/bool_green_true_48x48.png</file>
+  </qresource>
+</RCC>
