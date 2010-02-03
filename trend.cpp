@@ -231,6 +231,7 @@ TrendWindow::~TrendWindow()
 
 void TrendWindow::dataChange()
 {
+//    qDebug() << "\nstart" << sender();
     QString s="";
     QSqlQuery query; //(m_db);
     int i ;
@@ -282,19 +283,20 @@ void TrendWindow::dataChange()
 	s+=",";	
 	s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
     }
-    
+    //qDebug() << "FL s=" << s << "m_trinfo->numPlot = " << m_trinfo->numPlot;
     
     // фінальна побудова запиту
     s=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
-//    qDebug() << s;
+    //qDebug() << s;
     if(query.exec(s))
     {
-	int *v= new int[m_trinfo->numPlot];
-//	qDebug("Кількість записів %d",query.size());
+	//qDebug() << m_trinfo->numPlot;
+	//int *v= new int[m_trinfo->numPlot];
+	QVector<int> v(m_trinfo->numPlot);
+	qDebug("Кількість записів %d",query.size());
 	if(m_pnDt)
 	    delete m_pnDt;
 	m_pnDt = new unsigned int[query.size()];
-	
 	// ініціалізація об'єкта малювання графіку
 	m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
 	// виймання даних
@@ -307,10 +309,11 @@ void TrendWindow::dataChange()
 		v[i]=query.value(i+1).toInt();
 	    m_tw->setData(query.value(0).toUInt()-m_start.toTime_t(),v);
 	}
+
 	query.clear();
 	m_tw->draw();
 	
-	delete v;
+	//delete v;
 	QApplication::setOverrideCursor(Qt::ArrowCursor);
 	setCursor(-1);
     }
@@ -326,7 +329,8 @@ void TrendWindow::dataChange()
 	s+=pv[i]->checkState()==Qt::Checked?",min("+m_trinfo->fields[i]+"),avg("+m_trinfo->fields[i]+"),max("+m_trinfo->fields[i]+")" :",-1,-1,-1";
     }
     s=QString("SELECT COUNT(Dt)%1 FROM %2 WHERE Dt BETWEEN %3 AND %4").arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
-
+//    qDebug() << s;
+    
     if(query.exec(s))
     {
 	double min,avg,max;
@@ -352,6 +356,7 @@ void TrendWindow::dataChange()
 	qDebug() << query.lastError();
     }
 	
+    //qDebug() << "End";
 
 }
 
@@ -506,7 +511,7 @@ void TrendView::start(int nLen,int numPlot,int nHeight /*=4000*/) // тут ст
     }
 }
 
-void TrendView::setData(double nX,int *Data) // цей слот приймає дані для малювання.
+void TrendView::setData(double nX,QVector<int>& Data) // цей слот приймає дані для малювання.
 {
     int i;
 

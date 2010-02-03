@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1017</width>
-    <height>680</height>
+    <width>1138</width>
+    <height>810</height>
    </rect>
   </property>
   <property name="minimumSize" >
@@ -17,8 +17,8 @@
   </property>
   <property name="maximumSize" >
    <size>
-    <width>1600</width>
-    <height>1200</height>
+    <width>2560</width>
+    <height>1600</height>
    </size>
   </property>
   <property name="windowTitle" >
@@ -28,10 +28,7 @@
    <property name="bottomMargin" >
     <number>6</number>
    </property>
-   <property name="horizontalSpacing" >
-    <number>2</number>
-   </property>
-   <property name="verticalSpacing" >
+   <property name="spacing" >
     <number>2</number>
    </property>
    <item row="0" column="0" >
@@ -39,7 +36,7 @@
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>274</width>
        <height>20</height>
@@ -85,7 +82,7 @@
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0" >
       <size>
        <width>273</width>
        <height>20</height>
@@ -120,10 +117,7 @@
       <property name="bottomMargin" >
        <number>2</number>
       </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
+      <property name="spacing" >
        <number>4</number>
       </property>
       <item row="0" column="3" colspan="5" >
@@ -271,7 +265,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -284,7 +278,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -344,7 +338,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>0</width>
           <height>20</height>
@@ -357,7 +351,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>0</width>
           <height>20</height>
@@ -386,16 +380,7 @@
       <property name="spacing" >
        <number>10</number>
       </property>
-      <property name="leftMargin" >
-       <number>2</number>
-      </property>
-      <property name="topMargin" >
-       <number>2</number>
-      </property>
-      <property name="rightMargin" >
-       <number>2</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>2</number>
       </property>
       <item>
@@ -403,7 +388,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>195</width>
           <height>20</height>
@@ -451,7 +436,7 @@
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>194</width>
           <height>20</height>
@@ -471,7 +456,8 @@
          <string/>
         </property>
         <property name="icon" >
-         <iconset resource="picture.qrc" >:/butons/calendar_48x48.png</iconset>
+         <iconset resource="picture.qrc" >
+          <normaloff>:/butons/pict/calendar_48x48.png</normaloff>:/butons/pict/calendar_48x48.png</iconset>
         </property>
        </widget>
       </item>
@@ -528,7 +514,7 @@
      <property name="maximumSize" >
       <size>
        <width>16777215</width>
-       <height>176</height>
+       <height>180</height>
       </size>
      </property>
      <property name="frameShape" >
@@ -538,29 +524,20 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>4</number>
-      </property>
-      <property name="topMargin" >
-       <number>4</number>
-      </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
+      <property name="margin" >
        <number>4</number>
       </property>
       <item rowspan="5" row="0" column="1" >
        <widget class="QGroupBox" name="plotSelect" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="maximumSize" >
          <size>
-          <width>20</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -575,7 +552,7 @@
           <number>0</number>
          </property>
          <property name="leftMargin" >
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="topMargin" >
           <number>0</number>
@@ -648,7 +625,7 @@
       <item rowspan="5" row="0" column="2" >
        <widget class="QGroupBox" name="selectedBox" >
         <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Fixed" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -661,7 +638,7 @@
         </property>
         <property name="maximumSize" >
          <size>
-          <width>25</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -865,7 +842,7 @@
         <property name="sizeType" >
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>39</width>
           <height>20</height>
@@ -881,7 +858,7 @@
         <property name="sizeType" >
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>47</width>
           <height>39</height>
@@ -897,7 +874,7 @@
         <property name="sizeType" >
          <enum>QSizePolicy::Expanding</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>10</width>
           <height>139</height>
@@ -979,22 +956,6 @@
         </property>
        </widget>
       </item>
-      <item rowspan="4" row="1" column="8" >
-       <spacer>
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Expanding</enum>
-        </property>
-        <property name="sizeHint" >
-         <size>
-          <width>10</width>
-          <height>139</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item rowspan="2" row="3" column="9" >
        <widget class="QPushButton" name="Exit" >
         <property name="minimumSize" >
@@ -1010,7 +971,8 @@
          </size>
         </property>
         <property name="icon" >
-         <iconset resource="picture.qrc" >:/butons/exit_32x32.png</iconset>
+         <iconset resource="picture.qrc" >
+          <normaloff>:/butons/pict/exit_32x32.png</normaloff>:/butons/pict/exit_32x32.png</iconset>
         </property>
         <property name="iconSize" >
          <size>
@@ -1022,9 +984,15 @@
       </item>
       <item rowspan="5" row="0" column="4" >
        <widget class="QTableWidget" name="twAgr" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize" >
          <size>
-          <width>500</width>
+          <width>700</width>
           <height>0</height>
          </size>
         </property>

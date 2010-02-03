@@ -89,7 +89,7 @@ public:
 
 public slots:
     void start(int nLen,int numPlot,int nHeight=4000); // тут створ.ється новий oб'єкт m_px
-    void setData(double nX,int *Data); // цей слот приймає дані для малювання.
+    void setData(double nX,QVector<int>& Data); // цей слот приймає дані для малювання.
     void draw(); // власне по цій команді об'єкт m_px відображається на екрані
     
 signals:     
