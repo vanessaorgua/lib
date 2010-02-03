@@ -17,5 +17,6 @@
     <file>../pict/klapan_diskrette_vert_on_na_25x26.png</file>
     <file>../pict/bool_green_false_48x48.png</file>
     <file>../pict/bool_green_true_48x48.png</file>
+    <file>../pict/red_alarm_32x12.png</file>
   </qresource>
 </RCC>
