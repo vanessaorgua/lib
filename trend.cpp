@@ -30,7 +30,7 @@ namespace MyConst
 TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget(p)
     ,m_nHeight(nHeight),m_pnDt(NULL)
 {    
-    qDebug("Настройка вікна");
+    //qDebug("Настройка вікна");
 
     setupUi(this);
 //    setAttribute( Qt::WA_DeleteOnClose);
@@ -176,7 +176,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     twAgr->setRowCount(8);
     twAgr->setVerticalHeaderLabels(m_trinfo->fieldHead);
     twAgr->horizontalHeader()->hide();
-    twAgr->verticalHeader()->setFixedWidth(198);
+    twAgr->verticalHeader()->setFixedWidth(300);
     twAgr->setSortingEnabled(false);
     for(int i=0;i<8;++i)
 	twAgr->setRowHeight(i,20);
@@ -194,16 +194,28 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     }
     
     m_sTmpl= "SELECT Dt%1 FROM %2 WHERE Dt BETWEEN %3 AND %4 ORDER BY Dt";// шаблон запиту
-    
-    QSqlQuery query; //(m_db);
+
+    dbs=QSqlDatabase::addDatabase("QMYSQL","history");
+    QSettings s;
+
+    dbs.setHostName(tri->host);
+    dbs.setDatabaseName(tri->db);
+    dbs.setUserName(tri->user);
+    dbs.setPassword(tri->passwd);
+
+    if(dbs.open())
+    {
+	//qDebug() << "Connect to DB.";
+
+	QSqlQuery query(dbs);
 	// визначення чісового інтервалу наявних даних
 	if(query.exec(QString("SELECT min(Dt) ,max(Dt) from %1").arg(m_trinfo->table)))
 	{
 	    QDateTime tmp;
 	    query.next();
 	    
-	    qDebug("min(Dt)=%u",query.value(0).toUInt());
-	    qDebug("max(Dt)=%u",query.value(1).toUInt());	    
+	    //qDebug("min(Dt)=%u",query.value(0).toUInt());
+	    //qDebug("max(Dt)=%u",query.value(1).toUInt());	    
 	    
 	    tmp.setTime_t(query.value(0).toUInt());
 	    db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yyyy"));
@@ -214,26 +226,34 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 	}
 	else
 	{
-	    qDebug() << query.lastError();
+	    //qDebug() << query.lastError();
 	}
 	// перемалювання графіку
-	
-        dataChange();
-	setCursor(0);
+        //dataChange();
+	//setCursor(0);
+
+    }
+    else
+    {
+	// якщо не зв’язалися із БД
+	//qDebug() << dbs.lastError();
+    }
     //}
 }
 
 TrendWindow::~TrendWindow()
 {
     delete m_pnDt; 
-    qDebug("Кінець роботи");
+//    qDebug("Кінець роботи");
+    dbs.close();
+    //QSqlDatabase::removeDatabase("history");
+
 }
 
 void TrendWindow::dataChange()
 {
-//    qDebug() << "\nstart" << sender();
+    qDebug() << "start" << sender();
     QString s="";
-    QSqlQuery query; //(m_db);
     int i ;
     
     if(sender()!=NULL) // обробка зміни часу від навігаційних кнопок
@@ -287,13 +307,18 @@ void TrendWindow::dataChange()
     
     // фінальна побудова запиту
     s=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
+
+if(dbs.isOpen())
+{
+    QSqlQuery query(dbs);
+
     //qDebug() << s;
     if(query.exec(s))
     {
 	//qDebug() << m_trinfo->numPlot;
 	//int *v= new int[m_trinfo->numPlot];
 	QVector<int> v(m_trinfo->numPlot);
-	qDebug("Кількість записів %d",query.size());
+	//qDebug("Кількість записів %d",query.size());
 	if(m_pnDt)
 	    delete m_pnDt;
 	m_pnDt = new unsigned int[query.size()];
@@ -320,7 +345,7 @@ void TrendWindow::dataChange()
     else
     {
         QApplication::setOverrideCursor(Qt::ArrowCursor);
-	QMessageBox::critical(this,QString::fromUtf8("Помилка виконання запиту"),query.lastError().databaseText());
+	QMessageBox::critical(this,QString::fromUtf8(tr("Помилка виконання запиту")),query.lastError().databaseText());
     }        
     
     s.clear();
@@ -353,10 +378,16 @@ void TrendWindow::dataChange()
     }
     else
     {
-	qDebug() << query.lastError();
+	//qDebug() << query.lastError();
     }
 	
     //qDebug() << "End";
+}
+else
+{
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
+    QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),dbs.lastError().databaseText());
+}
 
 }
 
@@ -408,6 +439,8 @@ void TrendWindow::setCursor(int v)
 	v=ov;
     else
 	ov=v;
+if(dbs.isOpen())
+{
     
     pos=m_start.toTime_t()+ MyConst::tmr[Interval->currentIndex()]*v/m_tw->width();
 
@@ -427,7 +460,7 @@ void TrendWindow::setCursor(int v)
 	}while (step>0);
 	step=i; // зберегти значення
 	
-	QSqlQuery qry;
+	QSqlQuery qry(dbs);
 	QString s;
 
         for(i=0;i<m_trinfo->numPlot;++i)
@@ -454,9 +487,15 @@ void TrendWindow::setCursor(int v)
 	}
 	else
 	{
-	    qDebug() << qry.lastError();
+	    //qDebug() << qry.lastError();
 	}
     }
+}
+else
+{
+    QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),dbs.lastError().driverText());
+}
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------
@@ -506,7 +545,7 @@ void TrendView::start(int nLen,int numPlot,int nHeight /*=4000*/) // тут ст
     }
     else
     {
-	QMessageBox::critical(this,QString::fromUtf8("Помилка"),QString::fromUtf8("Невдалося створити об'єкт QPixmap\nПродовження роботи неможливе"));
+	QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),QString::fromUtf8(tr("Невдалося створити об'єкт QPixmap\nПродовження роботи неможливе")));
 	close();
     }
 }
