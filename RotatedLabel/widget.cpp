@@ -5,7 +5,7 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
-    label = new RotatedLabel("<h1>Text<sup>123</sup>&Psi;</h1>");
+    label = new RotatedLabel(this);
 
     spinBox = new QSpinBox;
     spinBox->setRange(-360, 360);

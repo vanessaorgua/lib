@@ -44,7 +44,7 @@ bool RotatedLabelPlugin::isContainer() const
 
 QWidget *RotatedLabelPlugin::createWidget(QWidget *parent)
 {
-    return new RotatedLabel("RotatedLabel",parent);
+    return new RotatedLabel(parent);
 }
 
 Q_EXPORT_PLUGIN2(rotatedlabelplugin,RotatedLabelPlugin)

@@ -11,7 +11,7 @@ class RotatedLabel : public QWidget
     Q_PROPERTY(qreal Angle READ angle WRITE setAngle)
     Q_PROPERTY(QString Text READ text WRITE setText)
 public:
-    RotatedLabel( QString text, QWidget *parent = 0);
+    RotatedLabel( QWidget *parent = 0);
     
     void setAngle(qreal angle);
     void setText(const QString &text);
@@ -30,6 +30,7 @@ private:
     qreal _angle;
     QLabel _label;
     QPixmap _pixmap;
+    QColor _bg;
 };
 
 #endif // ROTATEDLABEL_H

@@ -2,10 +2,18 @@
 #include <QPainter>
 #include <cmath>
 
-RotatedLabel::RotatedLabel(QString text,QWidget *parent)
-        : QWidget(parent),_label(text)
+RotatedLabel::RotatedLabel(QWidget *parent)
+        : QWidget(parent)
 {
     _angle = 0;
+    _label.setText("RotateLabel");
+
+    QColor cl;
+    QPalette pal;
+    cl.setRgb(90,132,201);
+    pal.setColor(QPalette::Background,cl);
+
+    _label.setPalette(pal);
 }
 
 void RotatedLabel::setAngle(qreal angle)
@@ -30,6 +38,7 @@ void RotatedLabel::updatePixmap()
     _label.adjustSize();
     _pixmap = QPixmap(_label.size());
     _label.render(&_pixmap);
+
     QTransform t;
     t.rotate(_angle);
     _pixmap = _pixmap.transformed(t, Qt::SmoothTransformation);
