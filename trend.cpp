@@ -345,7 +345,7 @@ if(dbs.isOpen())
     else
     {
         QApplication::setOverrideCursor(Qt::ArrowCursor);
-	QMessageBox::critical(this,QString::fromUtf8(tr("Помилка виконання запиту")),query.lastError().databaseText());
+	QMessageBox::critical(this,tr("Query error"),query.lastError().databaseText());
     }        
     
     s.clear();
@@ -386,7 +386,7 @@ if(dbs.isOpen())
 else
 {
     QApplication::setOverrideCursor(Qt::ArrowCursor);
-    QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),dbs.lastError().databaseText());
+    QMessageBox::critical(this,tr("Error"),dbs.lastError().databaseText());
 }
 
 }
@@ -493,7 +493,7 @@ if(dbs.isOpen())
 }
 else
 {
-    QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),dbs.lastError().driverText());
+    QMessageBox::critical(this,tr("Error"),dbs.lastError().driverText());
 }
 
 }
@@ -545,7 +545,7 @@ void TrendView::start(int nLen,int numPlot,int nHeight /*=4000*/) // тут ст
     }
     else
     {
-	QMessageBox::critical(this,QString::fromUtf8(tr("Помилка")),QString::fromUtf8(tr("Невдалося створити об'єкт QPixmap\nПродовження роботи неможливе")));
+	QMessageBox::critical(this,tr("Error"),tr("No allocate memoty from QPixmap"));
 	close();
     }
 }
