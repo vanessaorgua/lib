@@ -345,7 +345,7 @@ if(dbs.isOpen())
     else
     {
         QApplication::setOverrideCursor(Qt::ArrowCursor);
-	QMessageBox::critical(this,tr("Query error"),query.lastError().databaseText());
+	QMessageBox::critical(this,tr("Помилка виконання запиту"),query.lastError().databaseText());
     }        
     
     s.clear();
@@ -386,7 +386,7 @@ if(dbs.isOpen())
 else
 {
     QApplication::setOverrideCursor(Qt::ArrowCursor);
-    QMessageBox::critical(this,tr("Error"),dbs.lastError().databaseText());
+    QMessageBox::critical(this,tr("Помилка"),dbs.lastError().databaseText());
 }
 
 }
@@ -493,7 +493,7 @@ if(dbs.isOpen())
 }
 else
 {
-    QMessageBox::critical(this,tr("Error"),dbs.lastError().driverText());
+    QMessageBox::critical(this,tr("Помилка"),dbs.lastError().driverText());
 }
 
 }
@@ -545,7 +545,7 @@ void TrendView::start(int nLen,int numPlot,int nHeight /*=4000*/) // тут ст
     }
     else
     {
-	QMessageBox::critical(this,tr("Error"),tr("No allocate memoty from QPixmap"));
+	QMessageBox::critical(this,tr("Помилка"),tr("Не вдалося виділити пам\'ять під об\'єкт QPixmap"));
 	close();
     }
 }
