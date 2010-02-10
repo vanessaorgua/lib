@@ -47,7 +47,7 @@ signals:
 protected:
     TrendView *m_tw;
     
-    QSqlDatabase dbs;
+    //QSqlDatabase dbs;
 
     QDateTime m_start,m_stop,m_cursor;
     QColor m_Color[8];

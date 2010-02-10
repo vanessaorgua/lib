@@ -195,7 +195,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     
     m_sTmpl= "SELECT Dt%1 FROM %2 WHERE Dt BETWEEN %3 AND %4 ORDER BY Dt";// шаблон запиту
 
-    dbs=QSqlDatabase::addDatabase("QMYSQL","history");
+    QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","history");
     QSettings s;
 
     dbs.setHostName(tri->host);
@@ -245,14 +245,17 @@ TrendWindow::~TrendWindow()
 {
     delete m_pnDt; 
 //    qDebug("Кінець роботи");
-    dbs.close();
-    //QSqlDatabase::removeDatabase("history");
+    {
+	QSqlDatabase dbs=QSqlDatabase::database("history");
+	dbs.close();
+    }
+    QSqlDatabase::removeDatabase("history");
 
 }
 
 void TrendWindow::dataChange()
 {
-    qDebug() << "start" << sender();
+    //qDebug() << "start" << sender();
     QString s="";
     int i ;
     
@@ -308,6 +311,7 @@ void TrendWindow::dataChange()
     // фінальна побудова запиту
     s=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
 
+QSqlDatabase dbs=QSqlDatabase::database("history");
 if(dbs.isOpen())
 {
     QSqlQuery query(dbs);
@@ -439,6 +443,8 @@ void TrendWindow::setCursor(int v)
 	v=ov;
     else
 	ov=v;
+
+QSqlDatabase dbs=QSqlDatabase::database("history");
 if(dbs.isOpen())
 {
     
