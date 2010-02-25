@@ -25,13 +25,14 @@ private slots:
 
     void slotError(QAbstractSocket::SocketError);
 
-    void slotReadServer();
-
+    void slotRead();
+    void slotSend();
 private:
     QTcpSocket *pS; //сокет для зв’язку
     QString sHostname; // ім’я чи IP-адреса контролера
     int nPort; // номер порта, за замовчанням має бути 502
     qint16 nI; // це буде індекс пакунка
+    int nLen; // довжина наступноно бока даних
 
     QTimer *connSend; // таймер для відправки чергового запиту
     QTimer *connWait; // тайсер очікування перед спробою встановити нове з’єднання
