@@ -14,3 +14,4 @@ MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
 RCC_DIR = build
+OTHER_FILES += ../../Линовиця/Фільтри/text/tag_map.txt
