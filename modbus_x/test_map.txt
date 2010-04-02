@@ -1,0 +1,5 @@
+Tag_1	10	Bool	1	1
+Tag_2	11	Integer	1	1
+Tag_3	12	Real	1	1
+Tag_4	14	Long	1	1
+Tag_5	16	Timer	1	1

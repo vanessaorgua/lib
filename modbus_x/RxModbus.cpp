@@ -85,3 +85,67 @@ void RxModbus::slotRead()
     connTimeout->stop();
     connTimeout->start();
 }
+
+int RxModbus::loadList(QString fileName)
+{
+
+    QFile f(fileName);
+    int i;
+    QString s;
+    QStringList sl;
+    int wc=0 ; // лічильник слів
+    int next_addr=0; //остання адреса
+    qDebug() << "file " << fileName;
+
+    if(f.open(QIODevice::ReadOnly))
+    {
+        for(i=0;!f.atEnd();++i)
+        {
+            s=QString::fromUtf8(f.readLine()).trimmed();
+            sl= s.split("\t");
+            if(sl.size()>4) // якщо є всі поля
+            {
+                tag_name << sl[0];
+                tag_index << sl[1].toInt(); // тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
+                tag_history << sl[3].toInt();
+                tag_read << sl[4].toInt();
+                // розпізнати типи даних
+                if(sl[2]=="Integer" || sl[2]=="Bool" )
+                {
+                    ++wc;
+                    tag_len << 1;
+                }
+                else if (sl[2]=="Real" || sl[2]=="Timer" || sl[2]=="Long" )
+                {
+                    wc+=2;
+                    tag_len << 2;
+                }
+                else // невідомий тип даних
+                {
+                    wc++;
+                    tag_len  << 0;
+                }
+                if(tag_index!=next_addr ) //визначення межі пакунків
+                { // прора започаткувати новий пакунок
+
+                }
+
+                next_addr=tag_index+wc;
+
+            }
+
+        }
+        qDebug() << tag_name;
+        qDebug() << tag_index;
+        qDebug() << tag_len;
+        qDebug() << wc;
+
+        f.close();
+        return i;
+    }
+    else
+    {
+        return 0;
+    }
+
+}

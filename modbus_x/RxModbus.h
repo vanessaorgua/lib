@@ -17,6 +17,8 @@ public:
         RxModbus(); // кноструктор, треба уточнити
         ~RxModbus(); // поки-що тривіальний деструктор
 
+        int loadList(QString fileName);
+
 private slots:
     void slotConnected (); // приєдналися
     void slotNewConnect();
@@ -37,6 +39,18 @@ private:
     QTimer *connSend; // таймер для відправки чергового запиту
     QTimer *connWait; // тайсер очікування перед спробою встановити нове з’єднання
     QTimer *connTimeout; // таймер таймауту з’єднання, можливо в нових версіях QT цей алгоритм буде непотрібен
+
+
+    // Сховище даних. можливо треба буде переробляти
+    QStringList tag_name;            // назва змінної
+    QVector<qint32> tag_index;       // індекс в контролері
+    QVector<qint32> tag_len;         // довжина поля в словах
+    QVector<qint32> tag_history;     // прапор "запис в історію"
+    QVector<qint32> tag_read;        // прапор "завжди читати"
+    QVector<qint16> data;            // сирі дані із PLC
+
+
+
 };
 
 

@@ -14,4 +14,7 @@ MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
 RCC_DIR = build
-OTHER_FILES += ../../Линовиця/Фільтри/text/tag_map.txt
+OTHER_FILES += ../../8=>28FO/$V;LB@8/text/tag_map.txt \
+    ../../Linovitsa/filters/text/tag_list.txt \
+    test_map.txt
+RESOURCES += test.qrc

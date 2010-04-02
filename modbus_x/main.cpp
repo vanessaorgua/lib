@@ -5,7 +5,10 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    // QCoreApplication a(argc, argv);
+    RxModbus r;
 
-    return a.exec();
+    r.loadList(":/text/test_map.txt");
+
+    //return a.exec();
 }
