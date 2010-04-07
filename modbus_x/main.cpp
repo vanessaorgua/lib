@@ -8,7 +8,8 @@ int main(int argc, char *argv[])
     // QCoreApplication a(argc, argv);
     RxModbus r;
 
-    r.loadList(":/text/test_map.txt");
+    r.loadList(":/text/list.txt");
 
+        exit(0);
     //return a.exec();
 }

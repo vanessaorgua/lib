@@ -75,7 +75,15 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
 
 void RxModbus::slotSend()
 {
-
+    for(int i=0;i<query_list.size();++i)
+    {
+        if(1>local_read[i])
+        {
+            pS->write(query_list[i]);
+            local_read[i]=query_read[i];
+        }
+        local_read[i]--;
+    }
 }
 
 
@@ -94,8 +102,9 @@ int RxModbus::loadList(QString fileName)
     QString s;
     QStringList sl;
     int wc=0 ; // лічильник слів
-    qint16 next_addr=0,start_addr=0,current_addr; //адреси
-    qint16 current_len; // поточна довжина
+    qint16 next_addr=0,current_addr=0; //адреси
+    qint16 current_len=0,packet_len=0; // поточна довжина
+    qint8 current_rf=0,last_rf=0; // прапори читання
 
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
@@ -104,46 +113,85 @@ int RxModbus::loadList(QString fileName)
 
     qDebug() << "file " << fileName;
 
-    qry << qint16(0) << qint16(0) << qint16(0) << qint8(1) <<  qint8(4) ;
-
+        // очистити все на випадок повторного завантаження
+        tag_name.clear();
+        tag_index.clear();
+        tag_read.clear();
+        tag_history.clear();
+        query_list.clear();
+        query_read.clear();
+        local_read.clear();
 
     if(f.open(QIODevice::ReadOnly))
     {
         for(i=0;!f.atEnd();++i)
         {
-            s=QString::fromUtf8(f.readLine()).trimmed();
-            sl= s.split("\t");
+            s=QString::fromUtf8(f.readLine()).trimmed(); //читати
+            sl= s.split("\t"); // розбити на поля
             if(sl.size()>4) // якщо є всі поля
             {
-                tag_name << sl[0];
-                tag_index << current_addr=sl[1].toInt(); // тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
-                tag_history << sl[3].toInt();
-                tag_read << sl[4].toInt();
+                tag_name << sl[0]; // назва тега
+                current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
+                tag_index << current_addr ; // зберегти
+                tag_history << sl[4].toInt(); // прапори
+                current_rf=sl[3].toInt();
+                tag_read << current_rf ;
                 // розпізнати типи даних
                 if(sl[2]=="Integer" || sl[2]=="Bool" )
                 {
                     ++wc;
-                    tag_len << current_len=1;
+                    current_len=1;
+                    tag_len << current_len;
                 }
                 else if (sl[2]=="Real" || sl[2]=="Timer" || sl[2]=="Long" )
                 {
                     wc+=2;
-                    tag_len << current_len=2;
+                    current_len=2;
+                    tag_len << current_len;
                 }
                 else // невідомий тип даних
                 {
                     qDebug() << tr("Unknown data type");
                     ::exit(1);
                 }
+                packet_len+=current_len;
+
+                if(packet_len>124 || current_addr>next_addr || current_rf!=last_rf) //виявити дірки, межі пакунків, кратність читання.
+                {
+                    if(query.size()) // якщо щось є,
+                    {
+                        query_list <<  query; // зберегти
+                        //qDebug() << query;
+                    }
+
+                    // підготуватися до нового запиту
+                    qry.device()->seek(0);
+                    query.clear();
+                    // сформувати заголовок
+                    packet_len=current_len;
+                    qry << qint16(0) << qint16(0) << qint16(6) << qint8(1) <<  qint8(3) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
+                                                                                          //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
+                    query_read << current_rf; //прапор read на пакунок
+                    local_read << 0;
+                }
+                else // в іншому разі поновити дані про довжину.
+                {
+                    qry.device()->seek(query.size()-2);
+                }
+                qry << packet_len; //додати довжину пакунка
+                next_addr=current_addr+current_len; // розрахувати новий наступний очікуваний адрес
+                last_rf=current_rf;
 
             }
-
         }
-        qDebug() << tag_name;
-        qDebug() << tag_index;
-        qDebug() << tag_len;
-        qDebug() << wc;
 
+        if(query.size()) // зберегти останній запит.
+        {
+            query_list << query;
+            query_read << current_rf;
+        }
+        qDebug() << query_list.size();
+        data_raw.fill(wc); // ініціалізувати пам’ять під змінні
         f.close();
         return i;
     }

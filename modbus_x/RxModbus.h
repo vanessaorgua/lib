@@ -47,10 +47,11 @@ private:
     QVector<qint8> tag_len;         // довжина поля в словах
     QVector<qint8> tag_history;     // прапор "запис в історію"
     QVector<qint8> tag_read;        // прапор "завжди читати"
-    QVector<qint16> data;            // сирі дані із PLC
+    QVector<qint16> data_raw;            // сирі дані із PLC
 
     // Список запитів
-    QList<QByteArray> query_list;
+    QVector<QByteArray> query_list;
+    QVector<qint8> query_read,local_read;
 
 };
 

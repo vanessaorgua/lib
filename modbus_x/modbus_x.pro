@@ -16,5 +16,6 @@ UI_DIR = build
 RCC_DIR = build
 OTHER_FILES += ../../8=>28FO/$V;LB@8/text/tag_map.txt \
     ../../Linovitsa/filters/text/tag_list.txt \
-    test_map.txt
+    test_map.txt \
+    list.txt
 RESOURCES += test.qrc
