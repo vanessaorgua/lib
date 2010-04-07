@@ -43,13 +43,14 @@ private:
 
     // Сховище даних. можливо треба буде переробляти
     QStringList tag_name;            // назва змінної
-    QVector<qint32> tag_index;       // індекс в контролері
-    QVector<qint32> tag_len;         // довжина поля в словах
-    QVector<qint32> tag_history;     // прапор "запис в історію"
-    QVector<qint32> tag_read;        // прапор "завжди читати"
+    QVector<qint16> tag_index;       // індекс в контролері
+    QVector<qint8> tag_len;         // довжина поля в словах
+    QVector<qint8> tag_history;     // прапор "запис в історію"
+    QVector<qint8> tag_read;        // прапор "завжди читати"
     QVector<qint16> data;            // сирі дані із PLC
 
-
+    // Список запитів
+    QList<QByteArray> query_list;
 
 };
 
