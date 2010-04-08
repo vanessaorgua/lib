@@ -2,8 +2,11 @@
 
 #include <QString>
 #include <QTimer>
+#include <QtAlgorithms>
 
 #define GETHR 3
+#define PUTHR 16
+
 
 RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, треба уточнити
 {
@@ -76,8 +79,12 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
 }
 
 
+// виявилося що не получається виконувавти асинхронні запити до контролера I-8000, це не дуже добре.
+
 void RxModbus::slotSend()
 {
+#ifdef ASYNC
+
     if(1>local_read[0])
    {
       pS->write(query_list[0]);
@@ -85,6 +92,18 @@ void RxModbus::slotSend()
    }
    local_read[0]--;
     nC=1;
+#else
+    // асинхронне виконання
+    for(int i=0;i<query_list.size();++i)
+    {
+        if(1>local_read[i])
+        {
+            pS->write(query_list[i]);
+            local_read[i]=query_read[i];
+        }
+        local_read[i]--;
+    }
+#endif
 }
 
 
@@ -131,23 +150,26 @@ void RxModbus::slotRead()
                 }
 
                 break;
+            case PUTHR:
             default: // якщо якась неочікувана функція то просто очистити весь буфер
                 qDebug() << "Uncnown fc" << fc;
                 for(int i=2;i<nLen;++i)
                     in >>bc;
         }
-
+#ifdef ASYNC
         // відправити наступний запит
-        if(nC<query_list.size())
-        {
-           if(1>local_read[nC])
-            {
-                 pS->write(query_list[nC]);
-                 local_read[nC]=query_read[nC];
-            }
+
+        // тут треба попрацювати
+        for(;1>local_read[nC] && nC<query_list.size();++nC)
             local_read[nC]--;
-            nC++;
+        pS->write(query_list[nC]);
+        local_read[nC]=query_read[nC];
+
+        if(!query_queue.isEmpty()) // перевірити чергу
+        {
+            pS->write(query_queue.dequeue()); // якщо не пуста, передати
         }
+#endif
         qDebug() << "Packet #" <<nC << "Returned bytes:"<< nLen;
         qDebug() << data_raw;
         qDebug() ;
@@ -178,10 +200,8 @@ int RxModbus::loadList(QString fileName)
     qDebug() << "file " << fileName;
 
         // очистити все на випадок повторного завантаження
-        tag_name.clear();
-        tag_index.clear();
-        tag_read.clear();
-        tag_history.clear();
+        tags.clear();
+
         query_list.clear();
         query_read.clear();
         local_read.clear();
@@ -194,13 +214,11 @@ int RxModbus::loadList(QString fileName)
             sl= s.split("\t"); // розбити на поля
             if(sl.size()>4) // якщо є всі поля
             {
-                tag_name << sl[0]; // назва тега
+                s= sl[0]; // назва тега
                 current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
-                tag_address << current_addr ; // зберегти
-                tag_history << sl[4].toInt(); // прапори
+                tags[s] << wc             // index
+                        << current_addr ; // address
                 current_rf=sl[3].toInt();
-                tag_read << current_rf ;
-                tag_index << wc; // індекс змінної в масиві
                 wc_last=wc; // це потрібно для правильного формування поля id транзакції яке містить зміщення індексу в масиві даних
                 // метод не зовсім стандартний, на інших контролерах може і не буде працювати
                 // розпізнати типи даних
@@ -208,19 +226,21 @@ int RxModbus::loadList(QString fileName)
                 {
                     ++wc;
                     current_len=1;
-                    tag_len << current_len;
                 }
                 else if (sl[2]=="Real" || sl[2]=="Timer" || sl[2]=="Long" )
                 {
                     wc+=2;
                     current_len=2;
-                    tag_len << current_len;
                 }
                 else // невідомий тип даних
                 {
                     qDebug() << tr("Unknown data type");
                     ::exit(1);
                 }
+                tags[s] << current_len   // довжина
+                        << current_rf   //
+                        << sl[4].toInt(); // прапори
+
                 packet_len+=current_len;
 
                 if(packet_len>124 || current_addr>next_addr || current_rf!=last_rf) //виявити дірки, межі пакунків, кратність читання.
@@ -259,7 +279,7 @@ int RxModbus::loadList(QString fileName)
         }
         qDebug() << query_list.size();
         qDebug() << wc;
-        data_raw.fill(0,wc); // ініціалізувати пам’ять під змінні
+        data_raw.resize(wc); // ініціалізувати пам’ять під змінні
         qDebug() << data_raw;
 
         f.close();
@@ -287,3 +307,40 @@ void RxModbus::start()
     // тут би треба зробити якісь додаткові перевірки
     pS->connectToHost(sHostname,nPort);
 }
+
+void RxModbus::sendValue(QString tag,qint16 v)
+{
+
+}
+
+void RxModbus::sendValue(QString tag,double v)
+{
+}
+
+void RxModbus::sendValue(QString tag,QVector<qint16> v)
+{
+   QByteArray q;
+   QDataStream qry(&q,QIODevice::WriteOnly);
+
+   qry.setByteOrder(QDataStream::BigEndian);
+
+   if(tags.contains(tag) ) // перевірити наявність заданого тега
+   {
+        qry << qint16(0) << qint16(0) << qint16(qint16((v.size()<<1)+7))  // TCP заголовок
+           << qint8(1) << qint8(PUTHR)               // модбас заголовок
+           << qint16(tags[tag][1]-1)             // адреса даних
+           << qint16(v.size())                     // довжина даних
+           << qint8(v.size()<< 1);                 // кількість байт
+        int x=tags[tag][0];
+        foreach(qint16 t,v)
+        {
+             qry << t; // завантажити дані
+             data_raw[x++]=t; // записати в буфер
+        }
+#ifdef ASYNC
+        query_queue.enqueue(q); // поставити в чергу на відправку в контролер
+#endif
+    }
+}
+
+

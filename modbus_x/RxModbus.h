@@ -7,6 +7,8 @@
 #include <QObject>
 #include <QtNetwork>
 
+#define  ASYNC
+
 class QString;
 class QTimer;
 
@@ -21,7 +23,10 @@ public:
         void setHostName(QString hostName);
         void setPort(int Port);
         void start();
-
+public slots:
+            void sendValue(QString tag,qint16 v);
+            void sendValue(QString tag,double v);
+            void sendValue(QString tag,QVector<qint16> v);
 private slots:
     void slotConnected (); // приєдналися
     void slotNewConnect();
@@ -45,17 +50,22 @@ private:
 
 
     // Сховище даних. можливо треба буде переробляти
-    QStringList tag_name;            // назва змінної
-    QVector<int> tag_index;       // індекс в масиві
-    QVector<qint16> tag_address;  // адреса змінної в контролері
-    QVector<qint8> tag_len;         // довжина поля в словах
-    QVector<qint8> tag_history;     // прапор "запис в історію"
-    QVector<qint8> tag_read;        // прапор "завжди читати"
+    QHash<QString,QVector<qint16> > tags; // таблиця тегів
+    //QStringList tag_name;            // назва змінної
+    //QVector<int> tag_index;       // індекс в масиві
+    //QVector<qint16> tag_address;  // адреса змінної в контролері
+    //QVector<qint8> tag_len;         // довжина поля в словах
+    //QVector<qint8> tag_history;     // прапор "запис в історію"
+    //QVector<qint8> tag_read;        // прапор "завжди читати"
     QVector<qint16> data_raw;            // сирі дані із PLC
 
     // Список запитів
     QVector<QByteArray> query_list;
     QVector<qint8> query_read,local_read;
+
+#ifdef ASYNC
+    QQueue<QByteArray> query_queue; // черга на відправку даних в контролер
+#endif
 
     int nC;
     qint16 Index;
