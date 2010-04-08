@@ -18,6 +18,9 @@ public:
         ~RxModbus(); // поки-що тривіальний деструктор
 
         int loadList(QString fileName);
+        void setHostName(QString hostName);
+        void setPort(int Port);
+        void start();
 
 private slots:
     void slotConnected (); // приєдналися
@@ -43,7 +46,8 @@ private:
 
     // Сховище даних. можливо треба буде переробляти
     QStringList tag_name;            // назва змінної
-    QVector<qint16> tag_index;       // індекс в контролері
+    QVector<int> tag_index;       // індекс в масиві
+    QVector<qint16> tag_address;  // адреса змінної в контролері
     QVector<qint8> tag_len;         // довжина поля в словах
     QVector<qint8> tag_history;     // прапор "запис в історію"
     QVector<qint8> tag_read;        // прапор "завжди читати"
@@ -52,6 +56,9 @@ private:
     // Список запитів
     QVector<QByteArray> query_list;
     QVector<qint8> query_read,local_read;
+
+    int nC;
+    qint16 Index;
 
 };
 

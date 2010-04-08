@@ -1,6 +1,7 @@
-Tag_1	10	Bool	1	1
-Tag_2	11	Integer	1	1
-Tag_3	12	Real	1	1
-Tag_4	14	Long	1	1
-Tag_5	16	Timer	1	1
-Tag_6	20	Integer	1	1
+Cl_5_1	54	Bool	1	1
+Cl_5_2	55	Bool	1	1
+Cl_5_3	56	Bool	1	1
+Vl_5_1	78	Bool	1	1
+Vl_5_2	79	Bool	1	1
+Vl_5_3	80	Bool	1	1
+Vl_6_1	81	Bool	1	1

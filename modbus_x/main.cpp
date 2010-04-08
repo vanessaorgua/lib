@@ -5,11 +5,17 @@
 
 int main(int argc, char *argv[])
 {
-    // QCoreApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
     RxModbus r;
 
-    r.loadList(":/text/list.txt");
+    r.loadList(":/text/test_map.txt");
+    r.setHostName("192.168.1.51");
+    r.setPort(502);
 
-        exit(0);
-    //return a.exec();
+    r.start();
+
+
+
+
+    return a.exec();
 }

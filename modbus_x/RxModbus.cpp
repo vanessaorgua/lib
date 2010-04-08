@@ -3,8 +3,9 @@
 #include <QString>
 #include <QTimer>
 
+#define GETHR 3
 
-RxModbus::RxModbus(): QObject(),nPort(502) // кноструктор, треба уточнити
+RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, треба уточнити
 {
 
     // теймер для періодичної відправки запитів
@@ -27,7 +28,6 @@ RxModbus::RxModbus(): QObject(),nPort(502) // кноструктор, треба
     connect(pS,SIGNAL(readyRead()),this,SLOT(slotRead()));
     connect(pS,SIGNAL(disconnected()),this,SLOT(slotDisconnect()));
 
-    pS->connectToHost(sHostname,nPort);
     // десь тут ще потрібно сформувати пакунок на запити
 }
 
@@ -41,7 +41,9 @@ void RxModbus::slotConnected () // приєдналися
     connSend->start();
     connTimeout->start();
     nLen=0;
-    pS->write("");
+    qDebug() <<  "Connected to host";
+    slotSend(); // розпочати обмін
+    nC=0;
 }
 
 void RxModbus::slotNewConnect()
@@ -70,26 +72,88 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
     connTimeout->stop();
     connWait->start();
     pS->close();
+    qDebug() << "Connection error";
 }
 
 
 void RxModbus::slotSend()
 {
-    for(int i=0;i<query_list.size();++i)
-    {
-        if(1>local_read[i])
-        {
-            pS->write(query_list[i]);
-            local_read[i]=query_read[i];
-        }
-        local_read[i]--;
-    }
+    if(1>local_read[0])
+   {
+      pS->write(query_list[0]);
+      local_read[0]=query_read[0];
+   }
+   local_read[0]--;
+    nC=1;
 }
 
 
 void RxModbus::slotRead()
 {
+    QDataStream in(pS);
+    in.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
+    qint16 v16; // змінна для різних потреб
+    qint8  as,fc,bc;
 
+    for(;;)
+    {
+        if(nLen==0) // читати заголовок
+        {
+            if(pS->bytesAvailable()<6) // якщо тут мало байт
+            {
+                break;
+            }
+            in >> Index; // id транзакції воно ж зміщення індекса в масиві даних
+            in >> v16; // id протоколу
+            in >> v16; // довжина пакунка
+            nLen=v16;
+        }
+        if(pS->bytesAvailable()<nLen)
+        {
+            break;
+        }
+
+        // отримано весь пакунок, розібрати на частини
+        in >> as; // адреса ведомого
+        in >> fc; // код функції
+        qDebug() << "Index" << Index;
+        switch(fc)
+        {
+            case GETHR:
+                in >> bc; // прочитати кількість байт
+                bc >>= 1; // розрахувати кількість слів
+                qDebug() << "bc" << bc;
+
+                for(int i=0;i<bc;++i) // в циклі
+                {
+                        in >> v16; // прочитати слова
+                        data_raw[Index+i]=v16; // та записати в масив даних
+                }
+
+                break;
+            default: // якщо якась неочікувана функція то просто очистити весь буфер
+                qDebug() << "Uncnown fc" << fc;
+                for(int i=2;i<nLen;++i)
+                    in >>bc;
+        }
+
+        // відправити наступний запит
+        if(nC<query_list.size())
+        {
+           if(1>local_read[nC])
+            {
+                 pS->write(query_list[nC]);
+                 local_read[nC]=query_read[nC];
+            }
+            local_read[nC]--;
+            nC++;
+        }
+        qDebug() << "Packet #" <<nC << "Returned bytes:"<< nLen;
+        qDebug() << data_raw;
+        qDebug() ;
+
+        nLen=0;
+    }
     connTimeout->stop();
     connTimeout->start();
 }
@@ -101,7 +165,7 @@ int RxModbus::loadList(QString fileName)
     int i;
     QString s;
     QStringList sl;
-    int wc=0 ; // лічильник слів
+    int wc=0, wc_last=0; // лічильник слів
     qint16 next_addr=0,current_addr=0; //адреси
     qint16 current_len=0,packet_len=0; // поточна довжина
     qint8 current_rf=0,last_rf=0; // прапори читання
@@ -132,10 +196,13 @@ int RxModbus::loadList(QString fileName)
             {
                 tag_name << sl[0]; // назва тега
                 current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
-                tag_index << current_addr ; // зберегти
+                tag_address << current_addr ; // зберегти
                 tag_history << sl[4].toInt(); // прапори
                 current_rf=sl[3].toInt();
                 tag_read << current_rf ;
+                tag_index << wc; // індекс змінної в масиві
+                wc_last=wc; // це потрібно для правильного формування поля id транзакції яке містить зміщення індексу в масиві даних
+                // метод не зовсім стандартний, на інших контролерах може і не буде працювати
                 // розпізнати типи даних
                 if(sl[2]=="Integer" || sl[2]=="Bool" )
                 {
@@ -169,7 +236,7 @@ int RxModbus::loadList(QString fileName)
                     query.clear();
                     // сформувати заголовок
                     packet_len=current_len;
-                    qry << qint16(0) << qint16(0) << qint16(6) << qint8(1) <<  qint8(3) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
+                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(GETHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
                                                                                           //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
                     query_read << current_rf; //прапор read на пакунок
                     local_read << 0;
@@ -191,7 +258,10 @@ int RxModbus::loadList(QString fileName)
             query_read << current_rf;
         }
         qDebug() << query_list.size();
-        data_raw.fill(wc); // ініціалізувати пам’ять під змінні
+        qDebug() << wc;
+        data_raw.fill(0,wc); // ініціалізувати пам’ять під змінні
+        qDebug() << data_raw;
+
         f.close();
         return i;
     }
@@ -200,4 +270,20 @@ int RxModbus::loadList(QString fileName)
         return 0;
     }
 
+}
+
+void RxModbus::setHostName(QString hostName)
+{
+    sHostname=hostName;
+}
+
+void RxModbus::setPort(int Port)
+{
+    nPort=Port;
+}
+
+void RxModbus::start()
+{
+    // тут би треба зробити якісь додаткові перевірки
+    pS->connectToHost(sHostname,nPort);
 }
