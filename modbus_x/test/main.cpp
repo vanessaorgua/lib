@@ -1,6 +1,6 @@
 #include <QtCore/QCoreApplication>
 
-#include <RxModbus.h>
+#include "RxModbus.h"
 
 
 int main(int argc, char *argv[])
