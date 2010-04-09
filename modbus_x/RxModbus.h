@@ -61,7 +61,7 @@ private:
 
     // Список запитів
     QVector<QByteArray> query_list;
-    QVector<qint8> query_read,local_read;
+    QVector<qint16> query_read,local_read;
 
 #ifdef ASYNC
     QQueue<QByteArray> query_queue; // черга на відправку даних в контролер

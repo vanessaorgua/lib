@@ -13,7 +13,7 @@ RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, т�
 
     // теймер для періодичної відправки запитів
     connSend=new QTimer(this);
-    connSend->setInterval(1000);
+    connSend->setInterval(2000);
     connect(connSend,SIGNAL(timeout()),this,SLOT(slotSend()));
     // теймер паузи між спробами встановити нове з’єднання
     connWait=new QTimer(this);
@@ -84,20 +84,22 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
 void RxModbus::slotSend()
 {
 #ifdef ASYNC
-
+    qDebug() << "Start -------------------------------------------------------------------------------";
     if(1>local_read[0])
    {
       pS->write(query_list[0]);
       local_read[0]=query_read[0];
    }
    local_read[0]--;
-    nC=1;
+   nC=0;
 #else
     // асинхронне виконання
-    for(int i=0;i<query_list.size();++i)
+    qDebug() << "slotSend";
+    for(int i=1;i<query_list.size();++i)
     {
         if(1>local_read[i])
         {
+            qDebug() << i;
             pS->write(query_list[i]);
             local_read[i]=query_read[i];
         }
@@ -110,9 +112,11 @@ void RxModbus::slotSend()
 void RxModbus::slotRead()
 {
     QDataStream in(pS);
+    qint16 v16;
+    qint8  as,fc;
+    quint8 bc;
+
     in.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
-    qint16 v16; // змінна для різних потреб
-    qint8  as,fc,bc;
 
     for(;;)
     {
@@ -135,7 +139,7 @@ void RxModbus::slotRead()
         // отримано весь пакунок, розібрати на частини
         in >> as; // адреса ведомого
         in >> fc; // код функції
-        qDebug() << "Index" << Index;
+        qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
             case GETHR:
@@ -156,23 +160,32 @@ void RxModbus::slotRead()
                 for(int i=2;i<nLen;++i)
                     in >>bc;
         }
+
 #ifdef ASYNC
+      qDebug() << "nC " << nC << "local_read "<< local_read[nC];
         // відправити наступний запит
-
-        // тут треба попрацювати
-        for(;1>local_read[nC] && nC<query_list.size();++nC)
-            local_read[nC]--;
-        pS->write(query_list[nC]);
-        local_read[nC]=query_read[nC];
-
-        if(!query_queue.isEmpty()) // перевірити чергу
+        if(nC< query_list.size())
         {
+            ++nC;
+            while(nC<query_list.size())
+            {
+                local_read[nC]--;
+                if(1>local_read[nC])
+                {
+                    pS->write(query_list[nC]);
+                    local_read[nC]=query_read[nC];
+                    break;
+                }
+                ++nC;
+            }
+        }
+        else if(!query_queue.isEmpty()) // перевірити чергу
+        {
+            qDebug() << data_raw;
             pS->write(query_queue.dequeue()); // якщо не пуста, передати
         }
+
 #endif
-        qDebug() << "Packet #" <<nC << "Returned bytes:"<< nLen;
-        qDebug() << data_raw;
-        qDebug() ;
 
         nLen=0;
     }
@@ -190,7 +203,7 @@ int RxModbus::loadList(QString fileName)
     int wc=0, wc_last=0; // лічильник слів
     qint16 next_addr=0,current_addr=0; //адреси
     qint16 current_len=0,packet_len=0; // поточна довжина
-    qint8 current_rf=0,last_rf=0; // прапори читання
+    qint16 current_rf=0,last_rf=0; // прапори читання
 
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
@@ -277,10 +290,7 @@ int RxModbus::loadList(QString fileName)
             query_list << query;
             query_read << current_rf;
         }
-        qDebug() << query_list.size();
-        qDebug() << wc;
         data_raw.resize(wc); // ініціалізувати пам’ять під змінні
-        qDebug() << data_raw;
 
         f.close();
         return i;
