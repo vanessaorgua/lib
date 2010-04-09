@@ -23,10 +23,20 @@ public:
         void setHostName(QString hostName);
         void setPort(int Port);
         void start();
+
+        // методи доступу до даних
+        inline int getIndex(QString tag)
+        {
+            return tags[tag][0];
+        }
+
+
 public slots:
             void sendValue(QString tag,qint16 v);
             void sendValue(QString tag,double v);
             void sendValue(QString tag,QVector<qint16> v);
+
+
 private slots:
     void slotConnected (); // приєдналися
     void slotNewConnect();
