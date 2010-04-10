@@ -25,16 +25,16 @@ public:
         void start();
 
         // методи доступу до даних
-        inline int getIndex(QString tag)
-        {
-            return tags[tag][0];
-        }
-
+        inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }
+        inline qint16 getIndex(QString tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
+        inline qint16 getAddress(QString tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
+        inline const QVector<qint16> &getDataRaw() {return data_raw;}
 
 public slots:
             void sendValue(QString tag,qint16 v);
+            void sendValue(QString tag,qint32 v);
             void sendValue(QString tag,double v);
-            void sendValue(QString tag,QVector<qint16> v);
+            void sendValue(QString tag,QVector<qint16> &v);
 
 
 private slots:

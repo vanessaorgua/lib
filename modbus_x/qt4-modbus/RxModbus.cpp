@@ -4,8 +4,9 @@
 #include <QTimer>
 #include <QtAlgorithms>
 
-#define GETHR 3
-#define PUTHR 16
+#define GETMHR 3
+#define PUTSHR 6
+#define PUTMHR 16
 
 
 RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, треба уточнити
@@ -142,7 +143,7 @@ void RxModbus::slotRead()
         qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
-            case GETHR:
+            case GETMHR:
                 in >> bc; // прочитати кількість байт
                 bc >>= 1; // розрахувати кількість слів
                 qDebug() << "bc" << bc;
@@ -154,7 +155,8 @@ void RxModbus::slotRead()
                 }
 
                 break;
-            case PUTHR:
+            case PUTSHR:
+            case PUTMHR:
             default: // якщо якась неочікувана функція то просто очистити весь буфер
                 qDebug() << "Uncnown fc" << fc;
                 for(int i=2;i<nLen;++i)
@@ -269,7 +271,7 @@ int RxModbus::loadList(QString fileName)
                     query.clear();
                     // сформувати заголовок
                     packet_len=current_len;
-                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(GETHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
+                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(GETMHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
                                                                                           //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
                     query_read << current_rf; //прапор read на пакунок
                     local_read << 0;
@@ -320,14 +322,40 @@ void RxModbus::start()
 
 void RxModbus::sendValue(QString tag,qint16 v)
 {
+   QByteArray q;
+   QDataStream qry(&q,QIODevice::WriteOnly);
 
+   qry.setByteOrder(QDataStream::BigEndian);
+
+   if(tags.contains(tag) ) // перевірити наявність заданого тега
+   {
+        qry << qint16(0) << qint16(0) << qint16(6)  // TCP заголовок
+           << qint8(1) << qint8(PUTSHR)             // модбас заголовок
+           << qint16(tags[tag][1]-1)                // адреса даних
+           << v;                            // самі дані
+        data_raw[tags[tag][0]]=v; // записати в буфер
+#ifdef ASYNC
+        query_queue.enqueue(q); // поставити в чергу на відправку в контролер
+#endif
+    }
 }
+
+void RxModbus::sendValue(QString tag,qint32 v)
+{
+    QVector<qint16> t(2);
+    *((qint32*)t.data())=v;
+    sendValue(tag,t);
+}
+
 
 void RxModbus::sendValue(QString tag,double v)
 {
+    QVector<qint16> t(2);
+    *((float*)t.data())=(float)v;
+    sendValue(tag,t);
 }
 
-void RxModbus::sendValue(QString tag,QVector<qint16> v)
+void RxModbus::sendValue(QString tag,QVector<qint16> &v)
 {
    QByteArray q;
    QDataStream qry(&q,QIODevice::WriteOnly);
@@ -336,8 +364,8 @@ void RxModbus::sendValue(QString tag,QVector<qint16> v)
 
    if(tags.contains(tag) ) // перевірити наявність заданого тега
    {
-        qry << qint16(0) << qint16(0) << qint16(qint16((v.size()<<1)+7))  // TCP заголовок
-           << qint8(1) << qint8(PUTHR)               // модбас заголовок
+        qry << qint16(0) << qint16(0) << qint16((v.size()<<1)+7)  // TCP заголовок
+           << qint8(1) << qint8(PUTMHR)               // модбас заголовок
            << qint16(tags[tag][1]-1)             // адреса даних
            << qint16(v.size())                     // довжина даних
            << qint8(v.size()<< 1);                 // кількість байт
