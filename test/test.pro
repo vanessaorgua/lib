@@ -19,6 +19,6 @@ FORMS += form.ui
 
 QMAKE_LIBDIR    += ../
 
-LIBS            += -lqt4-modbus
+LIBS            += -lrcada
 
-INCLUDEPATH += ../qt4-modbus
+INCLUDEPATH += ../modbus

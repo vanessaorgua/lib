@@ -6,9 +6,10 @@ QT -= gui
 TARGET = rcada
 TEMPLATE = lib
 CONFIG += staticlib
-SOURCES += modbus/RxModbus.cpp
-HEADERS += modbus/RxModbus.h
-
+SOURCES += modbus/RxModbus.cpp \
+    logging/logging.cpp
+HEADERS += modbus/RxModbus.h \
+    logging/logging.h
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
