@@ -15,6 +15,7 @@ public:
     ~Form();
 private slots:
     void sendData();
+    void slotUpdate();
 
 private:
     RxModbus *s;

@@ -8,10 +8,8 @@ Form::Form(RxModbus *src,QWidget *parent) :
 {
     setupUi(this);
     connect(bn_Send,SIGNAL(clicked()),this,SLOT(sendData()));
-    sb_Nc_zd->setValue(s->getDataRaw()[s->getIndex("Nc_zd")]);
-
-    QString str="%1";
-    le_Tper_zd->setText(str.arg((double)(*(qint32*)(s->getDataRaw().data()+s->getIndex("Tper_zd")))/1000.0));
+    connect(bn_Update,SIGNAL(clicked()),this,SLOT(slotUpdate()));
+    slotUpdate();
 
 }
 
@@ -26,3 +24,11 @@ void Form::sendData()
 }
 
 
+void Form::slotUpdate()
+{
+    sb_Nc_zd->setValue(s->getDataRaw()[s->getIndex("Nc_zd")]);
+
+    QString str="%1";
+    le_Tper_zd->setText(str.arg((double)(*(qint32*)(s->getDataRaw().data()+s->getIndex("Tper_zd")))/1000.0));
+
+}

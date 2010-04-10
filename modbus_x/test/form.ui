@@ -59,6 +59,19 @@
     <string>Exit</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="bn_Update">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>50</y>
+     <width>105</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Update</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>
