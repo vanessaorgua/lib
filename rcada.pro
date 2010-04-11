@@ -1,8 +1,10 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-04-09T20:54:08
 # -------------------------------------------------
-QT += network
-QT -= gui
+QT += network \
+    sql
+
+# QT -= gui
 TARGET = rcada
 TEMPLATE = lib
 CONFIG += staticlib

@@ -210,6 +210,9 @@ int RxModbus::loadList(QString fileName)
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
 
+    QSet<QString> ft;
+    ft << "Integer" << "Bool" << "Real" << "Timer" << "Long";
+
     qry.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
 
     qDebug() << "file " << fileName;
@@ -231,11 +234,12 @@ int RxModbus::loadList(QString fileName)
             {
                 s= sl[0]; // назва тега
                 current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
-                tags[s] << wc             // index
-                        << current_addr ; // address
+                tags[s] << wc             // 0-index
+                        << current_addr ; // 1- address
                 current_rf=sl[3].toInt();
                 wc_last=wc; // це потрібно для правильного формування поля id транзакції яке містить зміщення індексу в масиві даних
-                // метод не зовсім стандартний, на інших контролерах може і не буде працювати
+                            // метод не зовсім стандартний, на інших контролерах може і не буде працювати
+
                 // розпізнати типи даних
                 if(sl[2]=="Integer" || sl[2]=="Bool" )
                 {
@@ -252,9 +256,10 @@ int RxModbus::loadList(QString fileName)
                     qDebug() << tr("Unknown data type");
                     ::exit(1);
                 }
-                tags[s] << current_len   // довжина
-                        << current_rf   //
-                        << sl[4].toInt(); // прапори
+
+                tags[s] << std::distance( ft.begin() ,ft.find(sl[2]))   // 2-довжина !!! це місце треба перевірити
+                        << current_rf   // 3-кратність читання
+                        << sl[4].toInt(); // 4-прапори запису історії
 
                 packet_len+=current_len;
 
