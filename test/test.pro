@@ -1,7 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2010-02-25T14:01:57
 # -------------------------------------------------
-QT += network
+QT += network sql
 TARGET = test
 CONFIG -= app_bundle
 TEMPLATE = app

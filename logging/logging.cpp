@@ -10,17 +10,17 @@ Logging::Logging(QVector<RxModbus*> src): s(src)
     QSettings set;
 
     dbs.setHostName(set.value("/db/host","localhost").toString());
-    dbs.setDatabaseName(set.value("/db/db","vipgr").toString());
+    dbs.setDatabaseName(set.value("/db/db","test").toString());
     dbs.setUserName(set.value("/db/username","scada").toString());
     dbs.setPassword(set.value("/db/passwd","").toString());
     dbs.open(); // спробувати відкрити
 
     QTimer *tmr=new QTimer(this);
     connect(tmr,SIGNAL(timeout()),this,SLOT(dbStore()));
-    tmr->setInterval(60000);
+    tmr->setInterval(5000);
     tmr->start();
 
-    startTimer(5000); // збиради дані раз в п’ять секунд
+    startTimer(60000); // збиради дані раз в п’ять секунд
     foreach(RxModbus *v,s)
     {
         tags_list << v->getTags();
@@ -37,12 +37,14 @@ Logging::~Logging()
     QSqlDatabase::removeDatabase("logging");
 }
 
+
+// збирає дані
 void Logging::dbStore()
 {
     QString field,value;
     int i,j=0;
     QDateTime tm=QDateTime::currentDateTime();
-    QVector<qint16> data;
+    //QVector<qint16> data;
 
     // фрагмет із RxModbus.cpp для орієнтування по типах даних
     //QSet<QString> ft;
@@ -52,39 +54,42 @@ void Logging::dbStore()
     foreach( v ,tags_list) // перебрати всі джерела даних
     {
         i=0;
-        data=s[j]->getDataRaw();
+        //data=s[j]->getDataRaw();
         field="Dt";
-        value=QString("\"%1\"").arg(tm.toTime_t());
+        value=QString("\'%1\'").arg(tm.toTime_t());
 
         foreach(QString tag, v.keys()) // перебрати всі теги
         {
             if(v[tag][4]) // якщо цей тег пишеться в історію
             {
-                field+=(","+tag);
+                field+=(" ,"+tag);
                 switch(v[tag][2]) // тип даних
                 {
                     default:
                     case 0: // Integer
-                        value+=QString(",\"%1\"").arg(data[s[j]->getIndex(tag)]);
+                        value+=QString(" ,\'%1\'").arg(s[j]->getValue16(tag));
                         break;
                     case 1: // Bool
+                        value+=QString(" ,\'%1\'").arg(s[j]->getValue16(tag)?1:0);
                         break;
                     case 2: // Real
+                        value+=QString(" ,\'%1\'").arg(s[j]->getValueFloat(tag),5,'f',0);
                         break;
                     case 3: // Timer
-                        break;
                     case 4: // Long
+                        value+=QString(" ,\'%1\'").arg(s[j]->getValue32(tag));
                         break;
                 }
             }
         }
-
+        //qDebug() <<  QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
+        log << QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
         ++j;
     }
 
 }
 
-
+// скидає зібрані дані в базу
 void Logging::timerEvent (QTimerEvent *)
 {
     int i=0;
