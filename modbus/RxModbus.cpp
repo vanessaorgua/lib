@@ -14,7 +14,7 @@ RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, т�
 
     // теймер для періодичної відправки запитів
     connSend=new QTimer(this);
-    connSend->setInterval(2000);
+    connSend->setInterval(1000);
     connect(connSend,SIGNAL(timeout()),this,SLOT(slotSend()));
     // теймер паузи між спробами встановити нове з’єднання
     connWait=new QTimer(this);
@@ -43,9 +43,9 @@ RxModbus::~RxModbus() // поки-що тривіальний деструкто
 void RxModbus::slotConnected () // приєдналися
 {
     connSend->start();
-    //connTimeout->start();
+    connTimeout->start();
     nLen=0;
-    qDebug() <<  "Connected to host";
+    //qDebug() <<  "Connected to host";
     slotSend(); // розпочати обмін
     nC=0;
 }
@@ -76,7 +76,7 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
     connTimeout->stop();
     connWait->start();
     pS->close();
-    qDebug() << "Connection error";
+    //qDebug() << "Connection error";
 }
 
 
@@ -85,7 +85,7 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
 void RxModbus::slotSend()
 {
 #ifdef ASYNC
-    qDebug() << "Start -------------------------------------------------------------------------------";
+    //qDebug() << "Start -------------------------------------------------------------------------------";
     if(1>local_read[0])
    {
       pS->write(query_list[0]);
@@ -95,12 +95,12 @@ void RxModbus::slotSend()
    nC=0;
 #else
     // асинхронне виконання
-    qDebug() << "slotSend";
+    //qDebug() << "slotSend";
     for(int i=1;i<query_list.size();++i)
     {
         if(1>local_read[i])
         {
-            qDebug() << i;
+            //qDebug() << i;
             pS->write(query_list[i]);
             local_read[i]=query_read[i];
         }
@@ -140,13 +140,13 @@ void RxModbus::slotRead()
         // отримано весь пакунок, розібрати на частини
         in >> as; // адреса ведомого
         in >> fc; // код функції
-        qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
+        //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
             case GETMHR:
                 in >> bc; // прочитати кількість байт
                 bc >>= 1; // розрахувати кількість слів
-                qDebug() << "bc" << bc;
+                //qDebug() << "bc" << bc;
 
                 for(int i=0;i<bc;++i) // в циклі
                 {
@@ -157,6 +157,10 @@ void RxModbus::slotRead()
                 break;
             case PUTSHR:
             case PUTMHR:
+                //qDebug() << "Ok fc "<< fc << "nLen " << nLen;
+                for(int i=2;i<nLen;++i)
+                    in >>bc;
+                break;
             default: // якщо якась неочікувана функція то просто очистити весь буфер
                 qDebug() << "Uncnown fc" << fc;
                 for(int i=2;i<nLen;++i)
@@ -166,7 +170,6 @@ void RxModbus::slotRead()
 #ifdef ASYNC
       // qDebug() << "nC " << nC << "local_read "<< local_read[nC];
         // відправити наступний запит
-        qDebug() << nC << query_list.size();
         ++nC;
         while(nC<query_list.size())
             {
@@ -174,15 +177,14 @@ void RxModbus::slotRead()
                 if(1>local_read[nC])
                 {
                     pS->write(query_list[nC]);
-                    qDebug() << "Send query no " <<  nC;
                     local_read[nC]=query_read[nC];
                     break;
                 }
                 ++nC;
             }
-        if(query_list.size()==nC && !query_queue.isEmpty()) // перевірити чергу
+        if(!(query_list.size()>nC || query_queue.isEmpty())) // перевірити чергу при умові що інших запитів немає.
         {
-            qDebug() << "Queue size " << query_queue.size();
+            //qDebug() << "Queue size " << query_queue.size();
             pS->write(query_queue.dequeue()); // якщо не пуста, передати
         }
 
@@ -190,8 +192,8 @@ void RxModbus::slotRead()
 
         nLen=0;
     }
-//    connTimeout->stop();
-//    connTimeout->start();
+    connTimeout->stop();
+    connTimeout->start();
 }
 
 int RxModbus::loadList(QString fileName)
@@ -214,7 +216,7 @@ int RxModbus::loadList(QString fileName)
 
     qry.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
 
-    qDebug() << "file " << fileName;
+    //qDebug() << "file " << fileName;
 
         // очистити все на випадок повторного завантаження
         tags.clear();

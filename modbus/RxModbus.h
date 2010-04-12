@@ -28,7 +28,11 @@ public:
         inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }
         inline qint16 getIndex(QString tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
         inline qint16 getAddress(QString tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
+
         inline const QVector<qint16> &getDataRaw() {return data_raw;}
+        inline qint16 getValue16(QString tag) {return data_raw[tags[tag][0]];}
+        inline qint32 getValue32(QString tag) {return *(qint32*)(data_raw.data()+tags[tag][0]); }
+        inline float getValueFloat(QString tag) { return *(float*)(data_raw.data()+tags[tag][0]); }
 
 public slots:
             void sendValue(QString tag,qint16 v);
