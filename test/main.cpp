@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     RxModbus r;
 
     r.loadList(":/text/list.txt");
-    r.setHostName("rabitsa.org.ua");
+    r.setHostName("192.168.1.51");
     r.setPort(502);
 
     r.start();

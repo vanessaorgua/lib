@@ -13,7 +13,7 @@ OBJECTS_DIR = build
 UI_DIR = build
 RCC_DIR = build
 OTHER_FILES += test_map.txt \
-    list.txt
+    list.txt ../librcada.a
 RESOURCES += test.qrc
 FORMS += form.ui
 

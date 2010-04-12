@@ -19,6 +19,7 @@ Form::~Form()
 }
 void Form::sendData()
 {
+    qDebug() << "Form::sendData()" ;
     s->sendValue("Tper_zd",qint32(le_Tper_zd->text().toDouble()*1000.0));
     s->sendValue("Nc_zd",qint16(sb_Nc_zd->value()));
 }

@@ -43,7 +43,7 @@ RxModbus::~RxModbus() // поки-що тривіальний деструкто
 void RxModbus::slotConnected () // приєдналися
 {
     connSend->start();
-    connTimeout->start();
+    //connTimeout->start();
     nLen=0;
     qDebug() <<  "Connected to host";
     slotSend(); // розпочати обмін
@@ -164,26 +164,25 @@ void RxModbus::slotRead()
         }
 
 #ifdef ASYNC
-      qDebug() << "nC " << nC << "local_read "<< local_read[nC];
+      // qDebug() << "nC " << nC << "local_read "<< local_read[nC];
         // відправити наступний запит
-        if(nC< query_list.size())
-        {
-            ++nC;
-            while(nC<query_list.size())
+        qDebug() << nC << query_list.size();
+        ++nC;
+        while(nC<query_list.size())
             {
                 local_read[nC]--;
                 if(1>local_read[nC])
                 {
                     pS->write(query_list[nC]);
+                    qDebug() << "Send query no " <<  nC;
                     local_read[nC]=query_read[nC];
                     break;
                 }
                 ++nC;
             }
-        }
-        else if(!query_queue.isEmpty()) // перевірити чергу
+        if(query_list.size()==nC && !query_queue.isEmpty()) // перевірити чергу
         {
-            qDebug() << data_raw;
+            qDebug() << "Queue size " << query_queue.size();
             pS->write(query_queue.dequeue()); // якщо не пуста, передати
         }
 
@@ -191,8 +190,8 @@ void RxModbus::slotRead()
 
         nLen=0;
     }
-    connTimeout->stop();
-    connTimeout->start();
+//    connTimeout->stop();
+//    connTimeout->start();
 }
 
 int RxModbus::loadList(QString fileName)
