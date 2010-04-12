@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QSettings>
 
+#include "../iodev.h"
 #include "RxModbus.h"
 #include "form.h"
 #include "../logging/logging.h"
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
     r.setHostName("192.168.1.51");
     r.setPort(502);
 
-    QVector<RxModbus*> src; // джерела даних.
+    QVector<IoDev*> src; // джерела даних.
     src << &r;
     Logging l(src);
 

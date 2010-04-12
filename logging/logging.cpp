@@ -1,9 +1,9 @@
 #include "logging.h"
-#include "../modbus/RxModbus.h"
+#include "../iodev.h"
 #include <QtSql>
 
 
-Logging::Logging(QVector<RxModbus*> src): s(src)
+Logging::Logging(QVector<IoDev*> src): s(src)
 {
     QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
 
@@ -21,7 +21,7 @@ Logging::Logging(QVector<RxModbus*> src): s(src)
     tmr->start();
 
     startTimer(60000); // збиради дані раз в п’ять секунд
-    foreach(RxModbus *v,s)
+    foreach(IoDev *v,s)
     {
         tags_list << v->getTags();
     }

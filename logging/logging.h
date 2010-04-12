@@ -6,19 +6,19 @@
 #include <QQueue>
 #include <QHash>
 
-class RxModbus;
+class IoDev;
 
 class Logging : public QObject
 {
 Q_OBJECT
 public:
-    Logging(QVector<RxModbus*> src);
+    Logging(QVector<IoDev*> src);
     ~Logging();
 
 private slots:
     void dbStore();
 private:
-    QVector<RxModbus*> s;
+    QVector<IoDev*> s;
 
     QQueue<QString> log;
     QVector<QHash<QString,QVector<qint16> > > tags_list; // довбанута структура, буду надіятися що бібліотека Qt правильно все зрозуміє.

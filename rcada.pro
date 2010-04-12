@@ -9,9 +9,11 @@ TARGET = rcada
 TEMPLATE = lib
 CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \
-    logging/logging.cpp
+    logging/logging.cpp \
+    iodev.cpp
 HEADERS += modbus/RxModbus.h \
-    logging/logging.h
+    logging/logging.h \
+    iodev.h
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build

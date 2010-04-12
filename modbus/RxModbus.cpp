@@ -9,7 +9,7 @@
 #define PUTMHR 16
 
 
-RxModbus::RxModbus(): QObject(),nPort(502) ,nC(0) // кноструктор, треба уточнити
+RxModbus::RxModbus(): nPort(502) ,nC(0) // кноструктор, треба уточнити
 {
 
     // теймер для періодичної відправки запитів
