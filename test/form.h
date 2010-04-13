@@ -5,20 +5,20 @@
 
 #include "ui_form.h"
 
-class RxModbus;
+class IoDev;
 
 class Form : public QWidget , public Ui::Form
 {
     Q_OBJECT
 public:
-    Form(RxModbus *src, QWidget *parent = 0);
+    Form(IoDev *src, QWidget *parent = 0);
     ~Form();
 private slots:
     void sendData();
     void slotUpdate();
 
 private:
-    RxModbus *s;
+    IoDev *s;
 
 };
 

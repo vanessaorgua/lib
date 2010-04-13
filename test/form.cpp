@@ -1,8 +1,9 @@
 #include "form.h"
 #include "ui_form.h"
-#include "RxModbus.h"
+#include "../iodev.h"
+#include <QDebug>
 
-Form::Form(RxModbus *src,QWidget *parent) :
+Form::Form(IoDev *src,QWidget *parent) :
     QWidget(parent),
     s(src)
 {

@@ -5,6 +5,7 @@
 #include "RxModbus.h"
 #include "form.h"
 #include "../logging/logging.h"
+#include "../ionetserver/IoNetServer.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +29,8 @@ int main(int argc, char *argv[])
     Logging l(src);
 
     r.start();
+
+    IoNetServer s(src);
 
     Form w(&r);
     w.show();
