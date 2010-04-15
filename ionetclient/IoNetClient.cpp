@@ -1,28 +1,11 @@
-#include "RIoNetClient.h"
+#include "IoNetClient.h"
+
 
 #include <QDebug>
 #include <QMessageBox>
 
-RIoNetClient::RIoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort)
+IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort)
 {
-    int i;
-
-    // ініціалізувати масиви
-    for(i=0;i<VALUERAW_LEN;++i)
-    {
-	Scale_min<< 0;
-	Scale_max<< 0;
-	Value_raw << 0.0;
-	Value_scale << 0.0;
-    }
-
-    // ініціалізувати пам’ять контролера
-    for(i=0;i<VALUE_LEN;++i)
-	Value << 0;
-    for(i=0;i<CTRL_LEN;++i)
-	Ctrl << 0;
-    for(i=0;i<PARM_LEN;++i)
-	Parm<<0;
 
     // з’єднатися із сервером
     connState.Len=-1;
@@ -52,16 +35,16 @@ RIoNetClient::RIoNetClient(QString hostname,int nPort) : host(hostname),Port(nPo
 
     qry << qint8('R') << qint8('V') << qint16(0) << qint16(0);
     qry << qint8('R') << qint8('C') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('P') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('R') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('S') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('N') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('X') << qint16(0) << qint16(0);
     //qDebug() << "Size" << query.size();
 
 }
 
-void RIoNetClient::slotConnected()
+IoNetClient::~IoNetClient()
+{
+    pTcpSock->close(); // від’єднатися від сервера
+}
+
+void IoNetClient::slotConnected()
 {
     //qDebug() << "Conected..";
     pTcpSock->write(query); // відправити запит на сервер
@@ -71,7 +54,7 @@ void RIoNetClient::slotConnected()
 }
 
 
-void RIoNetClient::slotTimeout() // таймаут отримання даних від сервера
+void IoNetClient::slotTimeout() // таймаут отримання даних від сервера
 {
     // якщо від сервера не отримуються дані тоді треба спробувати встановити з’єднання знову
     //qDebug() << "Signal slotTimeout()";
@@ -83,7 +66,7 @@ void RIoNetClient::slotTimeout() // таймаут отримання даних
 }
 
 
-void RIoNetClient::slotDisconnect() // від’єднання зі сторони сервера
+void IoNetClient::slotDisconnect() // від’єднання зі сторони сервера
 {
     //qDebug() << "Signal slotDisconnect()";
     // якщо сервер закрив з’єднання тоді спрбувати відкрити його знову
@@ -91,7 +74,7 @@ void RIoNetClient::slotDisconnect() // від’єднання зі сторон
 }
 
 
-void RIoNetClient::slotError(QAbstractSocket::SocketError)
+void IoNetClient::slotError(QAbstractSocket::SocketError)
 {
     //qDebug() << "Signal slotError()";
 
@@ -106,7 +89,7 @@ void RIoNetClient::slotError(QAbstractSocket::SocketError)
     connWait->start() ; // зробити затримку часу перед повторною спробою встановити з’єднання
 }
 
-void RIoNetClient::slotNewConnect()
+void IoNetClient::slotNewConnect()
 {
     //qDebug() << "Signal slotNewConnect()";
 
@@ -114,69 +97,13 @@ void RIoNetClient::slotNewConnect()
     pTcpSock->connectToHost(host,Port);
 }
 
-void RIoNetClient::slotSendQuery()
+void IoNetClient::slotSendQuery()
 {
     //qDebug() << "Send Query";
     pTcpSock->write(query); // відправити запит на сервер
 }
 
-
-void RIoNetClient::slotSendData(qint8 Type,short Index,QVector<short>& data)
-{
-    QByteArray arrBlock;
-    QDataStream out(&arrBlock,QIODevice::WriteOnly);
-    int i;
-    out.setVersion(QDataStream::Qt_4_2);
-    
-    out << qint8('W') << Type << Index << qint16(0) << data;
-    out.device()->seek(4);
-    out << qint16(arrBlock.size()-4);
-
-    //qDebug() << "QVector" << Index << data;
-
-    pTcpSock->write(arrBlock);
-
-    // внести зміни в локальну копію даних
-    switch(Type)
-    {
-	case 'C':
-	    for(i=0;i<data.size();++i)
-		Ctrl[Index+i]=data[i];
-	    break;
-	case 'P':
-	    for(i=0;i<data.size();++i)
-		Parm[Index+i]=data[i];
-	    break;
-    }
-}
-
-
-void RIoNetClient::slotSendData(qint8 Type,short Index,double& data)
-{
-    QByteArray arrBlock;
-    QDataStream out(&arrBlock,QIODevice::WriteOnly);
-    
-    out.setVersion(QDataStream::Qt_4_2);
-    
-    out << qint8('W') << Type << Index << qint16(0) << data;
-    out.device()->seek(4);
-    out << qint16(arrBlock.size()-4);
-
-    qDebug() << "double" << Index << data;
-
-    pTcpSock->write(arrBlock);
-
-}
-
-
-
-RIoNetClient::~RIoNetClient()
-{
-    pTcpSock->close(); // від’єднатися від сервера
-}
-
-
-void RIoNetClient::slotReadServer()
+void IoNetClient::slotReadServer()
 {
     QDataStream in(pTcpSock);
     in.setVersion(QDataStream::Qt_4_2);
@@ -208,28 +135,6 @@ void RIoNetClient::slotReadServer()
 	    case 'R': // запит на передачу даних
 		switch(connState.Type)
 		{
-		    case 'V':
-			in >> Value;
-			break;
-		    case 'C':
-			in >> Ctrl;
-			break;
-		    case 'P':
-			in >> Parm;
-			break;
-		    case 'R':
-			in >> Value_raw;
-			//qDebug() << Value_raw;
-			break;
-		    case 'S':
-			in >> Value_scale;
-			break;
-		    case 'N':
-			in >> Scale_min;
-			break;
-		    case 'X':
-			in >> Scale_max;
-			break;
 		    default:
 			break;
 		}
@@ -249,39 +154,5 @@ void RIoNetClient::slotReadServer()
     //qDebug()  << "exit " << pTcpSock->bytesAvailable() <<"\n";
 }
 
-const QVector<short>& RIoNetClient::getValue()
-{
-    return Value;
-}
-
-const QVector<short>& RIoNetClient::getCtrl()
-{
-    return Ctrl;
-}
-
-const QVector<short>& RIoNetClient::getParm()
-{
-    return Parm;
-}
-
-const QVector<double>& RIoNetClient::getValueRaw()
-{
-    return Value_raw;
-}
-
-const QVector<double>& RIoNetClient::getValueScale()
-{
-    return Value_scale;
-}
-
-const QVector<double>& RIoNetClient::getScaleMin()
-{
-    return Scale_min;
-}
-
-const QVector<double>& RIoNetClient::getScaleMax()
-{
-    return Scale_max;
-}
 
 

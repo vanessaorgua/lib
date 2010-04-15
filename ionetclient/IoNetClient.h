@@ -5,63 +5,30 @@
 #include <QtNetwork>
 #include <QtCore>
 
-// визначити довжину масивів
-#define VALUE_LEN 52
-#define VALUERAW_LEN 18
-#define PARM_LEN 126
-#define CTRL_LEN 32
+#include "../iodev.h"
+#include "../header.h"
 
-struct _Header
-{
-    qint8 Cmd;
-    qint8 Type;
-    short Index;
-    short Len;
-};
+class IoDev;
+// клас є нащадком IoDev
 
-class RIoNetClient : public QObject
+class IoNetClient : public IoDev
 {
 Q_OBJECT
 public:
-    RIoNetClient(QString hostname,int nPort=8184);
-    ~RIoNetClient();
+    IoNetClient(QString hostname,int nPort=8184);
+    ~IoNetClient();
 
-    // функції доступу - інтефейс як у відповідного класу сервернох частини
-    const QVector<short>& getValue();
-    const QVector<short>& getCtrl();
-    const QVector<short>& getParm();
-
-    const QVector<double>& getValueRaw();
-    const QVector<double>& getValueScale();
-
-    const QVector<double>& getScaleMin();
-    const QVector<double>& getScaleMax();
-
-public slots:
+public slots: // це все має відношення до з’єднання із сервером
 	void slotNewConnect();
 	void slotTimeout(); // таймаут отримання даних від сервера
-	void slotDisconnect(); // відєднання зі сторони сервера
-
+        void slotDisconnect(); // відєднання зі сторони сервера
 	void slotConnected();
 	void slotReadServer();
-	void slotSendQuery();
-	void slotSendData(qint8 Type,short Index,QVector<short>& data);
-	void slotSendData(qint8 Type,short Index,double& data);
 	void slotError(QAbstractSocket::SocketError);
+        void slotSendQuery();
 
 private:
     // масиви, які містять сирі дані із контролера копія даних із сервера
-    QVector<short> Value;
-    QVector<short> Parm;
-    QVector<short> Ctrl; 
-    // дві черги, для передачі даних в контралер значень із масивів Parm та Ctrl
-       
-    // оброблені дані
-    QVector<double> Value_raw;           // перетворені значення 0-4000
-    QVector<double> Value_scale;         // шкальовані дані
-    // шкали читати треба в конструкторі, запис - у функціях доступу.
-    QVector<double> Scale_min,Scale_max; // шкали. потрібно буде зберігати.
-    
     struct _Header connState;
     QString host;
     int Port;
@@ -70,6 +37,9 @@ private:
     QTimer *rtmr;
     QTimer *connWait; // тайсер очікування перед спробою встановити нове з’єднання
     QTimer *connTimeout;
+
+   // решта даних та функцій доступу наслідуються із батьківського класу
+
 };
 
 #endif

@@ -15,7 +15,8 @@ SOURCES += modbus/RxModbus.cpp \
 HEADERS += modbus/RxModbus.h \
     logging/logging.h \
     iodev.h \
-    ionetserver/IoNetServer.h
+    ionetserver/IoNetServer.h \
+    header.h
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
