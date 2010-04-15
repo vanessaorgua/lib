@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QVector>
 
-class IoDev: public QObject
+class IoDev : public QObject
 {
     Q_OBJECT
 public:

@@ -33,8 +33,8 @@ IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort
     QDataStream qry(&query,QIODevice::WriteOnly);
     qry.setVersion(QDataStream::Qt_4_2);
 
-    qry << qint8('R') << qint8('V') << qint16(0) << qint16(0);
-    qry << qint8('R') << qint8('C') << qint16(0) << qint16(0);
+    // перший запит  - на кількість наявних джерел даних
+    qry << qint8('R') << qint8('C') << qint8(0) << qint16(0) << qint16(0);
     //qDebug() << "Size" << query.size();
 
 }
@@ -42,6 +42,11 @@ IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort
 IoNetClient::~IoNetClient()
 {
     pTcpSock->close(); // від’єднатися від сервера
+
+    foreach(NetIoDev* v,src) // звільнити пам’ять з-під даних
+    {
+        delete v;
+    }
 }
 
 void IoNetClient::slotConnected()
@@ -135,7 +140,32 @@ void IoNetClient::slotReadServer()
 	    case 'R': // запит на передачу даних
 		switch(connState.Type)
 		{
-		    default:
+                    case 'C': // визначення кількості джерел даних на сервері
+                        qint16 c;
+                        in >> c;  // формування запитів на отримання тегів
+                        query.clear();
+                        QDataStream qry(&query,QIODevice::WriteOnly);
+                        qry.setVersion(QDataStream::Qt_4_2);
+                        for(int i=0;i<c;++i)
+                        {
+                            qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0);
+                        }
+                        pTcpSock->write(query);
+                        query.clear();
+                        break;
+                    case 'T':
+                        // отримання тегів
+                        if(connState.iD+1>src.size()) // перевірити чи є виділене місце у сховищі
+                        {
+                            for(int i=src.size()-1;i<connState.iD+1;++i)
+                            {
+                                NetIoDev *p=new NetIoDev(this);
+                                src << p;
+                            }
+
+                        }
+                        break;
+                    default:
 			break;
 		}
 		//sendBytes();

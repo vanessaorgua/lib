@@ -7,16 +7,22 @@
 
 #include "../iodev.h"
 #include "../header.h"
+#include "netiodev.h"
 
-class IoDev;
+
+//class NetIoDev;
 // клас є нащадком IoDev
 
-class IoNetClient : public IoDev
+class IoNetClient : public QObject
 {
 Q_OBJECT
 public:
     IoNetClient(QString hostname,int nPort=8184);
     ~IoNetClient();
+
+    // методи доступу
+    NetIoDev *operator[](int i) { return src[i]; }
+
 
 public slots: // це все має відношення до з’єднання із сервером
 	void slotNewConnect();
@@ -26,6 +32,7 @@ public slots: // це все має відношення до з’єднанн�
 	void slotReadServer();
 	void slotError(QAbstractSocket::SocketError);
         void slotSendQuery();
+
 
 private:
     // масиви, які містять сирі дані із контролера копія даних із сервера
@@ -39,6 +46,7 @@ private:
     QTimer *connTimeout;
 
    // решта даних та функцій доступу наслідуються із батьківського класу
+    QVector<NetIoDev*> src;
 
 };
 

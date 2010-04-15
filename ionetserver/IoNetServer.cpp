@@ -115,6 +115,9 @@ void IoNetServer::slotReadClient()
 	    case 'R': // запит на передачу даних
 		switch(connState[pCs].Type)
 		{
+                    case 'C':
+                        out << qint16(src.size());// відправити наявну кількість джерел даних
+                        break;
                     case 'T':
                         out << src[connState[pCs].iD]->getTags();
 			break;
