@@ -9,7 +9,7 @@ class IoDev //: public QObject
 //    Q_OBJECT
 public:
     IoDev() {}   // кноструктор, треба уточнити
-    //virtual ~IoDev() =0 ;// поки-що тривіальний деструктор
+    virtual ~IoDev() =0 ;// поки-що тривіальний деструктор
 
     // методи доступу до даних
     inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }

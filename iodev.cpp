@@ -1,15 +1,12 @@
 #include "iodev.h"
-#include <QDebug>
 
-IoDev::IoDev()
-{
-}
 
 
 IoDev::~IoDev()
 {
 
 }
+
 /*
 void IoDev::sendValue(QString ,qint16)
 {

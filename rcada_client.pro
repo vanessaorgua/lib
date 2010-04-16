@@ -14,7 +14,8 @@ HEADERS += datetimedialog.h \
     ionetclient/netiodev.h
 SOURCES += trend.cpp \
     ionetclient/IoNetClient.cpp \
-    ionetclient/netiodev.cpp
+    ionetclient/netiodev.cpp \
+    iodev.cpp
 FORMS += trend.ui \
     datetime.ui
 MOC_DIR = build
