@@ -5,11 +5,11 @@ class IoNetClient;
 
 #include "../iodev.h"
 
-class NetIoDev: public IoDev
+class NetIoDev: public QObject, public IoDev
 {
 public:
     NetIoDev(IoNetClient *parent);
-
+    ~NetIoDev();
     virtual void sendValue(QString tag,qint16 v);
     virtual void sendValue(QString tag,qint32 v);
     virtual void sendValue(QString tag,double v);

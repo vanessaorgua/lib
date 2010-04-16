@@ -16,7 +16,7 @@ class QTimer;
 // клас базується на шаблонному класі IoDev
 // треба написати документацію
 
-class RxModbus:  public IoDev // public QObject,
+class RxModbus:  public QObject,  public IoDev
 {
     Q_OBJECT
 public:

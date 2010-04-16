@@ -10,6 +10,12 @@ NetIoDev::NetIoDev(IoNetClient *parent) : p(parent)
 
 }
 
+NetIoDev::~NetIoDev()
+{
+
+}
+
+
 void NetIoDev::sendValue(QString tag,qint16 v)
 {
 

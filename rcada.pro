@@ -10,7 +10,6 @@ TEMPLATE = lib
 CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \
     logging/logging.cpp \
-    iodev.cpp \
     ionetserver/IoNetServer.cpp
 HEADERS += modbus/RxModbus.h \
     logging/logging.h \

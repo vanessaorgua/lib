@@ -113,7 +113,10 @@ void IoNetClient::slotReadServer()
     QDataStream in(pTcpSock);
     in.setVersion(QDataStream::Qt_4_2);
     int j=0;
-    
+    QDataStream qry(&query,QIODevice::WriteOnly);
+    qry.setVersion(QDataStream::Qt_4_2);
+    QVector<qint16> ts;
+
     //qDebug() << "ba: " << pTcpSock->bytesAvailable() << " time;" << QDateTime::currentDateTime();
 
     for(;;++j)
@@ -144,8 +147,8 @@ void IoNetClient::slotReadServer()
                         qint16 c;
                         in >> c;  // формування запитів на отримання тегів
                         query.clear();
-                        QDataStream qry(&query,QIODevice::WriteOnly);
-                        qry.setVersion(QDataStream::Qt_4_2);
+                        //QDataStream qry(&query,QIODevice::WriteOnly);
+                        //qry.setVersion(QDataStream::Qt_4_2);
                         for(int i=0;i<c;++i)
                         {
                             qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0);
@@ -164,6 +167,11 @@ void IoNetClient::slotReadServer()
                             }
 
                         }
+                        break;
+                    case 'D':
+                        ts.clear();
+                        in >> ts;
+                        src[connState.iD]->setData(ts);
                         break;
                     default:
 			break;

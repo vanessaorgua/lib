@@ -2,7 +2,7 @@
 
 #include <QString>
 #include <QTimer>
-#include <QtAlgorithms>
+
 
 #define GETMHR 3
 #define PUTSHR 6
