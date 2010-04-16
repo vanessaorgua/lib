@@ -116,6 +116,7 @@ void IoNetClient::slotReadServer()
     QDataStream qry(&query,QIODevice::WriteOnly);
     qry.setVersion(QDataStream::Qt_4_2);
     QVector<qint16> ts;
+    QHash<QString,QVector<qint16> > tg;
 
     //qDebug() << "ba: " << pTcpSock->bytesAvailable() << " time;" << QDateTime::currentDateTime();
 
@@ -167,11 +168,14 @@ void IoNetClient::slotReadServer()
                             }
 
                         }
+                        in >> tg;
+
                         break;
-                    case 'D':
+                    case 'D': // отримати масив з даними
                         ts.clear();
                         in >> ts;
-                        src[connState.iD]->setData(ts);
+                        if(src.size()>connState.iD) // якщо є куди писати
+                            src[connState.iD]->setData(ts); // зберегти отримані дані
                         break;
                     default:
 			break;
