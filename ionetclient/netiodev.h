@@ -15,12 +15,16 @@ public:
     virtual void sendValue(QString tag,double v);
     virtual void sendValue(QString tag,QVector<qint16> &v);
 
-    // це незовсім правильно, доступ до цього повинен бути тільки в класу IoClient
-    inline void setTags(QHash<QString,QVector<qint16> > t) {tags=t;}
-    inline void setData(QVector<qint16> t) { data_raw=t;}
 
 private:
     IoNetClient *p;
+
+    // становити правильний індекс
+    // питання: а може краже назву ?
+    qint8 iD;
+
+
+    friend class IoNetClient; // це для того, щоб можна було напряму працювати із tags та data_raw
 
 };
 

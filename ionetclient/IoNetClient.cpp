@@ -30,12 +30,6 @@ IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort
     connTimeout->setInterval(10000); // інтервал очікування даних від сервера
     connect(connTimeout,SIGNAL(timeout()),this,SLOT(slotTimeout()));
 
-    QDataStream qry(&query,QIODevice::WriteOnly);
-    qry.setVersion(QDataStream::Qt_4_2);
-
-    // перший запит  - на кількість наявних джерел даних
-    qry << qint8('R') << qint8('C') << qint8(0) << qint16(0) << qint16(0);
-    //qDebug() << "Size" << query.size();
 
 }
 
@@ -52,8 +46,15 @@ IoNetClient::~IoNetClient()
 void IoNetClient::slotConnected()
 {
     //qDebug() << "Conected..";
+
+    query.clear();
+    QDataStream qry(&query,QIODevice::WriteOnly);
+    qry.setVersion(QDataStream::Qt_4_2);
+
+    // перший запит  - на кількість наявних джерел даних
+    qry << qint8('R') << qint8('C') << qint8(0) << qint16(0) << qint16(0);
+
     pTcpSock->write(query); // відправити запит на сервер
-    rtmr->start();
     connTimeout->start();
     connState.Len=-1; // підготуватися до прийому пакунку
 }
@@ -104,7 +105,14 @@ void IoNetClient::slotNewConnect()
 
 void IoNetClient::slotSendQuery()
 {
-    //qDebug() << "Send Query";
+
+    query.clear();
+    QDataStream qry(&query,QIODevice::WriteOnly);
+    qry.setVersion(QDataStream::Qt_4_2);
+    for(int i=0;i<src.size();++i)  // перебрати по кількості джерел даних
+    {
+          qry << qint8('R') << qint8('D') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
+    }
     pTcpSock->write(query); // відправити запит на сервер
 }
 
@@ -116,7 +124,7 @@ void IoNetClient::slotReadServer()
     QDataStream qry(&query,QIODevice::WriteOnly);
     qry.setVersion(QDataStream::Qt_4_2);
     QVector<qint16> ts;
-    QHash<QString,QVector<qint16> > tg;
+    //QHash<QString,QVector<qint16> > tg;
 
     //qDebug() << "ba: " << pTcpSock->bytesAvailable() << " time;" << QDateTime::currentDateTime();
 
@@ -152,30 +160,28 @@ void IoNetClient::slotReadServer()
                         //qry.setVersion(QDataStream::Qt_4_2);
                         for(int i=0;i<c;++i)
                         {
-                            qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0);
+                            qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
+                            src << new NetIoDev(this); // створити класи-сховища
+                            src[i]->iD=i;
                         }
                         pTcpSock->write(query);
                         query.clear();
                         break;
                     case 'T':
                         // отримання тегів
-                        if(connState.iD+1>src.size()) // перевірити чи є виділене місце у сховищі
-                        {
-                            for(int i=src.size()-1;i<connState.iD+1;++i)
-                            {
-                                NetIoDev *p=new NetIoDev(this);
-                                src << p;
-                            }
+                        if(connState.iD<src.size()) // перевірити чи є виділене місце у сховищі
+                            in >> src[connState.iD]->tags; // зберегти отримані наді, перевірки не портібно бо нацей момент пам’ять вже повинна бути виділена
+                                                       // хоча тут може бути і проблема
 
-                        }
-                        in >> tg;
+                        if(connState.iD==src.size()-1) // із останнім списком тегів запустити періодичне опитування даних
+                           rtmr->start();
 
                         break;
                     case 'D': // отримати масив з даними
-                        ts.clear();
-                        in >> ts;
-                        if(src.size()>connState.iD) // якщо є куди писати
-                            src[connState.iD]->setData(ts); // зберегти отримані дані
+                        if(connState.iD<src.size()) // якщо є куди писати
+                            in >> src[connState.iD]->data_raw; // зберегти отримані дані
+                        else // інакше
+                            in >>  ts; // просто спорожнити буфер
                         break;
                     default:
 			break;
