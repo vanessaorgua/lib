@@ -33,7 +33,8 @@ public slots: // це все має відношення до з’єднанн�
 	void slotError(QAbstractSocket::SocketError);
         void slotSendQuery();
 
-
+signals:
+        void updateData();
 private:
     // масиви, які містять сирі дані із контролера копія даних із сервера
     struct _Header connState;

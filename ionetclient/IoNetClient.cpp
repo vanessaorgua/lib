@@ -132,13 +132,15 @@ void IoNetClient::slotReadServer()
     {
 	if(connState.Len==-1) // умова читання заголовку
 	{
-	    if(pTcpSock->bytesAvailable()<6)
+            if(pTcpSock->bytesAvailable()<7)
 	    {
 		break;
 	    }
 	     // прочитати заголовок
-	    in >> connState.Cmd >> connState.Type >> connState.Index >> connState.Len ;
-	    //qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
+            in >> connState.Cmd >> connState.Type >>connState.iD >> connState.Index >> connState.Len ;
+            //qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
+            qDebug() << "Packet recived " << connState.Cmd << connState.Type << connState.iD << connState.Index << connState.Len;
+
 	}
 
 	if(pTcpSock->bytesAvailable()<connState.Len) // чи доступні інші байти із потоку ?
@@ -155,6 +157,7 @@ void IoNetClient::slotReadServer()
                     case 'C': // визначення кількості джерел даних на сервері
                         qint16 c;
                         in >> c;  // формування запитів на отримання тегів
+                        qDebug()<< "Source count " << c;
                         query.clear();
                         //QDataStream qry(&query,QIODevice::WriteOnly);
                         //qry.setVersion(QDataStream::Qt_4_2);
@@ -169,19 +172,23 @@ void IoNetClient::slotReadServer()
                         break;
                     case 'T':
                         // отримання тегів
+                        qDebug()<< "Tags. connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // перевірити чи є виділене місце у сховищі
                             in >> src[connState.iD]->tags; // зберегти отримані наді, перевірки не портібно бо нацей момент пам’ять вже повинна бути виділена
                                                        // хоча тут може бути і проблема
-
+                         qDebug() << "Tags read is good";
                         if(connState.iD==src.size()-1) // із останнім списком тегів запустити періодичне опитування даних
                            rtmr->start();
 
                         break;
                     case 'D': // отримати масив з даними
+                        //qDebug() << "Data resived connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // якщо є куди писати
                             in >> src[connState.iD]->data_raw; // зберегти отримані дані
                         else // інакше
                             in >>  ts; // просто спорожнити буфер
+                        emit updateData();
+                        //qDebug() << "emit updateData()";
                         break;
                     default:
 			break;

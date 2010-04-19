@@ -30,14 +30,14 @@ void IoNetServer::slotNewConnection()
     connect(pClientSocket,SIGNAL(readyRead()),this,SLOT(slotReadClient()));
     connState[pClientSocket].Len=-1; // ставорити новий запис в хеш-таблиці, признак читання заголовку
     connState[pClientSocket].host=pClientSocket->peerAddress().toString(); // зберегти ім’я хочта для подальшого використання
-    //qDebug() << "Accept new connection";
+    qDebug() << "Accept new connection";
     
     //QFile f(QDir::homePath()+"/vipgr.log");
     //if(f.open(QIODevice::Append))
     //{
         //QTextStream t(&f);
-        //QDateTime dt= QDateTime::currentDateTime();
-        //t << dt.toString("yyyy/MM/dd hh:mm:ss") << " CONNECT host:" << pClientSocket->peerAddress().toString() << "\n";
+        QDateTime dt= QDateTime::currentDateTime();
+        qDebug() << dt.toString("yyyy/MM/dd hh:mm:ss") << " CONNECT host:" << pClientSocket->peerAddress().toString() << "\n";
         //f.close();
     //}
     //else
@@ -105,7 +105,7 @@ void IoNetServer::slotReadClient()
 	{
 	    break;
 	}
-	//qDebug() << "Packet recived " << connState[pCs].Cmd << connState[pCs].Type << connState[pCs].Index << connState[pCs].Len;
+        qDebug() << "Packet recived " << connState[pCs].Cmd << connState[pCs].Type << connState[pCs].iD << connState[pCs].Index << connState[pCs].Len;
 	// підготувати заголовок відповіді
 	v=0;
         out << connState[pCs].Cmd << connState[pCs].Type <<connState[pCs].iD << connState[pCs].Index << v;
@@ -129,6 +129,7 @@ void IoNetServer::slotReadClient()
 		}
                     out.device()->seek(5); // переміститись до поля із довжиною
                     out << qint16(arrBlock.size()-7); // записати довжину блоку даних
+                    qDebug() << "Resived bytes " << qint16(arrBlock.size()-7);
 		//sendBytes();
 		break;
 	    case 'W':

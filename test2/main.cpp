@@ -11,6 +11,7 @@ int main(int argc,char **argv)
 
     mainW w(s);
 
+    QObject::connect(&s,SIGNAL(updateData()),&w,SLOT(slotUpdate()));
 
     w.show();
 

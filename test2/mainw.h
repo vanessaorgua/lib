@@ -15,9 +15,12 @@ public:
     mainW(IoNetClient& src, QWidget *parent = 0);
     ~mainW();
 
+
 protected:
     void changeEvent(QEvent *e);
 
+private slots:
+    void slotUpdate();
 private:
     Ui::mainW *m_ui;
     IoNetClient &s;
