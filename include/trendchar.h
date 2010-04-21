@@ -1,0 +1,1 @@
+#include "../trendchar/trendchar.h"

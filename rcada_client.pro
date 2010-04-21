@@ -7,17 +7,20 @@ TARGET = rcada_client
 TEMPLATE = lib
 CONFIG += staticlib
 HEADERS += datetimedialog.h \
-    trend.h \
+    trend\trend.h \
     ionetclient/IoNetClient.h \
     iodev.h \
     header.h \
-    ionetclient/netiodev.h
-SOURCES += trend.cpp \
+    ionetclient/netiodev.h \
+    trendchar/trendchart.h
+SOURCES += trend\trend.cpp \
     ionetclient/IoNetClient.cpp \
     ionetclient/netiodev.cpp \
-    iodev.cpp
-FORMS += trend.ui \
-    datetime.ui
+    iodev.cpp \
+    trendchar/trendchart.cpp
+FORMS += trend\trend.ui \
+    trend\datetime.ui
+
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
