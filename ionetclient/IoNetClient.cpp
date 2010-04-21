@@ -139,7 +139,7 @@ void IoNetClient::slotReadServer()
 	     // прочитати заголовок
             in >> connState.Cmd >> connState.Type >>connState.iD >> connState.Index >> connState.Len ;
             //qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
-            qDebug() << "Packet recived " << connState.Cmd << connState.Type << connState.iD << connState.Index << connState.Len;
+            //qDebug() << "Packet recived " << connState.Cmd << connState.Type << connState.iD << connState.Index << connState.Len;
 
 	}
 
@@ -157,7 +157,7 @@ void IoNetClient::slotReadServer()
                     case 'C': // визначення кількості джерел даних на сервері
                         qint16 c;
                         in >> c;  // формування запитів на отримання тегів
-                        qDebug()<< "Source count " << c;
+                        //qDebug()<< "Source count " << c;
                         query.clear();
                         //QDataStream qry(&query,QIODevice::WriteOnly);
                         //qry.setVersion(QDataStream::Qt_4_2);
@@ -172,11 +172,11 @@ void IoNetClient::slotReadServer()
                         break;
                     case 'T':
                         // отримання тегів
-                        qDebug()<< "Tags. connState.iD " << connState.iD << " packet len" << connState.Len;
+                        //qDebug()<< "Tags. connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // перевірити чи є виділене місце у сховищі
                             in >> src[connState.iD]->tags; // зберегти отримані наді, перевірки не портібно бо нацей момент пам’ять вже повинна бути виділена
                                                        // хоча тут може бути і проблема
-                         qDebug() << "Tags read is good";
+                         //qDebug() << "Tags read is good";
                         if(connState.iD==src.size()-1) // із останнім списком тегів запустити періодичне опитування даних
                            rtmr->start();
 

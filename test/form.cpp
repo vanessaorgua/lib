@@ -10,6 +10,7 @@ Form::Form(IoDev *src,QWidget *parent) :
     setupUi(this);
     connect(bn_Send,SIGNAL(clicked()),this,SLOT(sendData()));
     connect(bn_Update,SIGNAL(clicked()),this,SLOT(slotUpdate()));
+    qDebug() << s->getTags().keys();
     slotUpdate();
 
 }

@@ -31,7 +31,7 @@ void mainW::changeEvent(QEvent *e)
 
 void mainW::slotUpdate()
 {
-//    qDebug() << "updateData()";
+    //qDebug() << "updateData()";
 
     if(s[0]->getValue16("Amr_5_"))
     {

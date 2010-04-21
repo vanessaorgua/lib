@@ -1,5 +1,5 @@
 QT += network \
-    sql
+    sql svg
 TARGET = test2
 CONFIG -= app_bundle
 TEMPLATE = app
