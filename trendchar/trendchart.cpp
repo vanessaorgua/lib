@@ -99,8 +99,11 @@ void TrendChart::loadPoint(QVector<double>& Val)
 
     if(!(t>++cP)) cP=0; // заворот
 
-    for(i=0;i<8;++i)
+    for(i=0;i<Val.size();++i)
 	pY[cP+t*i]=4000-Val[i]; // записати нові
+
+    for(;i<8;++i) // !!!! доповнюємо графік до 8 кривих
+        pY[cP+t*i]=4001; // записати пусту криву
 }
 
 void TrendChart::fill(double v)

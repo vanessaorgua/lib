@@ -182,6 +182,7 @@ T_v3_5_e	191	Integer	1	0
 T_v3_6_e	192	Integer	1	0
 T_v3_7_e	193	Integer	1	0
 T_v3_8_e	194	Integer	1	0
+L_ho	195	Integer	1	1
 T_v2_zd	256	Timer	10	0
 T_v3_zd	258	Timer	10	0
 Tper_zd	260	Timer	10	0
@@ -211,6 +212,7 @@ m_T_s	290	Integer	10	0
 z_G_cs	291	Integer	10	0
 m_G_cs	292	Integer	10	0
 d_L_sus_zd	293	Integer	10	0
+f_L_ho	294	Integer	10	0
 Cvit	512	Bool	10	0
 Man_1_	513	Bool	10	0
 Man_2_	514	Bool	10	0
@@ -222,3 +224,11 @@ Man_7_	519	Bool	10	0
 Man_8_	520	Bool	10	0
 Run	521	Bool	10	0
 Save	522	Bool	10	0
+Am_1_	523	Bool	1	0
+Am_2_	524	Bool	1	0
+Am_3_	525	Bool	1	0
+Am_4_	526	Bool	1	0
+Am_5_	527	Bool	1	0
+Am_6_	528	Bool	1	0
+Am_7_	529	Bool	1	0
+Am_8_	530	Bool	1	0

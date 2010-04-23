@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QVector>
+#include <QDebug>
 
 class IoDev //: public QObject
 {
@@ -17,7 +18,17 @@ public:
     inline qint16 getAddress(QString tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
 
     inline const QVector<qint16> &getDataRaw() {return data_raw;}
-    inline qint16 getValue16(QString tag) {return data_raw[tags[tag][0]];}
+    inline qint16 getValue16(QString tag) {
+        if(tags.contains(tag) )
+        {
+            return data_raw[tags[tag][0]];
+        } else
+        {
+            qDebug() << "Tag \"" <<tag << "\" not found";
+            return 0;
+        }
+    }
+
     inline qint32 getValue32(QString tag) {return *(qint32*)(data_raw.data()+tags[tag][0]); }
     inline float getValueFloat(QString tag) { return *(float*)(data_raw.data()+tags[tag][0]); }
 
