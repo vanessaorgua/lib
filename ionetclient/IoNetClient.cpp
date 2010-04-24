@@ -141,9 +141,7 @@ void IoNetClient::slotReadServer()
 	    }
 	     // прочитати заголовок
             in >> connState.Cmd >> connState.Type >>connState.iD >> connState.Index >> connState.Len ;
-            qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
-            //qDebug() << "Packet recived " << connState.Cmd << connState.Type << connState.iD << connState.Index << connState.Len;
-
+            //qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
 	}
 
 	if(pTcpSock->bytesAvailable()<connState.Len) // чи доступні інші байти із потоку ?
@@ -198,20 +196,13 @@ void IoNetClient::slotReadServer()
 
                         emit updateData();
                         emit updateDataRaw();
-                        qDebug() << "emit updateDataRaw()";
+                        //qDebug() << "emit updateDataRaw()";
                         break;
 
                     case 'S': // отримати масив з даними
-                        qDebug() << "Data resived Type S connState.iD " << connState.iD << " packet len" << connState.Len;
+                        //qDebug() << "Data resived Type S connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // якщо є куди писати
-                        {
                             in >> src[connState.iD]->data_scale; // зберегти отримані дані
-                            if(pTcpSock->bytesAvailable()>0)
-                            {
-                                qDebug() << "Not read all. Left " << pTcpSock->bytesAvailable();
-                                ::exit(1);
-                            }
-                        }
                         else // інакше
                             in >>  ss; // просто спорожнити буфер
                         emit updateData();
@@ -234,7 +225,7 @@ void IoNetClient::slotReadServer()
                 break;
 	}
 	connState.Len=-1; // знову читати заголовок
-        qDebug() << "Pack ACK";
+        //qDebug() << "Pack ACK";
     }
 
     // перезапустити таймер. Чи цього буде достатньо ?

@@ -325,6 +325,8 @@ int RxModbus::loadList(QString fileName)
         f.close();
         qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
 
+
+
 //        loadScale(fileName);
         return i;
     }

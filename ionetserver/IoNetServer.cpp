@@ -105,7 +105,7 @@ void IoNetServer::slotReadClient()
 	{
 	    break;
 	}
-        qDebug() << "Packet recived " << QChar(connState[pCs].Cmd) << QChar(connState[pCs].Type) << connState[pCs].iD << connState[pCs].Index << connState[pCs].Len;
+        //qDebug() << "Packet recived " << QChar(connState[pCs].Cmd) << QChar(connState[pCs].Type) << connState[pCs].iD << connState[pCs].Index << connState[pCs].Len;
 	// підготувати заголовок відповіді
 	v=0;
         out << connState[pCs].Cmd << connState[pCs].Type <<connState[pCs].iD << connState[pCs].Index << v;
@@ -126,6 +126,7 @@ void IoNetServer::slotReadClient()
 			break;
                      case 'S':
                         out << src[connState[pCs].iD]->getDataScaled();
+                        break;
                      case 'X':
                         out << src[connState[pCs].iD]->getText();
                         break;
@@ -134,7 +135,7 @@ void IoNetServer::slotReadClient()
 		}
                     out.device()->seek(5); // переміститись до поля із довжиною
                     out << qint16(arrBlock.size()-7); // записати довжину блоку даних
-                    qDebug() << "Resived bytes " << qint16(arrBlock.size()-7);
+                    //qDebug() << "Resived bytes " << qint16(arrBlock.size()-7);
 		//sendBytes();
 		break;
 	    case 'W':
