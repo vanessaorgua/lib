@@ -35,6 +35,8 @@ public slots: // це все має відношення до з’єднанн�
 
 signals:
         void updateData();
+        void updateDataRaw();
+        void updateDataScaled();
 private:
     // масиви, які містять сирі дані із контролера копія даних із сервера
     struct _Header connState;

@@ -6,17 +6,22 @@
 
 #include <QObject>
 #include <QtNetwork>
-#include "../iodev.h"
+//#include "../iodev.h"
 
 #define  ASYNC
 
 class QString;
 class QTimer;
 
+
+//цей клас реалізує методи шкалювання даних
+//class ScaleDev;
+#include "../scaledev.h"
+
 // клас базується на шаблонному класі IoDev
 // треба написати документацію
 
-class RxModbus:  public QObject,  public IoDev
+class RxModbus:  public QObject, public ScaledIoDev // ,  public IoDev
 {
     Q_OBJECT
 public:

@@ -15,6 +15,10 @@ public:
     virtual void sendValue(QString tag,double v);
     virtual void sendValue(QString tag,QVector<qint16> &v);
 
+    virtual void sendValueScaled(QString tag,double v) ;
+    virtual void setScaleZero(QString tag,double v) ;
+    virtual void setScaleFull(QString tag,double v) ;
+
 
 private:
     IoNetClient *p;

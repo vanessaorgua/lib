@@ -78,15 +78,15 @@ void IoNetServer::slotReadClient()
     qint16 v;
     QVector<qint16> ts;
     QString tag;
-    //double std;
+    double ds;
     
     QByteArray arrBlock;
 
     QDataStream in(pCs);
     QDataStream out(&arrBlock,QIODevice::WriteOnly);
 
-    in.setVersion(QDataStream::Qt_4_2);
-    out.setVersion(QDataStream::Qt_4_2);
+    in.setVersion(QDataStream::Qt_4_6);
+    out.setVersion(QDataStream::Qt_4_6);
     
     for(;;)
     {
@@ -105,7 +105,7 @@ void IoNetServer::slotReadClient()
 	{
 	    break;
 	}
-        qDebug() << "Packet recived " << connState[pCs].Cmd << connState[pCs].Type << connState[pCs].iD << connState[pCs].Index << connState[pCs].Len;
+        qDebug() << "Packet recived " << QChar(connState[pCs].Cmd) << QChar(connState[pCs].Type) << connState[pCs].iD << connState[pCs].Index << connState[pCs].Len;
 	// підготувати заголовок відповіді
 	v=0;
         out << connState[pCs].Cmd << connState[pCs].Type <<connState[pCs].iD << connState[pCs].Index << v;
@@ -124,6 +124,11 @@ void IoNetServer::slotReadClient()
                     case 'D':
                         out << src[connState[pCs].iD]->getDataRaw();
 			break;
+                     case 'S':
+                        out << src[connState[pCs].iD]->getDataScaled();
+                     case 'X':
+                        out << src[connState[pCs].iD]->getText();
+                        break;
 		    default:
 			break;
 		}
@@ -140,7 +145,19 @@ void IoNetServer::slotReadClient()
                         in >> tag >> ts;
                         src[connState[pCs].iD]->sendValue(tag,ts);
 			break;
-		    default:
+                    case 'S': // відправка шкальованого значення
+                        in >> tag >> ds;
+                        src[connState[pCs].iD]->sendValueScaled(tag,ds);
+                        break;
+                    case 'Z':
+                        in >> tag >> ds;
+                        src[connState[pCs].iD]->setScaleZero(tag,ds);
+                        break;
+                    case 'F':
+                        in >> tag >> ds;
+                        src[connState[pCs].iD]->setScaleFull(tag,ds);
+                        break;
+                    default:
 			break;
 		}
 		break;

@@ -182,6 +182,13 @@ void RxModbus::slotRead()
                 }
                 ++nC;
             }
+        // перерахувати шкальовані значення
+        if(nC==query_list.size())
+        {
+            //qDebug() << "Calculate data_scale";
+            updateScaledValue();
+        }
+
         if(!(query_list.size()>nC || query_queue.isEmpty())) // перевірити чергу при умові що інших запитів немає.
         {
             //qDebug() << "Queue size " << query_queue.size();
@@ -234,6 +241,7 @@ int RxModbus::loadList(QString fileName)
             if(sl.size()>4) // якщо є всі поля
             {
                 s= sl[0]; // назва тега
+                //qDebug() << s;
                 current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
                 tags[s] << wc             // 0-index
                         << current_addr ; // 1- address
@@ -290,6 +298,20 @@ int RxModbus::loadList(QString fileName)
                 next_addr=current_addr+current_len; // розрахувати новий наступний очікуваний адрес
                 last_rf=current_rf;
 
+                if(sl.size()>6)
+                    text[s]=sl[6] ; // назва тега
+                else
+                    text[s]="-";
+
+                if(sl[5]=="+")
+                {
+                    QSettings set;
+                    set.beginGroup("/ioserv/scale/");
+                        data_scale[s] << 0.0
+                        << set.value(QString("Zero/%1").arg(s),0.0).toDouble()
+                        << set.value(QString("Full/%1").arg(s),100.0).toDouble();
+                }
+
             }
         }
 
@@ -301,6 +323,9 @@ int RxModbus::loadList(QString fileName)
         data_raw.resize(wc); // ініціалізувати пам’ять під змінні
 
         f.close();
+        qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
+
+//        loadScale(fileName);
         return i;
     }
     else

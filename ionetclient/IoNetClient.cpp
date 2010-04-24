@@ -111,6 +111,7 @@ void IoNetClient::slotSendQuery()
     qry.setVersion(QDataStream::Qt_4_2);
     for(int i=0;i<src.size();++i)  // перебрати по кількості джерел даних
     {
+          qry << qint8('R') << qint8('S') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
           qry << qint8('R') << qint8('D') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
     }
     pTcpSock->write(query); // відправити запит на сервер
@@ -119,11 +120,13 @@ void IoNetClient::slotSendQuery()
 void IoNetClient::slotReadServer()
 {
     QDataStream in(pTcpSock);
-    in.setVersion(QDataStream::Qt_4_2);
+    in.setVersion(QDataStream::Qt_4_6);
     int j=0;
     QDataStream qry(&query,QIODevice::WriteOnly);
-    qry.setVersion(QDataStream::Qt_4_2);
+    qry.setVersion(QDataStream::Qt_4_6);
     QVector<qint16> ts;
+    QHash<QString,QVector<double> >  ss;
+
     //QHash<QString,QVector<qint16> > tg;
 
     //qDebug() << "ba: " << pTcpSock->bytesAvailable() << " time;" << QDateTime::currentDateTime();
@@ -138,7 +141,7 @@ void IoNetClient::slotReadServer()
 	    }
 	     // прочитати заголовок
             in >> connState.Cmd >> connState.Type >>connState.iD >> connState.Index >> connState.Len ;
-            //qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
+            qDebug() << "Packet recived " << j << QChar(connState.Cmd) << QChar(connState.Type) << connState.Index << connState.Len;
             //qDebug() << "Packet recived " << connState.Cmd << connState.Type << connState.iD << connState.Index << connState.Len;
 
 	}
@@ -163,7 +166,8 @@ void IoNetClient::slotReadServer()
                         //qry.setVersion(QDataStream::Qt_4_2);
                         for(int i=0;i<c;++i)
                         {
-                            qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
+                            qry << qint8('R') << qint8('X') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку тегів
+                            qry << qint8('R') << qint8('T') << qint8(i) << qint16(0) << qint16(0); // сформувати запит на отримання списку назв тегів
                             src << new NetIoDev(this); // створити класи-сховища
                             src[i]->iD=i;
                         }
@@ -181,26 +185,56 @@ void IoNetClient::slotReadServer()
                            rtmr->start();
 
                         break;
+                    case 'X':
+                        in >> src[connState.iD]->text;
+                        break;
+
                     case 'D': // отримати масив з даними
                         //qDebug() << "Data resived connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // якщо є куди писати
                             in >> src[connState.iD]->data_raw; // зберегти отримані дані
                         else // інакше
                             in >>  ts; // просто спорожнити буфер
+
                         emit updateData();
+                        emit updateDataRaw();
+                        qDebug() << "emit updateDataRaw()";
+                        break;
+
+                    case 'S': // отримати масив з даними
+                        qDebug() << "Data resived Type S connState.iD " << connState.iD << " packet len" << connState.Len;
+                        if(connState.iD<src.size()) // якщо є куди писати
+                        {
+                            in >> src[connState.iD]->data_scale; // зберегти отримані дані
+                            if(pTcpSock->bytesAvailable()>0)
+                            {
+                                qDebug() << "Not read all. Left " << pTcpSock->bytesAvailable();
+                                ::exit(1);
+                            }
+                        }
+                        else // інакше
+                            in >>  ss; // просто спорожнити буфер
+                        emit updateData();
+                        emit updateDataScaled();
                         //qDebug() << "emit updateData()";
                         break;
+
                     default:
+                        qDebug() << "Unknown field Type" << connState.Type;
+                        ::exit(1);
 			break;
 		}
 		//sendBytes();
 		break;
 	    case 'W':
+                break;
 	    default:
-		break;
+                        qDebug() << "Unknown field Cmd" << connState.Cmd;
+                        ::exit(1);
+                break;
 	}
 	connState.Len=-1; // знову читати заголовок
-	//qDebug() << "Pack ACK";
+        qDebug() << "Pack ACK";
     }
 
     // перезапустити таймер. Чи цього буде достатньо ?

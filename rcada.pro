@@ -11,12 +11,14 @@ CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \
     logging/logging.cpp \
     ionetserver/IoNetServer.cpp \
-    iodev.cpp
+    iodev.cpp \
+    scaledev.cpp
 HEADERS += modbus/RxModbus.h \
     logging/logging.h \
     iodev.h \
     ionetserver/IoNetServer.h \
-    header.h
+    header.h \
+    scaledev.h
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
