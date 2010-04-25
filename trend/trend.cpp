@@ -1,4 +1,5 @@
 #include "trend.h"
+#include "ui_trend.h"
 
 #include <QColor>
 #include <QPen>
@@ -10,6 +11,7 @@
 #include <QColorDialog>
 #include <QDebug>
 
+#include "math.h"
 
 #include "datetimedialog.h"
 
@@ -28,140 +30,141 @@ namespace MyConst
 };
 
 TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget(p)
-    ,m_nHeight(nHeight),m_pnDt(NULL)
+    ,m_nHeight(nHeight),m_pnDt(NULL),m_ui(new Ui::Trend)
 {    
     //qDebug("Настройка вікна");
 
-    setupUi(this);
-//    setAttribute( Qt::WA_DeleteOnClose);
+    m_ui->setupUi(this);
+    //setAttribute( Qt::WA_DeleteOnClose); // ??? це що таке
+    connect(m_ui->Exit,SIGNAL(clicked()),this,SLOT(slotExit()));
 
     m_trinfo=tri;
     setObjectName(m_trinfo->trend);    
     
-    QVBoxLayout *vbl=new QVBoxLayout(trend); // менеджер розміщення для об'єкту TrendView
-    m_tw=new TrendView(trend);
+    QVBoxLayout *vbl=new QVBoxLayout(m_ui->trend); // менеджер розміщення для об'єкту TrendView
+    m_tw=new TrendView(m_ui->trend);
     vbl->setContentsMargins(2,2,2,2);
     vbl->addWidget(m_tw);    
-    trend->setLayout(vbl);
+    m_ui->trend->setLayout(vbl);
     
     connect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
     
-    trendHead->setText(m_trinfo->trendHead);
+    m_ui->trendHead->setText(m_trinfo->trendHead);
 
     // навігаційні кнопки
-    connect(forward,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(backward,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(forwardHalf,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(backwardHalf,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(calendarButton,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(last,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(Interval,SIGNAL(activated(int)),this,SLOT(dataChange()));
+    connect(m_ui->forward,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->backward,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->forwardHalf,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->backwardHalf,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->calendarButton,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->last,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->Interval,SIGNAL(activated(int)),this,SLOT(dataChange()));
     // кнопки вибору кольору
-    connect(pc_0,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_1,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_2,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_3,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_4,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_5,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_6,SIGNAL(clicked()),this,SLOT(colorChange()));
-    connect(pc_7,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_0,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_1,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_2,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_3,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_4,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_5,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_6,SIGNAL(clicked()),this,SLOT(colorChange()));
+    connect(m_ui->pc_7,SIGNAL(clicked()),this,SLOT(colorChange()));
     // перемикач вибору поля курсоку
-    connect(ps_0,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_1,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_2,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_3,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_4,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_5,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_6,SIGNAL(clicked()),this,SLOT(plotChange()));
-    connect(ps_7,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_0,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_1,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_2,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_3,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_4,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_5,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_6,SIGNAL(clicked()),this,SLOT(plotChange()));
+    connect(m_ui->ps_7,SIGNAL(clicked()),this,SLOT(plotChange()));
     // чекбокси вмикання графіку
-    connect(pv_0,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_1,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_2,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_3,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_4,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_5,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_6,SIGNAL(clicked()),this,SLOT(dataChange()));
-    connect(pv_7,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_0,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_1,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_2,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_3,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_4,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_5,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_6,SIGNAL(clicked()),this,SLOT(dataChange()));
+    connect(m_ui->pv_7,SIGNAL(clicked()),this,SLOT(dataChange()));
     // сигнал від перегрядача трендів, запит наперемалювання
     connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
     
-    connect(cursorVal,SIGNAL(valueChanged(int)),cursorLCD,SLOT(display(int)));
+    //connect(m_ui->cursorVal,SIGNAL(valueChanged(int)),m_ui->cursorLCD,SLOT(display(int)));
         
     //фарбую кнопки
     QPalette pal;
     
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[0]));
-    pc_0->setPalette(pal);
+    m_ui->pc_0->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[1]));
-    pc_1->setPalette(pal);
+    m_ui->pc_1->setPalette(pal);
     
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[2]));
-    pc_2->setPalette(pal);
+    m_ui->pc_2->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[3]));
-    pc_3->setPalette(pal);
+    m_ui->pc_3->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[4]));
-    pc_4->setPalette(pal);
+    m_ui->pc_4->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[5]));
-    pc_5->setPalette(pal);
+    m_ui->pc_5->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[6]));
-    pc_6->setPalette(pal);
+    m_ui->pc_6->setPalette(pal);
 
     pal.setColor(QPalette::Button,QColor(MyConst::DefColor[7]));
-    pc_7->setPalette(pal);
+    m_ui->pc_7->setPalette(pal);
 
     QPalette pl;
     pl.setColor(QPalette::Highlight,QColor(MyConst::DefColor[0]));
-    cursorVal->setPalette(pl);
+    m_ui->cursorVal->setPalette(pl);
 
-    cursorVal->setValue(0);
-    cursorVal->setRange(0,m_nHeight);
+    m_ui->cursorVal->setValue(0);
+    m_ui->cursorVal->setRange(0,m_nHeight);
     
     QPalette pn;     
     pn.setColor(QPalette::Window,QColor((QRgb)0x84A3AB));
     
-    frame->setAutoFillBackground(true);
-    frame->setPalette(pn);
+    m_ui->frame->setAutoFillBackground(true);
+    m_ui->frame->setPalette(pn);
 
-    navigation->setAutoFillBackground(true);
-    navigation->setPalette(pn);    
+    m_ui->navigation->setAutoFillBackground(true);
+    m_ui->navigation->setPalette(pn);
 
-    view->setAutoFillBackground(true);
-    view->setPalette(pn);    
+    m_ui->view->setAutoFillBackground(true);
+    m_ui->view->setPalette(pn);
 
-    ps_0->setChecked(true);
+    m_ui->ps_0->setChecked(true);
     
-    pv_0->setChecked(true);
-    pv_1->setChecked(true);
-    pv_2->setChecked(true);
-    pv_3->setChecked(true);
-    pv_4->setChecked(true);
-    pv_5->setChecked(true);
-    pv_6->setChecked(true);
-    pv_7->setChecked(true);
+    m_ui->pv_0->setChecked(true);
+    m_ui->pv_1->setChecked(true);
+    m_ui->pv_2->setChecked(true);
+    m_ui->pv_3->setChecked(true);
+    m_ui->pv_4->setChecked(true);
+    m_ui->pv_5->setChecked(true);
+    m_ui->pv_6->setChecked(true);
+    m_ui->pv_7->setChecked(true);
     
-    pv[0]=pv_0;
-    pv[1]=pv_1;
-    pv[2]=pv_2;
-    pv[3]=pv_3;
-    pv[4]=pv_4;
-    pv[5]=pv_5;
-    pv[6]=pv_6;
-    pv[7]=pv_7;
+    pv[0]=m_ui->pv_0;
+    pv[1]=m_ui->pv_1;
+    pv[2]=m_ui->pv_2;
+    pv[3]=m_ui->pv_3;
+    pv[4]=m_ui->pv_4;
+    pv[5]=m_ui->pv_5;
+    pv[6]=m_ui->pv_6;
+    pv[7]=m_ui->pv_7;
     
-    ps[0]=ps_0;
-    ps[1]=ps_1;
-    ps[2]=ps_2;
-    ps[3]=ps_3;
-    ps[4]=ps_4;
-    ps[5]=ps_5;
-    ps[6]=ps_6;
-    ps[7]=ps_7;
+    ps[0]=m_ui->ps_0;
+    ps[1]=m_ui->ps_1;
+    ps[2]=m_ui->ps_2;
+    ps[3]=m_ui->ps_3;
+    ps[4]=m_ui->ps_4;
+    ps[5]=m_ui->ps_5;
+    ps[6]=m_ui->ps_6;
+    ps[7]=m_ui->ps_7;
     
     
     for(int i=0;i<8;++i)
@@ -172,16 +175,16 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     m_stop=QDateTime::currentDateTime();
 
     // таблиця параметрів внизу вікна
-    twAgr->setColumnCount(4);
-    twAgr->setRowCount(8);
-    twAgr->setVerticalHeaderLabels(m_trinfo->fieldHead);
-    twAgr->horizontalHeader()->hide();
-    twAgr->verticalHeader()->setFixedWidth(300);
-    twAgr->setSortingEnabled(false);
+    m_ui->twAgr->setColumnCount(4);
+    m_ui->twAgr->setRowCount(8);
+    m_ui->twAgr->setVerticalHeaderLabels(m_trinfo->fieldHead);
+    m_ui->twAgr->horizontalHeader()->hide();
+    m_ui->twAgr->verticalHeader()->setFixedWidth(300);
+    m_ui->twAgr->setSortingEnabled(false);
     for(int i=0;i<8;++i)
-	twAgr->setRowHeight(i,20);
+        m_ui->twAgr->setRowHeight(i,20);
     for(int i=0;i<4;++i)
-        twAgr->setColumnWidth(i,75);
+        m_ui->twAgr->setColumnWidth(i,75);
     QTableWidgetItem *_item;
     for(int i=0;i<8;++i)
     {
@@ -189,7 +192,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 	{
 	    _item= new QTableWidgetItem;
 	    _item->setText("0.00");
-	    twAgr->setItem(i,j,_item);
+            m_ui->twAgr->setItem(i,j,_item);
 	}
     }
     
@@ -218,10 +221,10 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 	    //qDebug("max(Dt)=%u",query.value(1).toUInt());	    
 	    
 	    tmp.setTime_t(query.value(0).toUInt());
-	    db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yyyy"));
+            m_ui->db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
 
 	    tmp.setTime_t(query.value(1).toUInt());
-	    db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yyyy"));
+            m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
 	    query.clear();
 	}
 	else
@@ -244,13 +247,19 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 TrendWindow::~TrendWindow()
 {
     delete m_pnDt; 
-//    qDebug("Кінець роботи");
+    //qDebug("TrendWindow Кінець роботи");
     {
 	QSqlDatabase dbs=QSqlDatabase::database("history");
 	dbs.close();
     }
     QSqlDatabase::removeDatabase("history");
+    delete m_ui;
 
+}
+
+void TrendWindow::slotExit()
+{
+    emit finished();
 }
 
 void TrendWindow::dataChange()
@@ -268,19 +277,19 @@ void TrendWindow::dataChange()
 	}
 	else if(sndr=="forward")
 	{
-	    m_stop=m_stop.addSecs(MyConst::tmr[Interval->currentIndex()]);
+            m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]);
 	}
 	else if(sndr=="forwardHalf")
 	{
-	    m_stop=m_stop.addSecs(MyConst::tmr[Interval->currentIndex()]/2);
+            m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]/2);
 	}
 	else if(sndr=="backwardHalf")
 	{
-	    m_stop=m_stop.addSecs(-MyConst::tmr[Interval->currentIndex()]/2);
+            m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]/2);
 	}
 	else if(sndr=="backward")
 	{
-	    m_stop=m_stop.addSecs(-MyConst::tmr[Interval->currentIndex()]);
+            m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
 	}
 	else if(sndr=="calendarButton")
 	{
@@ -296,10 +305,10 @@ void TrendWindow::dataChange()
     // початок виконання запиту та малювання графіку
     QApplication::setOverrideCursor(Qt::WaitCursor);
     
-    m_start=m_stop.addSecs(-MyConst::tmr[Interval->currentIndex()]);
+    m_start=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
 
-    startDate->setText(m_start.toString("hh:mm:ss\ndd:MM:yyyy"));
-    stopDate->setText(m_stop.toString("hh:mm:ss\ndd:MM:yyyy"));
+    m_ui->startDate->setText(m_start.toString("hh:mm:ss\ndd:MM:yy"));
+    m_ui->stopDate->setText(m_stop.toString("hh:mm:ss\ndd:MM:yy"));
 
     for(i=0;i<m_trinfo->numPlot;++i)  //визначення полів запиту. ті які не відображаються == -1 щоб бути поза зоною відображення
     {	
@@ -369,13 +378,13 @@ if(dbs.isOpen())
 	for(i=0;i<m_trinfo->numPlot;++i)
 	{
 	    min=query.value(i*3+1).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-	    twAgr->item(i,1)->setText(QString("%1").arg(min,6,'f',2));
+            m_ui->twAgr->item(i,1)->setText(QString("%1").arg(min,6,'f',2));
 	    	    
 	    avg=query.value(i*3+2).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-	    twAgr->item(i,2)->setText(QString("%1").arg(avg,6,'f',2));
+            m_ui->twAgr->item(i,2)->setText(QString("%1").arg(avg,6,'f',2));
 	    
 	    max=query.value(i*3+3).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-	    twAgr->item(i,3)->setText(QString("%1").arg(max,6,'f',2));	    
+            m_ui->twAgr->item(i,3)->setText(QString("%1").arg(max,6,'f',2));
 	}
 	query.clear();
 
@@ -413,7 +422,7 @@ void TrendWindow::colorChange()
 
 	    QPalette pl;
 	    pl.setColor(QPalette::Highlight,m_Color[i]);
-	    cursorVal->setPalette(pl);
+            m_ui->cursorVal->setPalette(pl);
 	
 	    m_tw->setColors(m_Color,m_trinfo->numPlot);
 	    dataChange();
@@ -427,7 +436,7 @@ void TrendWindow::plotChange()
     int i= sender()->objectName().mid(3,1).toInt();
     QPalette pal;
     pal.setColor(QPalette::Highlight,m_Color[i]);
-    cursorVal->setPalette(pal);
+    m_ui->cursorVal->setPalette(pal);
 //    cursorVal->setRange(m_trinfo->fScale[i][0],m_trinfo->fScale[i][1]);// недуже точно але....
     setCursor(-1);    
     
@@ -448,10 +457,10 @@ QSqlDatabase dbs=QSqlDatabase::database("history");
 if(dbs.isOpen())
 {
     
-    pos=m_start.toTime_t()+ MyConst::tmr[Interval->currentIndex()]*v/m_tw->width();
+    pos=m_start.toTime_t()+ MyConst::tmr[m_ui->Interval->currentIndex()]*v/m_tw->width();
 
     m_cursor.setTime_t(pos);    
-    cursorDate->setText(m_cursor.toString("hh:mm:ss\ndd:MM:yyyy"));  
+    m_ui->cursorDate->setText(m_cursor.toString("hh:mm:ss\ndd:MM:yy"));
     
     if(m_nLen > 1)
     {
@@ -481,12 +490,15 @@ if(dbs.isOpen())
 	    double val;	    
 	    for(i=0;i<m_trinfo->numPlot;++i)
 	    {
-		val=qry.value(i+1).toDouble()*	(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-		twAgr->item(i,0)->setText(QString("%1").arg(val,6,'f',2));
+                //qDebug() << i+1 << qry.value(i+1).toDouble() << m_trinfo->fScale[i][1] << m_trinfo->fScale[i][0] << m_nHeight;
+
+                val=(qry.value(i+1).toDouble()*	(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0]))/(double)m_nHeight + m_trinfo->fScale[i][0];
+                m_ui->twAgr->item(i,0)->setText(QString("%1").arg(val,6,'f',2));
 		if(ps[i]->isChecked())
 		{
-		    cursorVal->setValue(qry.value(i+1).toInt());
-		    cursorLCD->display(val);
+                    m_ui->cursorVal->setValue(qry.value(i+1).toInt());
+                    m_ui->cursorLCD->display(fabs(val)<1.5?ceil(val):val);
+
 		}
 	    }
 	    qry.clear();

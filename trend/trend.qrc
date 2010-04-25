@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="trend">
+    <file>../../pict/exit_32x32.png</file>
+    <file>../../pict/calendar_48x48.png</file>
+  </qresource>
+</RCC>

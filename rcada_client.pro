@@ -6,23 +6,23 @@ QT += network \
 TARGET = rcada_client
 TEMPLATE = lib
 CONFIG += staticlib
-HEADERS += datetimedialog.h \
-    trend\trend.h \
-    ionetclient/IoNetClient.h \
-    iodev.h \
+HEADERS += iodev.h \
     header.h \
     ionetclient/netiodev.h \
-    trendchar/trendchart.h
-SOURCES += trend\trend.cpp \
-    ionetclient/IoNetClient.cpp \
+    ionetclient/IoNetClient.h \
+    trendchar/trendchart.h \
+    trend/trend.h \
+    trend/datetimedialog.h
+SOURCES += ionetclient/IoNetClient.cpp \
     ionetclient/netiodev.cpp \
     iodev.cpp \
-    trendchar/trendchart.cpp
-FORMS += trend\trend.ui \
-    trend\datetime.ui
-
+    trendchar/trendchart.cpp \
+    trend/trend.cpp
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
 RCC_DIR = build
 VERSION = 0.1.0
+RESOURCES += trend/trend.qrc
+FORMS += trend/trend.ui \
+    trend/datetime.ui

@@ -1,12 +1,14 @@
 #ifndef _TREND_H_
 #define _TREND_H_
 
-#include "ui_trend.h"
+//#include "ui_trend.h"
 
 #include <QDateTime>
 #include <QString>
 #include <QPainter>
 #include <QColor>
+#include <QCheckBox>
+#include <QRadioButton>
 
 #include <QtSql>
 
@@ -27,8 +29,13 @@ struct trendinfo
     
 } ;
 
+namespace Ui
+{
+    class Trend;
+}
+
 // клас головного вікна
-class TrendWindow: public QWidget, public Ui::Trend
+class TrendWindow: public QWidget //, public Ui::Trend
 {
     Q_OBJECT
 public:
@@ -40,11 +47,12 @@ public slots:
     void colorChange();
     void plotChange();     
     void setCursor(int v=0);
+    void slotExit();
 
 signals:
     void repaintRequest();
-    
-protected:
+    void finished();
+private:
     TrendView *m_tw;
     
     //QSqlDatabase dbs;
@@ -68,6 +76,7 @@ protected:
 
     unsigned int *m_pnDt; //масив, для пошуку поточного положення курсору
     int m_nLen; // довжина масива
+    Ui::Trend *m_ui;
 };
 
 

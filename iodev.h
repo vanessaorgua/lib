@@ -16,6 +16,7 @@ public:
     inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }
     inline qint16 getIndex(QString tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
     inline qint16 getAddress(QString tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
+    inline qint16 fieldType(QString tag) { return tags.contains(tag) ?tags[tag][2]:qint16(-1); }
 
     inline const QVector<qint16> &getDataRaw() {return data_raw;}
 
@@ -48,7 +49,7 @@ public:
 // це стосується шкал, у деяких потомках треба перевизначити деякі методи
     double getValueScaled(QString tag) { return data_scale.contains(tag)?data_scale[tag][0]:0.0; }
     inline double scaleZero(QString tag) { return data_scale.contains(tag)?data_scale[tag][1]:0.0;    }
-    inline double scaleFull(QString tag) { return data_scale.contains(tag)?data_scale[tag][2]:0.0;    }
+    inline double scaleFull(QString tag) { return data_scale.contains(tag)?data_scale[tag][2]:100.0;    }
 
     virtual void sendValueScaled(QString tag,double v) ;
     virtual void setScaleZero(QString tag,double v) ;
