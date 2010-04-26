@@ -1,15 +1,18 @@
-#include <QApplication>
+#include <QCoreApplication>
 #include <QSettings>
+#include <QDebug>
 
-#include "../iodev.h"
+
+#include "iodev.h"
 #include "RxModbus.h"
-#include "form.h"
-#include "../logging/logging.h"
-#include "../ionetserver/IoNetServer.h"
+#include "logging.h"
+#include "IoNetServer.h"
+#include "alert.h"
+
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     QCoreApplication::setOrganizationName("Rabitsa");
     QCoreApplication::setApplicationName("test");
@@ -32,8 +35,12 @@ int main(int argc, char *argv[])
 
     IoNetServer s(src);
 
-    Form w(&r);
-    w.show();
+    Alert al(&r);
+    al.loadList(":/text/Linovitsa/filters/text/alert.txt");
+
+    QObject::connect(&r,SIGNAL(updateData()),&al,SLOT(checkAlert()));
+    QObject::connect(&al,SIGNAL(newAlert(QString)),&s,SLOT(sendAlert(QString)));
+
 
     return a.exec();
 }

@@ -37,6 +37,8 @@ signals:
         void updateData();
         void updateDataRaw();
         void updateDataScaled();
+        void Alert(QString);
+
 private:
     // масиви, які містять сирі дані із контролера копія даних із сервера
     struct _Header connState;

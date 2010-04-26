@@ -33,6 +33,9 @@ public:
         void setPort(int Port);
         void start();
 
+signals:
+    void updateData(); // сигнал висилається коли отримано новідані не наслідується
+
 public slots:
             void sendValue(QString tag,qint16 v);
             void sendValue(QString tag,qint32 v);

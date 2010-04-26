@@ -209,6 +209,14 @@ void IoNetClient::slotReadServer()
                         emit updateDataScaled();
                         //qDebug() << "emit updateData()";
                         break;
+                    case 'A':
+                        {
+                            QString as;
+                            in >> as;
+                            qDebug() << "Alert "<< as;
+                            emit Alert(as);
+                        }
+                        break;
 
                     default:
                         qDebug() << "Unknown field Type" << connState.Type;

@@ -1,6 +1,6 @@
 <RCC>
-    <qresource prefix="/text" >
-        <file>test_map.txt</file>
+    <qresource prefix="/text">
         <file>list.txt</file>
+        <file>../../Linovitsa/filters/text/alert.txt</file>
     </qresource>
 </RCC>

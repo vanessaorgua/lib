@@ -181,3 +181,20 @@ void IoNetServer::slotReadClient()
 }
 
 
+void IoNetServer::sendAlert(QString v)
+{
+    QByteArray arrBlock;
+    QDataStream out(&arrBlock,QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_4_6);
+
+    out << qint8('R') << qint8('A') << qint8(-1) << qint16(0) << qint16(0) << v;
+    out.device()->seek(5); // переміститись до поля із довжиною
+    out << qint16(arrBlock.size()-7); // записати довжину блоку даних
+
+    foreach(QTcpSocket* p,connState.keys())
+    {
+        p->write(arrBlock);
+    }
+
+
+}

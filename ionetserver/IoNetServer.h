@@ -20,6 +20,7 @@ public slots:
     virtual void slotNewConnection();
 	    void slotReadClient();
 	    void slotDisconnect();
+            void sendAlert(QString);
 
 private:
     QVector<IoDev*> src;

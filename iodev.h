@@ -12,6 +12,8 @@ public:
     IoDev() {}   // кноструктор, треба уточнити
     virtual ~IoDev() =0 ;// поки-що тривіальний деструктор
 
+
+
     // методи доступу до даних
     inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }
     inline qint16 getIndex(QString tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
@@ -54,6 +56,7 @@ public:
     virtual void sendValueScaled(QString tag,double v) ;
     virtual void setScaleZero(QString tag,double v) ;
     virtual void setScaleFull(QString tag,double v) ;
+
 
 protected:
     // Сховище даних. можливо треба буде переробляти

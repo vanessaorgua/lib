@@ -187,6 +187,7 @@ void RxModbus::slotRead()
         {
             //qDebug() << "Calculate data_scale";
             updateScaledValue();
+            emit updateData();
         }
 
         if(!(query_list.size()>nC || query_queue.isEmpty())) // перевірити чергу при умові що інших запитів немає.
@@ -217,6 +218,8 @@ int RxModbus::loadList(QString fileName)
 
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
+
+    QHash<QString,QString> tag_scale; // тут будуть теги, які шкалюються по іншому параметру
 
     QSet<QString> ft;
     ft << "Integer" << "Bool" << "Real" << "Timer" << "Long";
@@ -303,6 +306,10 @@ int RxModbus::loadList(QString fileName)
                 else
                     text[s]="-";
 
+
+                // цей код би винести в окремий клас
+            if(sl[5]!="-")
+            {
                 if(sl[5]=="+")
                 {
                     QSettings set;
@@ -311,6 +318,31 @@ int RxModbus::loadList(QString fileName)
                         << set.value(QString("Zero/%1").arg(s),0.0).toDouble()
                         << set.value(QString("Full/%1").arg(s),100.0).toDouble();
                 }
+                else
+                {
+                    QStringList f=sl[5].split(" "); // розбити поле на дві частини
+                    if(f.size()==2) // якщо там його насправді двое
+                    {
+                        bool o1,o2;
+                        double zs,fs;
+                        zs=f[0].toDouble(&o1);
+                        fs=f[1].toDouble(&o2);
+                        if(o1 && o2)
+                        {
+                            data_scale[s] << 0.0 << zs << fs;
+                        }
+                        else
+                        {
+                            data_scale[s] << 0.0 << 0.0 << 100.0;
+                        }
+                    }
+                    else // якщо дойшли сюди то там мабуть тег
+                    {
+                        tag_scale[s]=sl[5]; // запам’ятати
+                    }
+                }
+            }
+
 
             }
         }
@@ -323,7 +355,21 @@ int RxModbus::loadList(QString fileName)
         data_raw.resize(wc); // ініціалізувати пам’ять під змінні
 
         f.close();
-        qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
+
+        // завантаженя відложених тегів, якщо є
+        foreach(QString f,tag_scale.keys())
+        {
+            if(data_scale.contains(tag_scale[f]))
+            {
+                data_scale[f] << 0.0 << data_scale[tag_scale[f]][1] << data_scale[tag_scale[f]][2] ;
+            }
+            else
+            {
+                qDebug() << "Scale not found tag"<< f << "scaled on " << tag_scale[f];
+            }
+        }
+
+        //qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
 
 
 
