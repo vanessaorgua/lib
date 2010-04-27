@@ -22,7 +22,7 @@ public:
 
     inline const QVector<qint16> &getDataRaw() {return data_raw;}
 
-    inline const QHash<QString,QVector<double> > &getDataScaled() { return data_scale;}
+    inline QHash<QString,QVector<double> > &getDataScaled() { return data_scale;}
 
     inline const QHash<QString,QString> &getText() { return text; }
 
@@ -37,8 +37,15 @@ public:
         }
     }
 
-    inline qint32 getValue32(QString tag) {return *(qint32*)(data_raw.data()+tags[tag][0]); }
-    inline float getValueFloat(QString tag) { return *(float*)(data_raw.data()+tags[tag][0]); }
+    inline qint32 getValue32(QString tag)
+    {
+        return tags.contains(tag)?*(qint32*)(data_raw.data()+tags[tag][0]):0;
+    }
+
+    inline float getValueFloat(QString tag)
+    {
+        return tags.contains(tag)?*(float*)(data_raw.data()+tags[tag][0]):0;
+    }
 
 
 
