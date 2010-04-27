@@ -12,12 +12,14 @@ HEADERS += iodev.h \
     ionetclient/IoNetClient.h \
     trendchar/trendchart.h \
     trend/trend.h \
-    trend/datetimedialog.h
+    trend/datetimedialog.h \
+    RotatedLabel/rotatedlabel.h
 SOURCES += ionetclient/IoNetClient.cpp \
     ionetclient/netiodev.cpp \
     iodev.cpp \
     trendchar/trendchart.cpp \
-    trend/trend.cpp
+    trend/trend.cpp \
+    RotatedLabel/rotatedlabel.cpp
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
