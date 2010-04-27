@@ -52,7 +52,7 @@ private slots:
     void slotError(QAbstractSocket::SocketError);
 
     void slotRead();
-    void slotSend();
+    //void slotSend();
 private:
     QTcpSocket *pS; //сокет для зв’язку
     QString sHostname; // ім’я чи IP-адреса контролера
@@ -60,7 +60,7 @@ private:
     qint16 nI; // це буде індекс пакунка
     int nLen; // довжина наступноно бока даних
 
-    QTimer *connSend; // таймер для відправки чергового запиту
+    //QTimer *connSend; // таймер для відправки чергового запиту
     QTimer *connWait; // тайсер очікування перед спробою встановити нове з’єднання
     QTimer *connTimeout; // таймер таймауту з’єднання, можливо в нових версіях QT цей алгоритм буде непотрібен
 

@@ -13,16 +13,17 @@ RxModbus::RxModbus(): nPort(502) ,nC(0) // кноструктор, треба у
 {
 
     // теймер для періодичної відправки запитів
-    connSend=new QTimer(this);
-    connSend->setInterval(1000);
-    connect(connSend,SIGNAL(timeout()),this,SLOT(slotSend()));
+    //connSend=new QTimer(this);
+    //connSend->setInterval(1000);
+    //connect(connSend,SIGNAL(timeout()),this,SLOT(slotSend()));
+
     // теймер паузи між спробами встановити нове з’єднання
     connWait=new QTimer(this);
-    connWait->setInterval(5000);
+    connWait->setInterval(10000);
     connect(connWait,SIGNAL(timeout()),this,SLOT(slotNewConnect()));
     // таймер для відліку таймайту з’єднання
     connTimeout=new QTimer(this);
-    connTimeout->setInterval(10000);
+    connTimeout->setInterval(2000);
     connect(connTimeout,SIGNAL(timeout()),this,SLOT(slotTimeout()));
 
     // сокет для здійснення обміну даними
@@ -42,11 +43,12 @@ RxModbus::~RxModbus() // поки-що тривіальний деструкто
 
 void RxModbus::slotConnected () // приєдналися
 {
-    connSend->start();
+    //connSend->start();
     connTimeout->start();
     nLen=0;
     //qDebug() <<  "Connected to host";
-    slotSend(); // розпочати обмін
+    // slotSend(); // розпочати обмін
+    pS->write(query_list[0]);
     nC=0;
 }
 
@@ -58,7 +60,7 @@ void RxModbus::slotNewConnect()
 
 void RxModbus::slotTimeout() // таймаут отримання даних від сервера
 {
-    connSend->stop();
+//   connSend->stop();
     connTimeout->stop();
     connWait->start();
     pS->close();
@@ -66,22 +68,22 @@ void RxModbus::slotTimeout() // таймаут отримання даних в�
 
 void RxModbus::slotDisconnect() // відєднання зі сторони сервера
 {
-    connSend->stop(); // зупинити таймер, коли від’єднано немає сенсу слати запити
+    //connSend->stop(); // зупинити таймер, коли від’єднано немає сенсу слати запити
     pS->close();
 }
 
 void RxModbus::slotError(QAbstractSocket::SocketError)
 {
-    connSend->stop();
+    //connSend->stop();
     connTimeout->stop();
     connWait->start();
     pS->close();
-    //qDebug() << "Connection error";
+    qDebug() << "Connection error";
 }
 
 
 // виявилося що не получається виконувавти асинхронні запити до контролера I-8000, це не дуже добре.
-
+/*
 void RxModbus::slotSend()
 {
 #ifdef ASYNC
@@ -108,7 +110,7 @@ void RxModbus::slotSend()
     }
 #endif
 }
-
+*/
 
 void RxModbus::slotRead()
 {
@@ -194,6 +196,7 @@ void RxModbus::slotRead()
         {
             //qDebug() << "Queue size " << query_queue.size();
             pS->write(query_queue.dequeue()); // якщо не пуста, передати
+            if(query_queue.isEmpty()) nC=-1; // для того щоб наступний раз відправити перший пакунок
         }
 
 #endif
