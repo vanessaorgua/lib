@@ -50,6 +50,7 @@ void RxModbus::slotConnected () // приєдналися
     // slotSend(); // розпочати обмін
     pS->write(query_list[0]);
     nC=0;
+    emit Alert(QString("Connected to PLC: %1:%2").arg(sHostname).arg(nPort));
 }
 
 void RxModbus::slotNewConnect()
@@ -64,6 +65,7 @@ void RxModbus::slotTimeout() // таймаут отримання даних в�
     connTimeout->stop();
     connWait->start();
     pS->close();
+    emit Alert(QString("Connection to PLC lost: %1:%2").arg(sHostname).arg(nPort));
 }
 
 void RxModbus::slotDisconnect() // відєднання зі сторони сервера
@@ -77,8 +79,9 @@ void RxModbus::slotError(QAbstractSocket::SocketError)
     //connSend->stop();
     connTimeout->stop();
     connWait->start();
+    //qDebug() << "Connection error";
+    emit Alert(QString("Connection to PLC error: %1:%2. %3").arg(sHostname).arg(nPort).arg(pS->errorString()));
     pS->close();
-    qDebug() << "Connection error";
 }
 
 

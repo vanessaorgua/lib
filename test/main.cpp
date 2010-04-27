@@ -41,6 +41,8 @@ int main(int argc, char *argv[])
     QObject::connect(&r,SIGNAL(updateData()),&al,SLOT(checkAlert()));
     QObject::connect(&al,SIGNAL(newAlert(QString)),&s,SLOT(sendAlert(QString)));
 
+    QObject::connect(&r,SIGNAL(Alert(QString)),&s,SLOT(sendAlert(QString)));
+
 
     return a.exec();
 }

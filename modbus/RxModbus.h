@@ -35,6 +35,7 @@ public:
 
 signals:
     void updateData(); // сигнал висилається коли отримано новідані не наслідується
+    void Alert(QString); // будуть висилатися сигнали згідно із станом зв’язку
 
 public slots:
             void sendValue(QString tag,qint16 v);

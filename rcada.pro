@@ -26,3 +26,4 @@ OBJECTS_DIR = build
 UI_DIR = build
 RCC_DIR = build
 VERSION = 0.1.0
+
