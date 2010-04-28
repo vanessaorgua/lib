@@ -32,7 +32,7 @@ void Alert::checkAlert()
             if(( f & !o & v ) | (!f & o & !v )) // вираз оптимізований на основі карти карно
             {
                 emit newAlert(diAlert[str][2]);
-                qDebug() << "emit newAlert(diAlert[str][2])" ;
+                //qDebug() << "emit newAlert(diAlert[str][2])" ;
             }
             diAlert[str][3]=v?"1":"0";
         }
@@ -61,7 +61,7 @@ int Alert::loadList(QString fileName)
             }
         }
         f.close();
-        qDebug() << diAlert;
+        //qDebug() << diAlert;
     }
     else
     {

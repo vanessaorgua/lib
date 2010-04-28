@@ -48,6 +48,7 @@ void NetIoDev::sendValue(QString tag,QVector<qint16> &v)
     qry << qint16(query.size()-7);
 
     p->pTcpSock->write(query);
+    //qDebug() << tag << v;
 }
 
 void NetIoDev::sendValueScaled(QString tag,double v)
@@ -70,7 +71,7 @@ void NetIoDev::setScaleZero(QString tag,double v)
 {
     if(data_scale.contains(tag))
     {
-        qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
+        //qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
         QByteArray query;
         QDataStream qry(&query,QIODevice::WriteOnly);
         qry.setVersion(QDataStream::Qt_4_2);
