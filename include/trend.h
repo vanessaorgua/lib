@@ -1,0 +1,1 @@
+#include "../trend/trend.h"
