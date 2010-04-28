@@ -23,7 +23,7 @@ RxModbus::RxModbus(): nPort(502) ,nC(0) // кноструктор, треба у
     connect(connWait,SIGNAL(timeout()),this,SLOT(slotNewConnect()));
     // таймер для відліку таймайту з’єднання
     connTimeout=new QTimer(this);
-    connTimeout->setInterval(2000);
+    connTimeout->setInterval(10000);
     connect(connTimeout,SIGNAL(timeout()),this,SLOT(slotTimeout()));
 
     // сокет для здійснення обміну даними
@@ -173,7 +173,7 @@ void RxModbus::slotRead()
         }
 
 #ifdef ASYNC
-      // qDebug() << "nC " << nC << "local_read "<< local_read[nC];
+      //qDebug() << "nC " << nC  << "query_list.size()" << query_list.size() ;
         // відправити наступний запит
         ++nC;
         while(nC<query_list.size())
@@ -195,15 +195,19 @@ void RxModbus::slotRead()
             emit updateData();
         }
 
-        if(!(query_list.size()>nC || query_queue.isEmpty())) // перевірити чергу при умові що інших запитів немає.
+        if(! (nC < query_list.size()))
         {
-            //qDebug() << "Queue size " << query_queue.size();
-            pS->write(query_queue.dequeue()); // якщо не пуста, передати
-            if(query_queue.isEmpty()) nC=-1; // для того щоб наступний раз відправити перший пакунок
+            //qDebug() << "Process query queue" ;
+            if(query_queue.isEmpty()) // перевірити чергу при умові що інших запитів немає.
+            {
+                    pS->write(query_list[0]);
+                    nC=0;
+
+            }
+            else
+                pS->write(query_queue.dequeue()); // якщо не пуста, передати
         }
-
 #endif
-
         nLen=0;
     }
     connTimeout->stop();
