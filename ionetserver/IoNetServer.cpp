@@ -12,6 +12,7 @@ IoNetServer::IoNetServer(QVector<IoDev*> s,int nPort)
     {
 	qDebug() << "Unable to start the server";
 	m_pTcpServer->close();
+        ::exit(1);
     }
     connect(m_pTcpServer,SIGNAL(newConnection()),this,SLOT(slotNewConnection()));
     //QFile f("~/vipgr.log");
