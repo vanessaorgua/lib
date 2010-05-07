@@ -29,7 +29,7 @@ IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort
     connTimeout=new QTimer(this);
     connTimeout->setInterval(10000); // інтервал очікування даних від сервера
     connect(connTimeout,SIGNAL(timeout()),this,SLOT(slotTimeout()));
-
+    zero = new NetIoDev(this);
 
 }
 
@@ -41,6 +41,7 @@ IoNetClient::~IoNetClient()
     {
         delete v;
     }
+    delete zero;
 }
 
 void IoNetClient::slotConnected()

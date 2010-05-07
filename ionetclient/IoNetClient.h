@@ -21,7 +21,7 @@ public:
     ~IoNetClient();
 
     // методи доступу
-    NetIoDev *operator[](int i) { return src[i]; }
+    NetIoDev *operator[](int i) { return i<src.size()? src[i] :  zero ; }
 
 
 public slots: // це все має відношення до з’єднання із сервером
@@ -52,6 +52,8 @@ private:
 
    // решта даних та функцій доступу наслідуються із батьківського класу
     QVector<NetIoDev*> src;
+
+    NetIoDev* zero;
 
     friend class NetIoDev; // чи не забагато друзів, щоб не додавати зайві методи ?
 
