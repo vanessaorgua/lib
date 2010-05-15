@@ -273,6 +273,12 @@ int RxModbus::loadList(QString fileName)
                     wc+=2;
                     current_len=2;
                 }
+                else if(sl[2]=="EBOOL") // це спеціально для шнайдера
+                {
+                    ++wc;
+                    current_len=1;
+                    // тут треба зімітувати дірку
+                }
                 else // невідомий тип даних
                 {
                     qDebug() << tr("Unknown data type");
