@@ -68,6 +68,8 @@ private:
 
     // Список запитів
     QVector<QByteArray> query_list;
+    QVector<int> dataLen; // довжина відповіді в словах
+
     QVector<qint16> query_read,local_read;
 
 #ifdef ASYNC

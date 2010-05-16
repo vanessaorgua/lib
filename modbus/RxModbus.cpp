@@ -3,6 +3,9 @@
 #include <QString>
 #include <QTimer>
 
+#define GETMCR 1
+#define PUTSCR 5
+#define PUTMCR 15
 
 #define GETMHR 3
 #define PUTSHR 6
@@ -148,6 +151,26 @@ void RxModbus::slotRead()
         //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
+            case GETMCR:
+                in >> bc; // прочитати кількість байт
+                qDebug() <<  "dataLen " << dataLen[nC];
+                for(int i=0;i<bc;++i)
+                {
+                    qint8 v;
+                    in >> v; // a тепер це треба правильно розпакувати..........
+                    for(int j=0;j<8;++j)
+                    {
+                        int ix=i*8+j;
+                        if(ix<dataLen[nC])
+                        {
+                            data_raw[Index+ix]=qint16(v&0x01?-1:0); // все так от тільки чи влізе воно?
+                        }
+                        else
+                            break;
+                            v>>=1;
+                    }
+                }
+                break;
             case GETMHR:
                 in >> bc; // прочитати кількість байт
                 bc >>= 1; // розрахувати кількість слів
@@ -160,6 +183,9 @@ void RxModbus::slotRead()
                 }
 
                 break;
+
+            case PUTSCR:
+            case PUTMCR:
             case PUTSHR:
             case PUTMHR:
                 //qDebug() << "Ok fc "<< fc << "nLen " << nLen;
@@ -222,8 +248,11 @@ int RxModbus::loadList(QString fileName)
     QString s;
     QStringList sl;
     int wc=0, wc_last=0; // лічильник слів
+
     qint16 next_addr=0,current_addr=0; //адреси
+
     qint16 current_len=0,packet_len=0; // поточна довжина
+
     qint16 current_rf=0,last_rf=0; // прапори читання
 
     QByteArray query;
@@ -231,8 +260,9 @@ int RxModbus::loadList(QString fileName)
 
     QHash<QString,QString> tag_scale; // тут будуть теги, які шкалюються по іншому параметру
 
-    QSet<QString> ft;
-    ft << "Integer" << "Bool" << "Real" << "Timer" << "Long";
+    QStringList ft;
+    ft << "Integer" << "Bool" << "Real" << "Timer" << "Long" << "EBOOL" ;
+    qint16 current_ft=0,last_ft=0; // пити полів, для виявлення EBOOL
 
     qry.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
 
@@ -285,17 +315,21 @@ int RxModbus::loadList(QString fileName)
                     ::exit(1);
                 }
 
-                tags[s] << std::distance( ft.begin() ,ft.find(sl[2]))   // 2-довжина !!! це місце треба перевірити
+                current_ft=ft.indexOf(sl[2]);
+                //qDebug() << sl[2] << ft[current_ft];
+                tags[s] << current_ft   // 2-довжина !!! це місце треба перевірити
                         << current_rf   // 3-кратність читання
                         << sl[4].toInt(); // 4-прапори запису історії
 
                 packet_len+=current_len;
 
-                if(packet_len>124 || current_addr>next_addr || current_rf!=last_rf) //виявити дірки, межі пакунків, кратність читання.
+                if(packet_len>124 || current_addr>next_addr || current_rf!=last_rf || (current_ft==5 && last_ft!=5) || (current_ft!=5 && last_ft==5)) //виявити дірки, межі пакунків, кратність читання чи зміну типу
                 {
                     if(query.size()) // якщо щось є,
                     {
                         query_list <<  query; // зберегти
+                        dataLen << packet_len;
+                        qDebug() << packet_len-current_len; //
                         //qDebug() << query;
                     }
 
@@ -304,8 +338,9 @@ int RxModbus::loadList(QString fileName)
                     query.clear();
                     // сформувати заголовок
                     packet_len=current_len;
-                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(GETMHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
+                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
                                                                                           //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
+                    qDebug() << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1);
                     query_read << current_rf; //прапор read на пакунок
                     local_read << 0;
                 }
@@ -316,6 +351,7 @@ int RxModbus::loadList(QString fileName)
                 qry << packet_len; //додати довжину пакунка
                 next_addr=current_addr+current_len; // розрахувати новий наступний очікуваний адрес
                 last_rf=current_rf;
+                last_ft=current_ft;
 
                 if(sl.size()>6)
                     text[s]=sl[6] ; // назва тега
@@ -366,6 +402,8 @@ int RxModbus::loadList(QString fileName)
         if(query.size()) // зберегти останній запит.
         {
             query_list << query;
+            dataLen << packet_len;
+            qDebug() << packet_len;
             query_read << current_rf;
         }
         data_raw.resize(wc); // ініціалізувати пам’ять під змінні
@@ -387,7 +425,7 @@ int RxModbus::loadList(QString fileName)
 
         //qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
 
-
+        qDebug() << tags.keys();
 
 //        loadScale(fileName);
         return i;
@@ -425,9 +463,20 @@ void RxModbus::sendValue(QString tag,qint16 v)
    if(tags.contains(tag) ) // перевірити наявність заданого тега
    {
         qry << qint16(0) << qint16(0) << qint16(6)  // TCP заголовок
-           << qint8(1) << qint8(PUTSHR)             // модбас заголовок
+           << qint8(1) ;
+        if(tags[tag][2]!=5)
+        {
+            qry << qint8(PUTSHR)             // модбас заголовок
            << qint16(tags[tag][1]-1)                // адреса даних
            << v;                            // самі дані
+        }
+        else
+        {
+            qry << qint8(PUTSCR)             // модбас заголовок
+           << qint16(tags[tag][1]-1)                // адреса даних
+           << qint16(v?0xFF00:0);                            // самі дані
+        }
+
         data_raw[tags[tag][0]]=v; // записати в буфер
 #ifdef ASYNC
         query_queue.enqueue(q); // поставити в чергу на відправку в контролер
