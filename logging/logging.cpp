@@ -25,7 +25,7 @@ Logging::Logging(QVector<IoDev*> src): s(src)
     {
         tags_list << v->getTags();
     }
-
+    tables << "trend";
 }
 
 Logging::~Logging()
@@ -83,7 +83,7 @@ void Logging::dbStore()
             }
         }
         //qDebug() <<  QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
-        log << QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
+        log << QString("INSERT INTO %1 (%2) VALUE (%3)").arg(tables[j]).arg(field).arg(value);
         ++j;
     }
 
