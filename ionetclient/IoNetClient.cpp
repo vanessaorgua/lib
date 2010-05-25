@@ -46,7 +46,7 @@ IoNetClient::~IoNetClient()
 
 void IoNetClient::slotConnected()
 {
-    //qDebug() << "Conected..";
+    qDebug() << "Conected..";
 
     query.clear();
     QDataStream qry(&query,QIODevice::WriteOnly);
