@@ -19,7 +19,7 @@ TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent)
     
     resize(parent->width(),parent->height());
 
-    xS=((double)size().width())/3600.0;
+    xS=((double)size().width())/(double)nLen; // 3600.0;
     yS=((double)size().height())/4000.0;
 
 
@@ -36,7 +36,7 @@ TrendChart::TrendChart(QWidget *parent,TrendChart *p):QWidget(parent),slave(true
 
     resize(parent->width(),parent->height());
 
-    xS=((double)size().width())/3600.0;
+    xS=((double)size().width())/(double)nLen;
     yS=((double)size().height())/4000.0;
 
     nLen=master->nLen;
@@ -94,7 +94,7 @@ void TrendChart::paintEvent(QPaintEvent*)
 
 void TrendChart::resizeEvent(QResizeEvent *e)
 {
-    xS=((double)e->size().width())/3600.0; //  розразувати нові коефіцієнти масштабування
+    xS=((double)e->size().width())/(double)nLen ; // 3600.0; //  розразувати нові коефіцієнти масштабування
     yS=((double)e->size().height())/4000.0;
     update();
 }
