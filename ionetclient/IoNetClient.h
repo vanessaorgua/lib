@@ -35,6 +35,7 @@ public slots: // це все має відношення до з’єднанн�
 
 signals:
         void updateData();
+        void updateData(int);
         void updateDataRaw();
         void updateDataScaled();
         void Alert(QString);

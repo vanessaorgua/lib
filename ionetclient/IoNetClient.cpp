@@ -195,8 +195,11 @@ void IoNetClient::slotReadServer()
                         else // інакше
                             in >>  ts; // просто спорожнити буфер
 
+
                         emit updateData();
                         emit updateDataRaw();
+                        emit updateData(connState.iD);
+
                         //qDebug() << "emit updateDataRaw()";
                         break;
 
