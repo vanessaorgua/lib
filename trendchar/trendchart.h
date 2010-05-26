@@ -14,6 +14,8 @@ class TrendChart : public QWidget
 public:
 //    TrendChart(QWidget *parent); // конструктор
     TrendChart(QWidget *parent,int timeLen=3600,int Interval=5); // конструктор    
+    TrendChart(QWidget *parent,TrendChart *p); // якщо клас створюється на основі іншого класу то від буде працювати як слейв
+
     virtual ~TrendChart(); // деструктор
 
     inline QSize sizeHint() const {return QSize(400,300);}
@@ -21,7 +23,7 @@ public:
     
     void addPoint(QVector<double>& Val);
     void loadPoint(QVector<double>& Val);
-    
+
     void setColor(QVector<QColor>& v)
     {
 	clr=v;
@@ -39,6 +41,9 @@ protected:
     int *pY;
     int cP;
     double xS,yS; // коефіцієнти шкалювання
+
+    bool slave; // прапор, виставляється конструкторами класу
+    TrendChart *master;
 };
 
 

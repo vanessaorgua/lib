@@ -22,7 +22,7 @@ public:
 
     // методи доступу
     NetIoDev *operator[](int i) { return i<src.size()? src[i] :  zero ; }
-
+    int size() {return src.size(); }
 
 public slots: // це все має відношення до з’єднання із сервером
 	void slotNewConnect();

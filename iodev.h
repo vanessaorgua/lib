@@ -29,7 +29,7 @@ public:
     inline qint16 getValue16(QString tag) {
         if(tags.contains(tag) )
         {
-            return data_raw[tags[tag][0]];
+            return tags[tag][0]<data_raw.size()?data_raw[tags[tag][0]]:0 ;
         } else
         {
             qDebug() << "Tag \"" <<tag << "\" not found";
@@ -44,7 +44,7 @@ public:
 
     inline float getValueFloat(QString tag)
     {
-        return tags.contains(tag)?*(float*)(data_raw.data()+tags[tag][0]):0;
+        return tags.contains(tag) && tags[tag][0]<data_raw.size() ? *(float*)(data_raw.data()+tags[tag][0]):0.0;
     }
 
 

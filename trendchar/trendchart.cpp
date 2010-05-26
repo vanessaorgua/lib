@@ -11,7 +11,7 @@
 #include <math.h>
 
 
-TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent),nLen(timeLen),nInterval(Interval),cP(0)
+TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent),nLen(timeLen),nInterval(Interval),cP(0),slave(false)
 {
 //    int i,n,ofs;
 //    int h2;
@@ -31,11 +31,26 @@ TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent)
     clr << QColor(255,24,237) << QColor(66,168,255)<< QColor(0,186,0)<< QColor(100,255,0)<< QColor(Qt::yellow)<< QColor(90,0,113)<< QColor(0,9,137)<< QColor(0,89,0);
 }
 
+TrendChart::TrendChart(QWidget *parent,TrendChart *p):QWidget(parent),slave(true),master(p) // конструктор класу-слейва
+{
+
+    resize(parent->width(),parent->height());
+
+    xS=((double)size().width())/3600.0;
+    yS=((double)size().height())/4000.0;
+
+    nLen=master->nLen;
+    nInterval=master->nInterval;
+    cP=master->cP;
+    pY=master->pY; // дані мастера
+    clr=master->clr;
+}
+
 TrendChart::~TrendChart()
 {    
 //    qDebug() << "Mem clean";
 //  delete pGraph;
-    delete pY;
+    if(!slave) delete pY; // якщо свої дані - тоді видалити
 }
 
 
@@ -93,6 +108,8 @@ void TrendChart::addPoint(QVector<double>& Val)
 // тільки завантаження даних у буфер без відображення на графіку
 void TrendChart::loadPoint(QVector<double>& Val)
 {
+  if(!slave)
+  {
     int i,t;
 
     t=nLen/nInterval;
@@ -104,14 +121,23 @@ void TrendChart::loadPoint(QVector<double>& Val)
 
     for(;i<8;++i) // !!!! доповнюємо графік до 8 кривих
         pY[cP+t*i]=4001; // записати пусту криву
+  }
+  else
+  {
+        cP=master->cP; // прочитати значення сР з мастера
+  }
+
 }
 
 void TrendChart::fill(double v)
 {
-    int i,cP;
-    cP=nLen/nInterval;
-    //qDebug() << 8*cP;
-    for(i=0;i<8*cP;++i)
-	pY[i]=4000-(int)v;
-    update();
+    if(!slave)
+    {
+        int i,cP;
+        cP=nLen/nInterval;
+        //qDebug() << 8*cP;
+        for(i=0;i<8*cP;++i)
+                pY[i]=4000-(int)v;
+        update();
+    }
 }
