@@ -148,7 +148,7 @@ void RxModbus::slotRead()
         // отримано весь пакунок, розібрати на частини
         in >> as; // адреса ведомого
         in >> fc; // код функції
-        //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
+        qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
             case GETMCR:
