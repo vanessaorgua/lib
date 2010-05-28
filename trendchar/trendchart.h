@@ -9,6 +9,8 @@
 #include <QPoint>
 
 
+class QVBoxLayout;
+
 class TrendChart : public QWidget
 {
 public:
@@ -44,6 +46,8 @@ protected:
 
     bool slave; // прапор, виставляється конструкторами класу
     TrendChart *master;
+    QVBoxLayout *vbl;
+
 };
 
 

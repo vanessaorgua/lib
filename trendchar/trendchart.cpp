@@ -10,8 +10,9 @@
 #include "trendchart.h"
 #include <math.h>
 
+#include <QVBoxLayout>
 
-TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent),nLen(timeLen),nInterval(Interval),cP(0),slave(false)
+TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent),nLen(timeLen),nInterval(Interval),cP(0),slave(false),vbl(NULL)
 {
 //    int i,n,ofs;
 //    int h2;
@@ -31,7 +32,7 @@ TrendChart::TrendChart(QWidget *parent,int timeLen,int Interval):QWidget(parent)
     clr << QColor(255,24,237) << QColor(66,168,255)<< QColor(0,186,0)<< QColor(100,255,0)<< QColor(Qt::yellow)<< QColor(90,0,113)<< QColor(0,9,137)<< QColor(0,89,0);
 }
 
-TrendChart::TrendChart(QWidget *parent,TrendChart *p):QWidget(parent),slave(true),master(p) // конструктор класу-слейва
+TrendChart::TrendChart(QWidget *parent,TrendChart *p):QWidget(parent),slave(true),master(p),vbl(new QVBoxLayout(parent)) // конструктор класу-слейва
 {
 
     resize(parent->width(),parent->height());
@@ -44,12 +45,16 @@ TrendChart::TrendChart(QWidget *parent,TrendChart *p):QWidget(parent),slave(true
     cP=master->cP;
     pY=master->pY; // дані мастера
     clr=master->clr;
+
+    vbl->addWidget(this);
+    parent->setLayout(vbl);
 }
 
 TrendChart::~TrendChart()
 {    
 //    qDebug() << "Mem clean";
 //  delete pGraph;
+    if(vbl) delete vbl;
     if(!slave) delete pY; // якщо свої дані - тоді видалити
 }
 
