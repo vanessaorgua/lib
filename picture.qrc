@@ -2,6 +2,7 @@
   <qresource prefix="/butons" >
     <file>../pict/alarm_32x32.png</file>
     <file>../pict/exit_32x32.png</file>
+    <file>../pict/exit_32x32_revers.png</file>
     <file>../pict/logo_32x32.png</file>
     <file>../pict/thrend_32x32.png</file>
     <file>../pict/hand_18x20.png</file>
