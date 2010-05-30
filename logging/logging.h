@@ -13,7 +13,7 @@ class Logging : public QObject
 {
 Q_OBJECT
 public:
-    Logging(QVector<IoDev*> src);
+    Logging(QVector<IoDev*> src,int collectInterval=5000);
     ~Logging();
 
     void setTables(QStringList list) { tables=list;}

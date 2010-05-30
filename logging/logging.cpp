@@ -3,7 +3,7 @@
 #include <QtSql>
 
 
-Logging::Logging(QVector<IoDev*> src): s(src)
+Logging::Logging(QVector<IoDev*> src,int collectInterval): s(src)
 {
     QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
 
@@ -17,7 +17,7 @@ Logging::Logging(QVector<IoDev*> src): s(src)
 
     QTimer *tmr=new QTimer(this);
     connect(tmr,SIGNAL(timeout()),this,SLOT(dbStore()));
-    tmr->setInterval(5000);
+    tmr->setInterval(collectInterval);
     tmr->start();
 
     startTimer(60000); // збиради дані раз в п’ять секунд
@@ -107,7 +107,11 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
             while(!log.empty())
             {
                 ++i;
-                query.exec(log.dequeue());
+                if(!query.exec(log.dequeue()))
+                {
+                         qDebug() << query.lastError();
+                         qDebug() << query.lastQuery();
+                }
             }
             //query.exec("COMMIT");
             dbs.commit();
