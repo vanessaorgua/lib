@@ -20,5 +20,6 @@
     <file>../pict/bool_green_true_48x48.png</file>
     <file>../pict/red_alarm_32x12.png</file>
     <file>../pict/calendar_48x48.png</file>
+    <file>../pict/report_32x32.png</file>
   </qresource>
 </RCC>
