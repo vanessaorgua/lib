@@ -49,7 +49,7 @@ void RxModbus::slotConnected () // приєдналися
     //connSend->start();
     connTimeout->start();
     nLen=0;
-    //qDebug() <<  "Connected to host";
+    qDebug() <<  "Connected to host" << sHostname;
     // slotSend(); // розпочати обмін
     pS->write(query_list[0]);
     nC=0;
@@ -69,6 +69,8 @@ void RxModbus::slotTimeout() // таймаут отримання даних в�
     connWait->start();
     pS->close();
     emit Alert(QString("Connection to PLC lost: %1:%2").arg(sHostname).arg(nPort));
+    qDebug() << QString("Connection to PLC lost: %1:%2").arg(sHostname).arg(nPort);
+
 }
 
 void RxModbus::slotDisconnect() // відєднання зі сторони сервера
@@ -329,7 +331,7 @@ int RxModbus::loadList(QString fileName)
                     {
                         query_list <<  query; // зберегти
                         dataLen << packet_len;
-                        qDebug() << packet_len-current_len; //
+                        //qDebug() << packet_len-current_len; //
                         //qDebug() << query;
                     }
 
@@ -340,7 +342,7 @@ int RxModbus::loadList(QString fileName)
                     packet_len=current_len;
                     qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
                                                                                           //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
-                    qDebug() << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1);
+                    //qDebug() << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1);
                     query_read << current_rf; //прапор read на пакунок
                     local_read << 0;
                 }
@@ -403,7 +405,7 @@ int RxModbus::loadList(QString fileName)
         {
             query_list << query;
             dataLen << packet_len;
-            qDebug() << packet_len;
+            //qDebug() << packet_len;
             query_read << current_rf;
         }
         data_raw.resize(wc); // ініціалізувати пам’ять під змінні
@@ -419,13 +421,13 @@ int RxModbus::loadList(QString fileName)
             }
             else
             {
-                qDebug() << "Scale not found tag"<< f << "scaled on " << tag_scale[f];
+                //qDebug() << "Scale not found tag"<< f << "scaled on " << tag_scale[f];
             }
         }
 
         //qDebug() << "Scaled tags " << data_scale.size() << "\n" << data_scale.keys();
 
-        qDebug() << tags.keys();
+        //qDebug() << tags.keys();
 
 //        loadScale(fileName);
         return i;
