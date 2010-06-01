@@ -150,12 +150,12 @@ void RxModbus::slotRead()
         // отримано весь пакунок, розібрати на частини
         in >> as; // адреса ведомого
         in >> fc; // код функції
-        qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
+        //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
         switch(fc)
         {
             case GETMCR:
                 in >> bc; // прочитати кількість байт
-                qDebug() <<  "dataLen " << dataLen[nC];
+                //qDebug() <<  "dataLen " << dataLen[nC];
                 for(int i=0;i<bc;++i)
                 {
                     qint8 v;
