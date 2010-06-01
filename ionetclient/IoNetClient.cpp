@@ -70,6 +70,7 @@ void IoNetClient::slotTimeout() // таймаут отримання даних 
     connTimeout->stop();
     connWait->start();
     pTcpSock->close(); // закрити з’єднання. Приведе до генерації сигналу disconnected() або я помиляюся
+    emit Alert(tr("Unable comunicate to io server"));
 }
 
 

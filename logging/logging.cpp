@@ -117,6 +117,11 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
             dbs.commit();
             //qDebug("Скинуто в базу %d записів",i);
         }
+        else
+        {
+            qDebug() << dbs.lastError().databaseText();
+        }
+
 
 
     }
