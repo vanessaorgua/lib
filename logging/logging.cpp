@@ -110,7 +110,7 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
                 if(!query.exec(log.dequeue()))
                 {
                          qDebug() << query.lastError();
-                         qDebug() << query.lastQuery();
+                         //qDebug() << query.lastQuery();
                 }
             }
             //query.exec("COMMIT");
