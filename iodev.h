@@ -16,15 +16,16 @@ public:
 
     // методи доступу до даних
     inline QHash<QString,QVector<qint16> > &getTags()   {   return tags;    }
-    inline qint16 getIndex(QString tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
-    inline qint16 getAddress(QString tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
-    inline qint16 fieldType(QString tag) { return tags.contains(tag) ?tags[tag][2]:qint16(-1); }
+    inline qint16 getIndex(QString &tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
+    inline qint16 getAddress(QString &tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
+    inline qint16 fieldType(QString &tag) { return tags.contains(tag) ?tags[tag][2]:qint16(-1); }
 
     inline const QVector<qint16> &getDataRaw() {return data_raw;}
 
     inline QHash<QString,QVector<double> > &getDataScaled() { return data_scale;}
 
     inline const QHash<QString,QString> &getText() { return text; }
+    inline const QString &getDescription(QString &tag) { return text.contains(tag)?text[tag]:QString("");}
 
     inline qint16 getValue16(QString tag) {
         if(tags.contains(tag) )
