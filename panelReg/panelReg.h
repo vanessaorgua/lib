@@ -72,9 +72,9 @@ private:
     QVector<QStringList> RegDes; // масив опису параметрів регуляторів
     IoDev &src;
 
-    // масив для пошуку віджетів
     TrendChart *trChart;
     QVector<double> v; // дані для запису на графік
+    // масив для пошуку віджетів
     QHash<QString, Ri::Index> ctrlSearch;     // хеш для пошуку тегів
 };
 
