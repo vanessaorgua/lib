@@ -490,7 +490,12 @@ void RxModbus::sendValue(QString tag,qint32 v)
 {
     QVector<qint16> t(2);
     *((qint32*)t.data())=v;
+
+    if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
+        data_scale[tag][0]=((double)v/4000.0*(data_scale[tag][2]-data_scale[tag][1])+data_scale[tag][1]);
+
     sendValue(tag,t);
+
 }
 
 
@@ -498,6 +503,13 @@ void RxModbus::sendValue(QString tag,double v)
 {
     QVector<qint16> t(2);
     *((float*)t.data())=(float)v;
+
+    if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
+    {
+        data_scale[tag][0]=(v/4000.0*(data_scale[tag][2]-data_scale[tag][1])+data_scale[tag][1]);
+        qDebug() << "tag "  << tag << " value " <<  v << "scaled " << data_scale[tag][0];
+    }
+
     sendValue(tag,t);
 }
 
@@ -524,6 +536,24 @@ void RxModbus::sendValue(QString tag,QVector<qint16> &v)
 #ifdef ASYNC
         query_queue.enqueue(q); // поставити в чергу на відправку в контролер
 #endif
+        if(data_scale.contains(tag) && v.size()==2) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його і записувалося одиночне значення
+        {
+            double tv;
+            switch(tags[tag][2]) // тип даних
+                {
+                    default:
+                    case 2: // Real
+                        tv=*(float*)v.data();
+                        break;
+                    case 3: // Timer
+                    case 4: // Long
+                        tv=*(int*)v.data();
+                        break;
+                }
+                data_scale[tag][0]=(tv/4000.0*(data_scale[tag][2]-data_scale[tag][1])+data_scale[tag][1]);
+
+        }
+
     }
 }
 

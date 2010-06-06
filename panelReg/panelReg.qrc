@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/slider">
-        <file>../../pict/Valve.png</file>
-        <file>../../pict/SPR_1.png</file>
-        <file>../../pict/SP_3.png</file>
-        <file>../../pict/SP_2.png</file>
-        <file>../../pict/SP_1.png</file>
-    </qresource>
-</RCC>

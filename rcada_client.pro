@@ -28,7 +28,7 @@ UI_DIR = build
 RCC_DIR = build
 VERSION = 0.1.0
 RESOURCES += trend/trend.qrc \
-    panelReg/panelReg.qrc
+    picture.qrc
 FORMS += trend/trend.ui \
     trend/datetime.ui \
     panelReg/panelReg.ui

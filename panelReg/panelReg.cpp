@@ -15,8 +15,8 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
 
     // на замовлення Поліщученка
     ui->Trend->hide();
-    ui->label->hide();
-    ui->regRev->hide();
+    //ui->label->hide();
+    //ui->regRev->hide();
 
     ui->RegParm->hide(); // сховати область настройки регулятора
     //resize(size()-QSize(0,159)); // зменшити розмір вікна
@@ -99,8 +99,8 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ctrlSearch["dialTd"]=Ri::Td;
     ctrlSearch["sbTd"]=Ri::Td;
 
-    ctrlSearch["Xmin"]=Ri::Xmin;
-    ctrlSearch["Xmax"]=Ri::Xmax;
+    ctrlSearch["sbXmin"]=Ri::Xmin;
+    ctrlSearch["sbXmax"]=Ri::Xmax;
     // --------------------------------------------------
 
     // завантажити дані
@@ -158,7 +158,8 @@ RpanelReg::~RpanelReg()
 void RpanelReg::changeReg(int Index) // зміна регулятор
 {
     RegNum=Index;
-        
+    qDebug() << "RegNum"         << RegNum;
+
     ui->Value_1->setText(src.getDescription(RegDes[RegNum][Ri::PV_1]));
     ui->Value_2->setText(src.getDescription(RegDes[RegNum][Ri::PV_2]));
     ui->Value_3->setText(src.getDescription(RegDes[RegNum][Ri::PV_3]));
@@ -336,6 +337,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
     // Kpr
     double t=fabs(src.getValueFloat(RegDes[RegNum][Ri::Kpr]));
+    //qDebug() << "Kpr"<< RegDes[RegNum][Ri::Kpr] << ":" << t;
     ui->sbKpr->blockSignals(true);
     ui->sbKpr->setValue(t);
     ui->sbKpr->blockSignals(false);
@@ -366,6 +368,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
     
     // KTi
+    //qDebug() << "Ti"<< RegDes[RegNum][Ri::TI] << ":" << src.getValueFloat(RegDes[RegNum][Ri::TI]);
     ui->sbTi->blockSignals(true);
     ui->sbTi->setValue(src.getValueFloat(RegDes[RegNum][Ri::TI]));
     ui->sbTi->blockSignals(false);
@@ -375,6 +378,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     ui->dialTi->blockSignals(false);
 
     // KTd
+    //qDebug() << "Td"<< RegDes[RegNum][Ri::Td] << ":" << src.getValueFloat(RegDes[RegNum][Ri::Td]);
     ui->sbTd->blockSignals(true);
     ui->sbTd->setValue(src.getValueFloat(RegDes[RegNum][Ri::Td]));
     ui->sbTd->blockSignals(false);
@@ -659,12 +663,11 @@ void RpanelReg::setGraph()
 void RpanelReg::setCtrlValue(double v)
 {
     //qDebug() << sender()->objectName() << v;
-    double td;
-    td=v*40.0;
-    src.sendValueScaled(RegDes[RegNum][Ri::X],td);
+
+    src.sendValueScaled(RegDes[RegNum][Ri::X],v);
 
     ui->vsX->blockSignals(true);
-    ui->vsX->setValue(td);
+    ui->vsX->setValue((double)v*40.0);
     ui->vsX->blockSignals(false);
 
 }
@@ -672,8 +675,8 @@ void RpanelReg::setCtrlValue(double v)
 void RpanelReg::setCtrlValue(int v)
 {
     //qDebug() << sender()->objectName() << v;
-    double td;
-    td=v;
+    double td=v;
+
     src.sendValue(RegDes[RegNum][Ri::X],td);
 
     ui->sbX->blockSignals(true);
@@ -684,7 +687,9 @@ void RpanelReg::setCtrlValue(int v)
 
 void RpanelReg::setParmValue(double v) // слот відправки даних
 {
-  if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
+    //qDebug() << sender()->objectName() << ":" << v;
+
+    if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
   { // якщо не знайдено
     Ri::Index ix=ctrlSearch[sender()->objectName()];
     switch( ix )
@@ -713,7 +718,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
 
         case Ri::Xmin: // sbXmin
         case Ri::Xmax: // sbXmax
-            src.sendValueScaled(RegDes[RegNum][ix],v);
+            src.sendValue(RegDes[RegNum][ix],v*40.0);
 	    break;
         case Ri::K_1: // sbK_1
         case Ri::K_2: // sbK_2
@@ -757,7 +762,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
 
 void RpanelReg::setParmValue(int v)
 {
-    //qDebug() << sender()->objectName() << v;
+    //qDebug() << sender()->objectName() << ":" << v;
 
   if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
   { // якщо не знайдено

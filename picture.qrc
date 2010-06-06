@@ -22,4 +22,10 @@
     <file>../pict/calendar_48x48.png</file>
     <file>../pict/report_32x32.png</file>
   </qresource>
+    <qresource prefix="/slider">
+        <file>../pict/SPR_1.png</file>
+        <file>../pict/SP_3.png</file>
+        <file>../pict/SP_2.png</file>
+        <file>../pict/SP_1.png</file>
+    </qresource>
 </RCC>

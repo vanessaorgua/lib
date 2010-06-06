@@ -25,7 +25,7 @@ public:
     inline QHash<QString,QVector<double> > &getDataScaled() { return data_scale;}
 
     inline const QHash<QString,QString> &getText() { return text; }
-    inline const QString &getDescription(QString &tag) { return text.contains(tag)?text[tag]:QString("");}
+    inline const QString getDescription(QString &tag) { return text.contains(tag)?text[tag]:QString("");}
 
     inline qint16 getValue16(QString tag) {
         if(tags.contains(tag) )

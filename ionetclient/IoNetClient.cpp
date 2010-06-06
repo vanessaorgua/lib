@@ -212,7 +212,7 @@ void IoNetClient::slotReadServer()
                             in >>  ss; // просто спорожнити буфер
                         emit updateData();
                         emit updateDataScaled();
-                        //qDebug() << "emit updateData()";
+                        //qDebug() << "emit updateDataScaled()";
                         break;
                     case 'A':
                         {
