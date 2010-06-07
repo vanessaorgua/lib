@@ -755,6 +755,8 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             qDebug() << "Index not fount" << sender()->objectName();
 	    break;
     }
+    src.sendValue("Save",qint16(-1));
+
   }
   else
       qDebug() << "Sender not found" << sender()->objectName();
@@ -815,6 +817,7 @@ void RpanelReg::setParmValue(int v)
             qDebug() << sender()->objectName();
 	    break;
     }
+      src.sendValue("Save",qint16(-1));
   }
   else
       qDebug() << "Sender not found" << sender()->objectName();
@@ -830,6 +833,7 @@ void RpanelReg::setParmKprSig(int v)
     //qDebug() << sender()->objectName() << tmp;
 
     src.sendValue(RegDes[RegNum][Ri::Kpr],tmp);
+    src.sendValue("Save",qint16(-1));
 }
 
 
@@ -851,12 +855,14 @@ void RpanelReg::setParmAM(int v)
     }
 
     src.sendValue(RegDes[RegNum][Ri::AM],qint16(-v));
+    src.sendValue("Save",qint16(-1));
 }
 
 void RpanelReg::setParmRej(int v)
 {
     //qDebug() << sender()->objectName() << v;
     src.sendValue(RegDes[RegNum][Ri::Rej],qint16(-v));
+    src.sendValue("Save",qint16(-1));
 }
 
 void RpanelReg::setParmRev()
@@ -868,6 +874,7 @@ void RpanelReg::setParmRev()
         v=1;
 
     src.sendValue(RegDes[RegNum][Ri::Rev],qint16(-v));
+    src.sendValue("Save",qint16(-1));
 
 }
 
