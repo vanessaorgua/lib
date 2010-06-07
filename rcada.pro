@@ -5,7 +5,6 @@ QT += network \
     sql
 
 # QT -= gui
-TARGET = rcada
 TEMPLATE = lib
 CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \

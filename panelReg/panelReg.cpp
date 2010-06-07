@@ -3,6 +3,7 @@
 
 #include "../iodev.h"
 #include "../trendchar/trendchart.h"
+#include <math.h>
 
 #include <QtSql>
 
@@ -363,10 +364,9 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     ui->dialKpr->blockSignals(false);
 
     ui->regRev->blockSignals(true);
-    ui->regRev->setChecked(t<0.0);
+    ui->regRev->setChecked(src.getValueFloat(RegDes[RegNum][Ri::Kpr])<0.0);
     ui->regRev->blockSignals(false);
 
-    
     // KTi
     //qDebug() << "Ti"<< RegDes[RegNum][Ri::TI] << ":" << src.getValueFloat(RegDes[RegNum][Ri::TI]);
     ui->sbTi->blockSignals(true);
@@ -695,7 +695,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
     switch( ix )
     {
         case Ri::Kpr : // sbKpr
-            src.sendValue(RegDes[RegNum][Ri::Kpr],v* ui->regRev->isChecked()?-1.0:1.0);
+            src.sendValue(RegDes[RegNum][Ri::Kpr],v* (ui->regRev->isChecked()?-1.0:1.0));
 
             ui->dialKpr->blockSignals(true);
             ui->dialKpr->setValue(v*100.0);
@@ -791,7 +791,7 @@ void RpanelReg::setParmValue(int v)
             ui->sbSP_3->blockSignals(false);
 	    break;
         case Ri::Kpr: // dialKpr
-            src.sendValue(RegDes[RegNum][ix],(double)v/100.0*ui->regRev->isChecked()?-1.0:1.0);
+            src.sendValue(RegDes[RegNum][ix],(double)v/100.0*(ui->regRev->isChecked()?-1.0:1.0));
 
             ui->sbKpr->blockSignals(true);
             ui->sbKpr->setValue((double)v/100.0);
@@ -823,10 +823,12 @@ void RpanelReg::setParmValue(int v)
 
 void RpanelReg::setParmKprSig(int v)
 {
-    //qDebug() << sender()->objectName() << v;
     double tmp;
 
-    tmp=ui->sbKpr->value() * v?-1.0:1.0;
+    tmp=ui->sbKpr->value() * (v?-1.0:1.0);
+
+    //qDebug() << sender()->objectName() << tmp;
+
     src.sendValue(RegDes[RegNum][Ri::Kpr],tmp);
 }
 

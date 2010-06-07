@@ -3,7 +3,6 @@
 # -------------------------------------------------
 QT += network \
     sql
-TARGET = rcada_client
 TEMPLATE = lib
 CONFIG += staticlib
 HEADERS += iodev.h \
