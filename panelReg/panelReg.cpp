@@ -5,6 +5,9 @@
 #include "../trendchar/trendchart.h"
 #include <math.h>
 
+#include <QString>
+#include <QStringList>
+
 #include <QtSql>
 
 RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfName) :QDialog(p),
@@ -511,18 +514,18 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 	QDateTime dt = QDateTime::currentDateTime();
 	QSqlQuery qry;
 	QString sQuery="SELECT Dt,%1 FROM trend WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
-	
+        QString fields=RegDes[RegNum][Ri::PV_1];
+
+        for(i=1;i<8;++i)
+        {
+            fields+=",";
+            if(RegDes[RegNum][i].size() > 0)
+                fields+=RegDes[RegNum][i];
+            else
+                fields+="0";
+        }
 	//qDebug() << sQuery.arg(RegDes[RegNum].field).arg(dt.toTime_t()-3600).arg(dt.toTime_t());
-        if(qry.exec(sQuery.arg(QString("%1,%2,%3,%4,%5,%6,%7,%8")
-            .arg(RegDes[RegNum][Ri::PV_1]) //1
-            .arg(RegDes[RegNum][Ri::PV_2]) //2
-            .arg(RegDes[RegNum][Ri::PV_3]) //3
-            .arg(RegDes[RegNum][Ri::SPR_1])//5
-            .arg(RegDes[RegNum][Ri::X])    //4
-            .arg(RegDes[RegNum][Ri::SP_1]) //5
-            .arg(RegDes[RegNum][Ri::SP_2]) //7
-            .arg(RegDes[RegNum][Ri::SP_3]) //8
-            ).arg(dt.toTime_t()-3600).arg(dt.toTime_t())))
+        if(qry.exec(sQuery.arg(fields).arg(dt.toTime_t()-3600).arg(dt.toTime_t())))
 	{
 	    while(qry.next())
 	    {
@@ -539,6 +542,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         {
     	QApplication::setOverrideCursor(Qt::ArrowCursor);
 	    QMessageBox::critical(this,tr("Помилка виконання запиту"),qry.lastError().databaseText());
+            qDebug() << qry.lastQuery();
 	}    
 	
     
