@@ -129,7 +129,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     {
         qDebug() << "File not open "  << f.errorString();
     }
-    qDebug() << RegDes;
+    //qDebug() << RegDes;
     
     // запустити таймер поновлення надих. може краще переробити на сигнал ?
     QTimer *t=new QTimer(this);
@@ -162,7 +162,7 @@ RpanelReg::~RpanelReg()
 void RpanelReg::changeReg(int Index) // зміна регулятор
 {
     RegNum=Index;
-    qDebug() << "RegNum"         << RegNum;
+    //qDebug() << "RegNum"         << RegNum;
 
     ui->Value_1->setText(src.getDescription(RegDes[RegNum][Ri::PV_1]));
     ui->Value_2->setText(src.getDescription(RegDes[RegNum][Ri::PV_2]));
@@ -373,11 +373,11 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     // KTi
     //qDebug() << "Ti"<< RegDes[RegNum][Ri::TI] << ":" << src.getValueFloat(RegDes[RegNum][Ri::TI]);
     ui->sbTi->blockSignals(true);
-    ui->sbTi->setValue(src.getValueFloat(RegDes[RegNum][Ri::TI]));
+    ui->sbTi->setValue(src.getValueFloat(RegDes[RegNum][Ri::TI])/60.0);
     ui->sbTi->blockSignals(false);
 
     ui->dialTi->blockSignals(true);
-    ui->dialTi->setValue(src.getValueFloat(RegDes[RegNum][Ri::TI])*100.0);
+    ui->dialTi->setValue(src.getValueFloat(RegDes[RegNum][Ri::TI])*100.0/60.0);
     ui->dialTi->blockSignals(false);
 
     // KTd
@@ -706,7 +706,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             ui->dialKpr->blockSignals(false);
 	    break;
         case Ri::TI : // sbTi
-            src.sendValue(RegDes[RegNum][Ri::TI],v);
+            src.sendValue(RegDes[RegNum][Ri::TI],v*60.0);
 
             ui->dialTi->blockSignals(true);
             ui->dialTi->setValue(abs(v*100.0));
@@ -804,7 +804,7 @@ void RpanelReg::setParmValue(int v)
             ui->sbKpr->blockSignals(false);
 	    break;
         case Ri::TI: // dialTi
-            src.sendValue(RegDes[RegNum][ix],(double)v/100.0);
+            src.sendValue(RegDes[RegNum][ix],(double)v/100.0*60.0);
 
             ui->sbTi->blockSignals(true);
             ui->sbTi->setValue((double)v/100.0);
