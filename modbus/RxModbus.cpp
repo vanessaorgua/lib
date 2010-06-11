@@ -286,7 +286,7 @@ int RxModbus::loadList(QString fileName)
             if(sl.size()>4) // якщо є всі поля
             {
                 s= sl[0]; // назва тега
-                //qDebug() << s;
+                qDebug() << s;
                 current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
                 tags[s] << wc             // 0-index
                         << current_addr ; // 1- address
@@ -361,7 +361,7 @@ int RxModbus::loadList(QString fileName)
                     text[s]="-";
 
 
-                // цей код би винести в окремий клас
+            // цей код би винести в окремий клас
             if(sl[5]!="-")
             {
                 if(sl[5]=="+")
