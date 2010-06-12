@@ -21,6 +21,12 @@
     <file>../pict/red_alarm_32x12.png</file>
     <file>../pict/calendar_48x48.png</file>
     <file>../pict/report_32x32.png</file>
+    <file>../pict/lib/div_off_45x90.png</file>
+    <file>../pict/lib/div_on_45x90.png</file>
+
+    <file>../pict/lib/pump_off_26x30.png</file>
+    <file>../pict/lib/pump_on_26x30.png</file>
+
   </qresource>
     <qresource prefix="/slider">
         <file>../pict/SPR_1.png</file>
