@@ -301,6 +301,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->cbRej->hide();
         ui->labelRej->hide();
     }
+
 // код перенесено із updateData
 // ініціалізація контролів, це буде погано працювати коли в мережі будуть кількі клієнтів 
 // одночасно працювати із одним регулятором. Ситуація малоймовірна але можлива
@@ -330,14 +331,23 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     // SP_3
     if(src.getTags().contains(RegDes[RegNum][Ri::SP_3]))
     {
+        ui->sbSP_3->show();
         ui->sbSP_3->blockSignals(true);
         ui->sbSP_3->setValue(src.getValueScaled(RegDes[RegNum][Ri::SP_3]));
         ui->sbSP_3->blockSignals(false);
 
+        ui->vsSP_3->show();
         ui->vsSP_3->blockSignals(true);
         ui->vsSP_3->setValue(src.getValueFloat(RegDes[RegNum][Ri::SP_2]));
         ui->vsSP_3->blockSignals(false);
     }
+    else
+    {
+        ui->sbSP_3->hide();
+        ui->vsSP_3->hide();
+    }
+
+
 
     // Kpr
     double t=fabs(src.getValueFloat(RegDes[RegNum][Ri::Kpr]));
@@ -476,19 +486,24 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     }
 
     // Rev
-    if(src.getValue16(RegDes[RegNum][Ri::Rev]))
+    if(src.getTags().contains(RegDes[RegNum][Ri::Rev]))
     {
-        ui->rRev->blockSignals(true);
-        ui->rRev->setChecked(true);
-        ui->rRev->blockSignals(false);
+        ui->gbRev->show();
+        if(src.getValue16(RegDes[RegNum][Ri::Rev]))
+        {
+            ui->rRev->blockSignals(true);
+            ui->rRev->setChecked(true);
+            ui->rRev->blockSignals(false);
+        }
+        else
+        {
+            ui->pRev->blockSignals(true);
+            ui->pRev->setChecked(true);
+            ui->pRev->blockSignals(false);
+        }
     }
     else
-    {
-        ui->pRev->blockSignals(true);
-        ui->pRev->setChecked(true);
-        ui->pRev->blockSignals(false);
-    }
-
+        ui->gbRev->hide();
 
 
 // завантаження даних на графік із історії
@@ -678,7 +693,7 @@ void RpanelReg::setCtrlValue(double v)
 
 void RpanelReg::setCtrlValue(int v)
 {
-    //qDebug() << sender()->objectName() << v;
+    qDebug() << sender()->objectName() << v;
     double td=v;
 
     src.sendValue(RegDes[RegNum][Ri::X],td);
@@ -693,9 +708,12 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
 {
     //qDebug() << sender()->objectName() << ":" << v;
 
+
     if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
   { // якщо не знайдено
     Ri::Index ix=ctrlSearch[sender()->objectName()];
+    //qDebug() << "Tag" << RegDes[RegNum][ix];
+
     switch( ix )
     {
         case Ri::Kpr : // sbKpr
@@ -773,6 +791,7 @@ void RpanelReg::setParmValue(int v)
   if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
   { // якщо не знайдено
     Ri::Index ix=ctrlSearch[sender()->objectName()];
+    //qDebug() << "Tag" << RegDes[RegNum][ix];
       switch( ix )
       {
         case Ri::SP_1: // vsSP_1

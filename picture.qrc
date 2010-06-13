@@ -26,6 +26,9 @@
 
     <file>../pict/lib/pump_off_26x30.png</file>
     <file>../pict/lib/pump_on_26x30.png</file>
+    <file>../pict/lib/pump_green_26x30.png</file>
+    <file>../pict/lib/pump_off_10x11.png</file>
+    <file>../pict/lib/pump_on_10x11.png</file>
 
   </qresource>
     <qresource prefix="/slider">
