@@ -13,7 +13,7 @@ void IoDev::sendValueScaled(QString tag,double v)
 {
     if(tags.contains(tag))
     {
-        qDebug() << "sendValueScaled: tag -" <<  tag << "type:" << tags[tag][2] << " ; value :" << v ;
+        //qDebug() << "sendValueScaled: tag -" <<  tag << "type:" << tags[tag][2] << " ; value :" << v ;
         QVector<qint16> t(2);
         data_scale[tag][0]=v;
         v=((v-data_scale[tag][1])/(data_scale[tag][2] - data_scale[tag][1]) *4000.0 );
