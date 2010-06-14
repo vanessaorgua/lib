@@ -150,6 +150,7 @@ void IoNetServer::slotReadClient()
                     case 'S': // відправка шкальованого значення
                         in >> tag >> ds;
                         src[connState[pCs].iD]->sendValueScaled(tag,ds);
+                        qDebug() << "Send value scaled "  << tag << ds ;
                         break;
                     case 'Z':
                         in >> tag >> ds;

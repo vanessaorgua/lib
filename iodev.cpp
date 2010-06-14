@@ -11,13 +11,30 @@ IoDev::~IoDev()
 
 void IoDev::sendValueScaled(QString tag,double v)
 {
-    //qDebug() << "sendValueScaled: tag -" <<  tag << " ; value :" << v;
     if(tags.contains(tag))
     {
-        data_scale[tag][0]=v;
+        qDebug() << "sendValueScaled: tag -" <<  tag << "type:" << tags[tag][2] << " ; value :" << v ;
         QVector<qint16> t(2);
-        *(float*)t.data()=(float)((v-data_scale[tag][1])/(data_scale[tag][2] - data_scale[tag][1]) *4000.0 );
-        sendValue(tag,t);
+        data_scale[tag][0]=v;
+        v=((v-data_scale[tag][1])/(data_scale[tag][2] - data_scale[tag][1]) *4000.0 );
+
+        switch(tags[tag][2]) // тип даних
+            {
+                default:
+                case 0: // Integer
+                    sendValue(tag,qint16(v));
+                    break;
+                case 1: // Bool
+                    break;
+                case 2: // Real
+                    sendValue(tag,v);
+                    break;
+                case 3: // Timer
+                case 4: // Long
+                    sendValue(tag,qint32(v));
+                    break;
+            }
+
 
     }
     else
