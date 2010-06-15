@@ -321,7 +321,8 @@ int RxModbus::loadList(QString fileName)
                 //qDebug() << sl[2] << ft[current_ft];
                 tags[s] << current_ft   // 2-довжина !!! це місце треба перевірити
                         << current_rf   // 3-кратність читання
-                        << sl[4].toInt(); // 4-прапори запису історії
+                        << sl[4].toInt() // 4-прапори запису історії
+                        << 0 ; // 5 шкаліровка, може мінятися далі в програмі
 
                 packet_len+=current_len;
 
@@ -362,10 +363,12 @@ int RxModbus::loadList(QString fileName)
 
 
             // цей код би винести в окремий клас
+
             if(sl[5]!="-")
             {
                 if(sl[5]=="+")
                 {
+                    tags[s][5]=1;
                     QSettings set;
                     set.beginGroup("/ioserv/scale/");
                         data_scale[s] << 0.0

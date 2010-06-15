@@ -291,6 +291,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     }
 
     // cbRej
+    //qDebug() << RegDes[RegNum][Ri::Rej] << src.getTags().contains(RegDes[RegNum][Ri::Rej]);
     if(src.getTags().contains(RegDes[RegNum][Ri::Rej]))
     {
         ui->cbRej->show();

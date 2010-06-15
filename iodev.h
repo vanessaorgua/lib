@@ -57,6 +57,8 @@ public:
     virtual void sendValue(QString tag,QVector<qint16> &v) =0 ;
 
 // це стосується шкал, у деяких потомках треба перевизначити деякі методи
+    bool isScaleChange(QString tag) { return tags.contains(tag)?tags[tag][5]:false ; }
+
     double getValueScaled(QString tag) { return data_scale.contains(tag)?data_scale[tag][0]:0.0; }
     inline double scaleZero(QString tag) { return data_scale.contains(tag)?data_scale[tag][1]:0.0;    }
     inline double scaleFull(QString tag) { return data_scale.contains(tag)?data_scale[tag][2]:100.0;    }
