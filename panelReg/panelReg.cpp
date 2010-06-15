@@ -231,6 +231,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     }
 
     // K_1
+    //qDebug() << RegDes[RegNum][Ri::K_1];
     if(src.getTags().contains(RegDes[RegNum][Ri::K_1]))
     {
         ui->sbK_1->show();
@@ -748,6 +749,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
         case Ri::K_3: // sbK_3
         case Ri::K_4: // sbK_4
         case Ri::Kkor: // sbKkor
+            //qDebug() << "sendPAram" << RegDes[RegNum][ix];
             src.sendValue(RegDes[RegNum][ix],v);
 	    break;
 
