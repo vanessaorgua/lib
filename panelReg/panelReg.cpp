@@ -127,7 +127,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     }
     else
     {
-        qDebug() << "File not open "  << f.errorString();
+        qDebug() << "panelReg: file not open "  << f.errorString();
     }
     //qDebug() << RegDes;
     
