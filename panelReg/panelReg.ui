@@ -1566,7 +1566,7 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="text">
-            <string>P0</string>
+            <string>Td</string>
            </property>
           </widget>
          </item>
