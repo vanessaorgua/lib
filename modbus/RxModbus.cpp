@@ -282,6 +282,7 @@ int RxModbus::loadList(QString fileName)
         for(i=0;!f.atEnd();++i)
         {
             s=QString::fromUtf8(f.readLine()).trimmed(); //читати
+            //qDebug() << i << s;
             sl= s.split("\t"); // розбити на поля
             if(sl.size()>4) // якщо є всі поля
             {
