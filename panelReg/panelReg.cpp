@@ -32,38 +32,62 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     // реакції користувацького інтерфейсу
     connect(ui->vsX,SIGNAL(valueChanged(int)),this,SLOT(setCtrlValue(int)));
     connect(ui->sbX,SIGNAL(valueChanged(double)),this,SLOT(setCtrlValue(double)));
+    ui->sbX->setKeyboardTracking(false);
     // SP_1
     connect(ui->vsSP_1,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_1,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbSP_1->setKeyboardTracking(false);
+
     // SP_2
     connect(ui->vsSP_2,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_2,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbSP_2->setKeyboardTracking(false);
     // SP_3
     connect(ui->vsSP_3,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_3,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbSP_3->setKeyboardTracking(false);
+
     // Kpr
     connect(ui->dialKpr,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbKpr,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbKpr->setKeyboardTracking(false);
+
     // Ti
     connect(ui->dialTi,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbTi,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbTi->setKeyboardTracking(false);
     // Td
     connect(ui->dialTd,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbTd,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbTd->setKeyboardTracking(false);
     // Xmin
     connect(ui->sbXmin,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbXmin->setKeyboardTracking(false);
+
     // Xmax
     connect(ui->sbXmax,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbXmax->setKeyboardTracking(false);
+
     // K_1
     connect(ui->sbK_1,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbK_1->setKeyboardTracking(false);
+
     // K_2
     connect(ui->sbK_2,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbK_2->setKeyboardTracking(false);
+
     // K_3
     connect(ui->sbK_3,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbK_3->setKeyboardTracking(false);
+
     // K_4
     connect(ui->sbK_4,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbK_4->setKeyboardTracking(false);
+
     // Kkor
     connect(ui->sbKkor,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    ui->sbKkor->setKeyboardTracking(false);
+
     // AM
     connect(ui->cbAM,SIGNAL(currentIndexChanged(int)),this,SLOT(setParmAM(int)));
     // Rej
@@ -118,7 +142,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
             {
                 ui->regList->addItem(sl[21]); // додати до списку регуляторів
                 RegDes << sl; // зберегти
-                qDebug() << i << sl ;
+                //qDebug() << i << sl ;
             }
             else
             {
