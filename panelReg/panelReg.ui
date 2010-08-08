@@ -1204,34 +1204,6 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="Exit">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>130</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>130</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="whatsThis">
-         <string>Кнопка закриття панелі регулятора</string>
-        </property>
-        <property name="text">
-         <string>Вихід</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <widget class="QPushButton" name="Setting">
         <property name="sizePolicy">
@@ -1376,6 +1348,44 @@ p, li { white-space: pre-wrap; }
           <string>АВТ</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="Exit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>130</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="whatsThis">
+         <string>Кнопка закриття панелі регулятора</string>
+        </property>
+        <property name="text">
+         <string>Вихід</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -1915,6 +1925,48 @@ p, li { white-space: pre-wrap; }
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton</tabstop>
+  <tabstop>vsSPR_1</tabstop>
+  <tabstop>vsSP_1</tabstop>
+  <tabstop>Value_1</tabstop>
+  <tabstop>vsSP_2</tabstop>
+  <tabstop>Value_2</tabstop>
+  <tabstop>vsSP_3</tabstop>
+  <tabstop>Value_3</tabstop>
+  <tabstop>Valve</tabstop>
+  <tabstop>sbX</tabstop>
+  <tabstop>vsX</tabstop>
+  <tabstop>leSPR_1</tabstop>
+  <tabstop>Exit</tabstop>
+  <tabstop>Setting</tabstop>
+  <tabstop>Trend</tabstop>
+  <tabstop>sbKkor</tabstop>
+  <tabstop>cbRej</tabstop>
+  <tabstop>cbAM</tabstop>
+  <tabstop>regList</tabstop>
+  <tabstop>lePV_1</tabstop>
+  <tabstop>sbSP_1</tabstop>
+  <tabstop>lePV_2</tabstop>
+  <tabstop>sbSP_2</tabstop>
+  <tabstop>lePV_3</tabstop>
+  <tabstop>sbSP_3</tabstop>
+  <tabstop>dialTd</tabstop>
+  <tabstop>sbKpr</tabstop>
+  <tabstop>sbTi</tabstop>
+  <tabstop>sbTd</tabstop>
+  <tabstop>regRev</tabstop>
+  <tabstop>dialTi</tabstop>
+  <tabstop>dialKpr</tabstop>
+  <tabstop>sbK_1</tabstop>
+  <tabstop>sbK_2</tabstop>
+  <tabstop>sbK_3</tabstop>
+  <tabstop>sbK_4</tabstop>
+  <tabstop>sbXmin</tabstop>
+  <tabstop>sbXmax</tabstop>
+  <tabstop>pRev</tabstop>
+  <tabstop>rRev</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -25,7 +25,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ui->RegParm->hide(); // сховати область настройки регулятора
     //resize(size()-QSize(0,159)); // зменшити розмір вікна
     
-    connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
+    //connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
     connect(ui->Setting,SIGNAL(clicked()),this,SLOT(Control()));
     connect(ui->Trend,SIGNAL(clicked()),this,SLOT(runTrend()));
 
@@ -118,6 +118,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
             {
                 ui->regList->addItem(sl[21]); // додати до списку регуляторів
                 RegDes << sl; // зберегти
+                qDebug() << i << sl ;
             }
             else
             {
