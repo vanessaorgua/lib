@@ -10,9 +10,10 @@
 
 #include <QtSql>
 
-RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfName) :QDialog(p),
+RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfName,QString tableName) :QDialog(p),
     src(source)  ,
     RegNum(n) ,
+    tblName(tableName),
     ui(new Ui::panelReg)
 {
     ui->setupUi(this);
@@ -25,7 +26,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ui->RegParm->hide(); // сховати область настройки регулятора
     //resize(size()-QSize(0,159)); // зменшити розмір вікна
     
-    //connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
+    connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
     connect(ui->Setting,SIGNAL(clicked()),this,SLOT(Control()));
     connect(ui->Trend,SIGNAL(clicked()),this,SLOT(runTrend()));
 
@@ -555,7 +556,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
 	QDateTime dt = QDateTime::currentDateTime();
 	QSqlQuery qry;
-	QString sQuery="SELECT Dt,%1 FROM trend WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
+        QString sQuery="SELECT Dt,%1 FROM %4 WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
         QString fields=RegDes[RegNum][Ri::PV_1];
 
         for(i=1;i<8;++i)
@@ -567,7 +568,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
                 fields+="0";
         }
 	//qDebug() << sQuery.arg(RegDes[RegNum].field).arg(dt.toTime_t()-3600).arg(dt.toTime_t());
-        if(qry.exec(sQuery.arg(fields).arg(dt.toTime_t()-3600).arg(dt.toTime_t())))
+        if(qry.exec(sQuery.arg(fields).arg(dt.toTime_t()-3600).arg(dt.toTime_t()).arg(tblName)))
 	{
 	    while(qry.next())
 	    {

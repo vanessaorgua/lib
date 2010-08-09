@@ -42,7 +42,7 @@ class RpanelReg: public QDialog
 {
 Q_OBJECT
 public:
-    RpanelReg(IoDev &source,int n=0,QWidget *p=NULL,QString cfName=":/text/reg.txt");
+    RpanelReg(IoDev &source,int n=0,QWidget *p=NULL,QString cfName=":/text/reg.txt",QString tableName="trend");
     ~RpanelReg();
 
 private slots:
@@ -76,6 +76,7 @@ private:
     QVector<double> v; // дані для запису на графік
     // масив для пошуку віджетів
     QHash<QString, Ri::Index> ctrlSearch;     // хеш для пошуку тегів
+    QString tblName; // назва таблиці
 };
 
 
