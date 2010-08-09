@@ -1,1 +1,50 @@
-<RCC/>
+<RCC>
+  <qresource prefix="/butons" >
+    <file>../pict/alarm_32x32.png</file>
+    <file>../pict/exit_32x32.png</file>
+    <file>../pict/exit_32x32_revers.png</file>
+    <file>../pict/logo_32x32.png</file>
+    <file>../pict/thrend_32x32.png</file>
+    <file>../pict/hand_18x20.png</file>
+    <file>../pict/hand_21x26.png</file>
+    <file>../pict/klapan_analog_horiz_off_28x41.png</file>
+    <file>../pict/klapan_analog_vert_off_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_r_off_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_on_28x41.png</file>
+    <file>../pict/klapan_analog_vert_on_28x41.png</file>
+    <file>../pict/klapan_analog_horiz_r_on_28x41.png</file>
+    <file>../pict/setup_32x32.png</file>
+    <file>../pict/klapan_diskrette_vert_off_na_25x46.png</file>
+    <file>../pict/klapan_diskrette_vert_on_na_25x26.png</file>
+    <file>../pict/bool_green_false_48x48.png</file>
+    <file>../pict/bool_green_true_48x48.png</file>
+    <file>../pict/red_alarm_32x12.png</file>
+    <file>../pict/calendar_48x48.png</file>
+    <file>../pict/report_32x32.png</file>
+    <file>../pict/bleding_25x34.png</file>
+    <file>../pict/mdef_39x22.png</file>
+    <file>../pict/1sat_27x33.png</file>
+    <file>../pict/2sat_27x3.png</file>
+
+
+    <file>../pict/lib/div_off_45x90.png</file>
+    <file>../pict/lib/div_on_45x90.png</file>
+
+    <file>../pict/lib/pump_off_26x30.png</file>
+    <file>../pict/lib/pump_on_26x30.png</file>
+    <file>../pict/lib/pump_green_26x30.png</file>
+    <file>../pict/lib/pump_off_10x11.png</file>
+    <file>../pict/lib/pump_on_10x11.png</file>
+
+    <file>../pict/lib/pump_off_l_26x30.png</file>
+    <file>../pict/lib/pump_on_l_26x30.png</file>
+    <file>../pict/lib/pump_green_l_26x30.png</file>
+
+  </qresource>
+    <qresource prefix="/slider">
+        <file>../pict/SPR_1.png</file>
+        <file>../pict/SP_3.png</file>
+        <file>../pict/SP_2.png</file>
+        <file>../pict/SP_1.png</file>
+    </qresource>
+</RCC>
