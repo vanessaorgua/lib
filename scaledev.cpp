@@ -11,12 +11,12 @@ void ScaledIoDev::loadScale(QString fn) // це завантажить шкал�
 
 
    QSettings s;
-   s.beginGroup("/ioserv/scale/");
+   s.beginGroup(QString("/ioserv/scale/%1").arg(objectName()));
    foreach(QString tag,tags.keys())
    {
         data_scale[tag] << 0.0
-                << s.value(QString("Zero/%1").arg(tag),0.0).toDouble()
-                << s.value(QString("Full/%1").arg(tag),100.0).toDouble();
+                << s.value(QString("%1/Zero").arg(tag),0.0).toDouble()
+                << s.value(QString("%1/Full").arg(tag),100.0).toDouble();
    }
 }
 

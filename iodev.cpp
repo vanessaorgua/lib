@@ -48,7 +48,7 @@ void IoDev::setScaleZero(QString tag,double v)
     if(data_scale.contains(tag))
     {
         QSettings s;
-        s.beginGroup("/ioserv/scale/Zero");
+        s.beginGroup(QString("/ioserv/scale/%1/Zero").arg(objectName()));
         s.setValue(tag,v);
         data_scale[tag][1]=v;
     }
@@ -65,7 +65,7 @@ void IoDev::setScaleFull(QString tag,double v)
     if(data_scale.contains(tag))
     {
         QSettings s;
-        s.beginGroup("/ioserv/scale/Full");
+        s.beginGroup(QString("/ioserv/scale/%1/Full").arg(objectName()));
         s.setValue(tag,v);
         data_scale[tag][2]=v;
     }

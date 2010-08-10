@@ -5,7 +5,7 @@ class IoNetClient;
 
 #include "../iodev.h"
 
-class NetIoDev: public QObject, public IoDev
+class NetIoDev: /*public QObject,*/ public IoDev
 {
 public:
     NetIoDev(IoNetClient *parent);

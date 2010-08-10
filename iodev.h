@@ -1,11 +1,12 @@
 #ifndef __IODEV__H__
 #define __IODEV__H__
 
+#include <QObject>
 #include <QHash>
 #include <QVector>
 #include <QDebug>
 
-class IoDev //: public QObject
+class IoDev : public QObject
 {
 //    Q_OBJECT
 public:
