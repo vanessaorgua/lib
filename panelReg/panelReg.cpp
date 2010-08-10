@@ -194,12 +194,19 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     ui->Value_2->setText(src.getDescription(RegDes[RegNum][Ri::PV_2]));
     ui->Value_3->setText(src.getDescription(RegDes[RegNum][Ri::PV_3]));
     ui->Valve->setText(src.getDescription(RegDes[RegNum][Ri::X]));
-    
+
+    //ui->min_PV1->setText(QString("%1").arg(src.scaleZero(RegDes[RegNum][Ri::PV_1]),3,'f',0));
+    //ui->max_PV1->setText(QString("%1").arg(src.scaleFull(RegDes[RegNum][Ri::PV_1]),3,'f',0));
+
+    ui->scalePV_1->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_1]),src.scaleFull(RegDes[RegNum][Ri::PV_1]));
     // показати-сховати потрібне
     // PV_2
     if(src.getTags().contains(RegDes[RegNum][Ri::PV_2]))
     {
         ui->Parametr_2->show();
+        //ui->min_PV2->setText(QString("%1").arg(src.scaleZero(RegDes[RegNum][Ri::PV_2]),3,'f',0));
+        //ui->max_PV2->setText(QString("%1").arg(src.scaleFull(RegDes[RegNum][Ri::PV_2]),3,'f',0));
+        ui->scalePV_2->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_2]),src.scaleFull(RegDes[RegNum][Ri::PV_2]));
     }
     else
     {
@@ -210,6 +217,9 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     if(src.getTags().contains(RegDes[RegNum][Ri::PV_3]))
     {
         ui->Parametr_3->show();
+        //ui->min_PV3->setText(QString("%1").arg(src.scaleZero(RegDes[RegNum][Ri::PV_3]),3,'f',0));
+        //ui->max_PV3->setText(QString("%1").arg(src.scaleFull(RegDes[RegNum][Ri::PV_3]),3,'f',0));
+        ui->scalePV_3->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_3]),src.scaleFull(RegDes[RegNum][Ri::PV_3]));
     }
     else
     {
@@ -441,13 +451,19 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     // K_1
     if(src.getTags().contains(RegDes[RegNum][Ri::K_1]))
     {
+
+        kk_1=(src.scaleFull(RegDes[RegNum][Ri::PV_2]) -src.scaleZero(RegDes[RegNum][Ri::PV_2])) /
+              (src.scaleFull(RegDes[RegNum][Ri::PV_1]) -src.scaleZero(RegDes[RegNum][Ri::PV_1])) / 100.0;
+
         ui->sbK_1->blockSignals(true);
-        ui->sbK_1->setValue(src.getValueFloat(RegDes[RegNum][Ri::K_1])); //треба шкалювати
+        ui->sbK_1->setValue(src.getValueFloat(RegDes[RegNum][Ri::K_1])/kk_1); //треба шкалювати
         ui->sbK_1->blockSignals(false);
     }
+    else
+        kk_1=1;
     
     
-    // K_1
+    // K_2
     if(src.getTags().contains(RegDes[RegNum][Ri::K_2]))
     {
         ui->sbK_2->blockSignals(true);
@@ -455,7 +471,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->sbK_2->blockSignals(false);
     }
 
-    // K_2
+    // K_3
     if(src.getTags().contains(RegDes[RegNum][Ri::K_3]))
     {
         ui->sbK_3->blockSignals(true);
@@ -598,7 +614,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     QApplication::setOverrideCursor(Qt::ArrowCursor);
     
     updateData();
-    trChart->addPoint(v); // 
+    trChart->addPoint(v); //
 }
 
 void RpanelReg::runTrend() // зміна регулятор
@@ -771,6 +787,9 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             src.sendValue(RegDes[RegNum][ix],v*40.0);
 	    break;
         case Ri::K_1: // sbK_1
+            src.sendValue(RegDes[RegNum][ix],v*kk_1);
+            break;
+
         case Ri::K_2: // sbK_2
         case Ri::K_3: // sbK_3
         case Ri::K_4: // sbK_4

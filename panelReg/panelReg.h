@@ -77,6 +77,8 @@ private:
     // масив для пошуку віджетів
     QHash<QString, Ri::Index> ctrlSearch;     // хеш для пошуку тегів
     QString tblName; // назва таблиці
+
+    double kk_1 ;  // коефіцієнт корекції для K_1
 };
 
 
