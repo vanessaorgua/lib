@@ -13,9 +13,10 @@ Scale::Scale(QWidget *parent) :
   {
 	QLabel *t=new QLabel(this);
         t->setAlignment(Qt::AlignRight);
+        t->setFont(QFont("Times", 7));
         labels << t;
   }
-  setSizePolicy(QSizePolicy::Fixed,QSizePolicy::MinimumExpanding);
+  //setSizePolicy(QSizePolicy::Fixed,QSizePolicy::MinimumExpanding);
 }
 
 Scale::~Scale()
@@ -41,11 +42,11 @@ void Scale::paintEvent(QPaintEvent *e)
     QPen pen;
     pen.setColor(Qt::black);
 
-    int w,h,n,i;
+    int w,h,n,i,l=3,pr=0;
 
     w=size().width();
     h=size().height();
-
+    //qDebug() << "Object" << objectName() << "Scale width" << w ;
     //p.drawRect(0,0,w-1,h-1);
 
     switch(h/labels[0]->size().height())
@@ -80,14 +81,23 @@ void Scale::paintEvent(QPaintEvent *e)
         double dS=((double)h-labels[0]->size().height())/((double)n-1.0);
         double offset=labels[0]->size().height() /2.0;
 
+        if(dMax<20.0)
+        {
+            pr=1;
+        }
+        else
+        {
+            pr=0;
+        }
+
 
         for(i=0; i<n;++i)
         {
             p.drawLine(w-5,dS*i+offset,w-1,dS*i+offset);
 
             labels[i]->show();
-            labels[i]->setText(QString("%1").arg(dMax-s*i,3,'f',0));
-            labels[i]->setGeometry(w-25,dS*i,20,labels[i]->size().height());
+            labels[i]->setText(QString("%1").arg(dMax-s*i,l,'f',pr));
+            labels[i]->setGeometry(0,dS*i,25,labels[i]->size().height());
         }
         for(;i<11;++i)
         {

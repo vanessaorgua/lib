@@ -11,8 +11,8 @@ public:
     Scale(QWidget *parent = 0);
     ~Scale();
 
-    QSize sizeHint() const {return QSize(25,300);}
-    //QSizePolicy sizePolicy() const {return QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);}
+    QSize sizeHint() const {return QSize(35,300);}
+    QSizePolicy sizePolicy() const {return QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);}
 
     inline double scaleMin() {return dMin ;}
     inline double scaleMax() {return dMax ;}

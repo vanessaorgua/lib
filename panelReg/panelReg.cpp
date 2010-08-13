@@ -199,6 +199,17 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     //ui->max_PV1->setText(QString("%1").arg(src.scaleFull(RegDes[RegNum][Ri::PV_1]),3,'f',0));
 
     ui->scalePV_1->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_1]),src.scaleFull(RegDes[RegNum][Ri::PV_1]));
+    if(src.scaleFull(RegDes[RegNum][Ri::PV_1])<20)
+    {
+        ui->sbSP_1->setDecimals(2);
+        ui->sbSP_1->setSingleStep(0.01);
+    }
+    else
+    {
+        ui->sbSP_1->setDecimals(0);
+        ui->sbSP_1->setSingleStep(1);
+    }
+
     // показати-сховати потрібне
     // PV_2
     if(src.getTags().contains(RegDes[RegNum][Ri::PV_2]))
@@ -627,12 +638,12 @@ void RpanelReg::Control() // відображення-приховувавння
     if(ui->RegParm->isHidden()) // якщо сховано
     {
         ui->RegParm->show(); // показати область настройки регулятора
-	resize(size()+QSize(0,155)); // збільшити розмір вікна
+        //resize(size()+QSize(0,155)); // збільшити розмір вікна
     }
     else
     {
         ui->RegParm->hide(); // сховати область настройки регулятора
-	resize(size()-QSize(0,155)); // зменшити розмір вікна
+        //resize(size()-QSize(0,155)); // зменшити розмір вікна
     }
     //qDebug() << size().height();
 }
