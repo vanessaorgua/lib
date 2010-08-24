@@ -199,6 +199,10 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     //ui->max_PV1->setText(QString("%1").arg(src.scaleFull(RegDes[RegNum][Ri::PV_1]),3,'f',0));
 
     ui->scalePV_1->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_1]),src.scaleFull(RegDes[RegNum][Ri::PV_1]));
+
+    ui->sbSP_1->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_1]));
+    ui->sbSP_1->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_1]));
+
     if(src.scaleFull(RegDes[RegNum][Ri::PV_1])<20)
     {
         ui->sbSP_1->setDecimals(2);
@@ -251,30 +255,35 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->labelSPR_1->hide();
     }
 
-    // SP_1
-    if(src.getTags().contains(RegDes[RegNum][Ri::SP_1]))
-    {
-        ui->sbSP_1->show();
-        ui->vsSP_1->show();
-    }
-    else
-    {
-        ui->sbSP_1->hide();
-        ui->vsSP_1->hide();
-	
-    }
-
     // SP_2
     if(src.getTags().contains(RegDes[RegNum][Ri::SP_2]))
     {
         ui->sbSP_2->show();
         ui->vsSP_2->show();
+
+        ui->sbSP_2->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_2]));
+        ui->sbSP_2->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_2]));
     }
     else
     {
         ui->sbSP_2->hide();
         ui->vsSP_2->hide();
 	
+    }
+
+    // SP_3
+    if(src.getTags().contains(RegDes[RegNum][Ri::SP_3]))
+    {
+        ui->sbSP_3->show();
+        ui->vsSP_3->show();
+        ui->sbSP_3->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_3]));
+        ui->sbSP_3->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_3]));
+    }
+    else
+    {
+        ui->sbSP_3->hide();
+        ui->vsSP_3->hide();
+
     }
 
     // K_1
@@ -657,7 +666,12 @@ void RpanelReg::updateData() // поновлення даних у віджет�
         ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),4,'f',1));
     else
         ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),3,'f',0));
-    ui->pbPV_1->setValue(qint32(src.getValueFloat(RegDes[RegNum][Ri::PV_1])));
+
+    int t1 = src.getValueFloat(RegDes[RegNum][Ri::PV_1]);
+    if(t1<0) t1=0;
+    if(t1>4000) t1=4000;
+
+    ui->pbPV_1->setValue(t1);
 
     v << src.getValueFloat(RegDes[RegNum][Ri::PV_1]);
     
@@ -668,7 +682,12 @@ void RpanelReg::updateData() // поновлення даних у віджет�
             ui->lePV_2->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_2]),4,'f',1));
 	else
             ui->lePV_2->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_2]),3,'f',0));
-        ui->pbPV_2->setValue(qint32(src.getValueFloat(RegDes[RegNum][Ri::PV_2])));
+
+        int t1 = src.getValueFloat(RegDes[RegNum][Ri::PV_2]);
+        if(t1<0) t1=0;
+        if(t1>4000) t1=4000;
+
+        ui->pbPV_2->setValue(t1);
         v << src.getValueFloat(RegDes[RegNum][Ri::PV_2]);
     }
     else
@@ -681,7 +700,13 @@ void RpanelReg::updateData() // поновлення даних у віджет�
             ui->lePV_3->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_3]),4,'f',1));
 	else
             ui->lePV_3->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_3]),3,'f',0));
-        ui->pbPV_3->setValue(qint32(src.getValueFloat(RegDes[RegNum][Ri::PV_3])));
+
+        int t1 = src.getValueFloat(RegDes[RegNum][Ri::PV_3]);
+        if(t1<0) t1=0;
+        if(t1>4000) t1=4000;
+
+        ui->pbPV_3->setValue(t1);
+
         v << src.getValueFloat(RegDes[RegNum][Ri::PV_3]);
     }
     else
