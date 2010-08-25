@@ -367,15 +367,23 @@ int RxModbus::loadList(QString fileName)
 
             if(sl[5]!="-")
             {
+                //qDebug() << "sl[5] " << sl[5];
                 if(sl[5]=="+")
                 {
                     tags[s][5]=1;
                     QSettings set;
-                    set.beginGroup("/ioserv/scale/");
+                    //qDebug() << QString("/ioserv/scale/%1").arg(objectName());
+
+                    set.beginGroup(QString("/ioserv/scale/%1").arg(objectName()));
+
                         data_scale[s] << 0.0
                         << set.value(QString("Zero/%1").arg(s),0.0).toDouble()
                         << set.value(QString("Full/%1").arg(s),100.0).toDouble();
-                }
+
+                        //qDebug() << QString("Zero/%1").arg(s) <<  set.value(QString("Zero/%1").arg(s),0.0).toDouble();
+                        //qDebug() << QString("Full/%1").arg(s) <<  set.value(QString("Full/%1").arg(s),100.0).toDouble() << "\n\n";
+
+                    }
                 else
                 {
                     QStringList f=sl[5].split(" "); // розбити поле на дві частини
@@ -433,7 +441,7 @@ int RxModbus::loadList(QString fileName)
 
         //qDebug() << tags.keys();
 
-//        loadScale(fileName);
+        //loadScale(fileName);
         return i;
     }
     else

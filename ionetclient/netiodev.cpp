@@ -89,7 +89,7 @@ void NetIoDev::setScaleFull(QString tag,double v)
 {
     if(data_scale.contains(tag))
     {
-        qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
+        //qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
         QByteArray query;
         QDataStream qry(&query,QIODevice::WriteOnly);
         qry.setVersion(QDataStream::Qt_4_2);
