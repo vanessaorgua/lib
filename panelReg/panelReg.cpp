@@ -837,7 +837,6 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
         case Ri::SP_1: // sbSP_1
             src.sendValueScaled(RegDes[RegNum][ix],v);
 
-
             ui->vsSP_1->blockSignals(true);
             ui->vsSP_1->setValue((v-src.scaleZero(RegDes[RegNum][ix]))/(src.scaleFull(RegDes[RegNum][ix]) - src.scaleZero(RegDes[RegNum][ix])) *4000.0);
             ui->vsSP_1->blockSignals(false);
