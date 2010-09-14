@@ -1163,7 +1163,7 @@ p, li { white-space: pre-wrap; }
             <string>Коефіцієнт К1 розрахунку завдання</string>
            </property>
            <property name="maximum">
-            <double>200.000000000000000</double>
+            <double>4000.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -1198,7 +1198,7 @@ p, li { white-space: pre-wrap; }
             <string>Коефіцієнт К2 розрахунку завдання</string>
            </property>
            <property name="maximum">
-            <double>200.000000000000000</double>
+            <double>4000.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -1233,7 +1233,7 @@ p, li { white-space: pre-wrap; }
             <string>Коефіцієнт К3 розрахунку завдання</string>
            </property>
            <property name="maximum">
-            <double>200.000000000000000</double>
+            <double>4000.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -1268,7 +1268,7 @@ p, li { white-space: pre-wrap; }
             <string>Коефіцієнт К4 розрахунку завдання</string>
            </property>
            <property name="maximum">
-            <double>200.000000000000000</double>
+            <double>4000.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -2028,8 +2028,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>pRev</tabstop>
   <tabstop>rRev</tabstop>
  </tabstops>
- <resources>
-  <include location="panelReg.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

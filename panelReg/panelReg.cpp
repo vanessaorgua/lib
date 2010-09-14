@@ -200,8 +200,6 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
     ui->scalePV_1->setScaleMinMax(src.scaleZero(RegDes[RegNum][Ri::PV_1]),src.scaleFull(RegDes[RegNum][Ri::PV_1]));
 
-    ui->sbSP_1->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_1]));
-    ui->sbSP_1->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_1]));
 
     if(src.scaleFull(RegDes[RegNum][Ri::PV_1])<20)
     {
@@ -261,8 +259,6 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->sbSP_2->show();
         ui->vsSP_2->show();
 
-        ui->sbSP_2->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_2]));
-        ui->sbSP_2->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_2]));
     }
     else
     {
@@ -276,8 +272,6 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     {
         ui->sbSP_3->show();
         ui->vsSP_3->show();
-        ui->sbSP_3->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_3]));
-        ui->sbSP_3->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_3]));
     }
     else
     {
@@ -367,6 +361,10 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
 //     // SP_1
     ui->sbSP_1->blockSignals(true);
+
+    ui->sbSP_1->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_1]));
+    ui->sbSP_1->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_1]));
+
     ui->sbSP_1->setValue(src.getValueScaled(RegDes[RegNum][Ri::SP_1]));
     ui->sbSP_1->blockSignals(false);
 
@@ -378,6 +376,9 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     if(src.getTags().contains(RegDes[RegNum][Ri::SP_2]))
     {
         ui->sbSP_2->blockSignals(true);
+        ui->sbSP_2->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_2]));
+        ui->sbSP_2->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_2]));
+
         ui->sbSP_2->setValue(src.getValueScaled(RegDes[RegNum][Ri::SP_2]));
         ui->sbSP_2->blockSignals(false);
 	
@@ -391,6 +392,10 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     {
         ui->sbSP_3->show();
         ui->sbSP_3->blockSignals(true);
+
+        ui->sbSP_3->setMinimum(src.scaleZero(RegDes[RegNum][Ri::SP_3]));
+        ui->sbSP_3->setMaximum(src.scaleFull(RegDes[RegNum][Ri::SP_3]));
+
         ui->sbSP_3->setValue(src.getValueScaled(RegDes[RegNum][Ri::SP_3]));
         ui->sbSP_3->blockSignals(false);
 
@@ -786,7 +791,7 @@ void RpanelReg::setCtrlValue(int v)
 
 void RpanelReg::setParmValue(double v) // слот відправки даних
 {
-    //qDebug() << sender()->objectName() << ":" << v;
+    qDebug() << "setParmValue(double v)" << sender()->objectName() << ":" << v;
 
 
     if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
@@ -869,7 +874,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
 
 void RpanelReg::setParmValue(int v)
 {
-    //qDebug() << sender()->objectName() << ":" << v;
+    qDebug() << "setParmValue(int v)" << sender()->objectName() << ":" << v;
 
   if(ctrlSearch.contains(sender()->objectName())) // пошукати вадправника
   { // якщо не знайдено
