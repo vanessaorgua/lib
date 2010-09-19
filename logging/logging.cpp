@@ -41,7 +41,7 @@ Logging::~Logging()
 // збирає дані
 void Logging::dbStore()
 {
-    QString field,value;
+    QStringList field,value;
     int i,j=0;
     QDateTime tm=QDateTime::currentDateTime();
     //QVector<qint16> data;
@@ -55,35 +55,37 @@ void Logging::dbStore()
     {
         i=0;
         //data=s[j]->getDataRaw();
-        field="Dt";
-        value=QString("\'%1\'").arg(tm.toTime_t());
+        field.clear();
+        field << "Dt";
+        value.clear();
+        value << QString("%1").arg(tm.toTime_t());
 
         foreach(QString tag, v.keys()) // перебрати всі теги
         {
             if(v[tag][4]) // якщо цей тег пишеться в історію
             {
-                field+=(" ,"+tag);
+                field << tag;
                 switch(v[tag][2]) // тип даних
                 {
                     default:
                     case 0: // Integer
-                        value+=QString(" ,\'%1\'").arg(s[j]->getValue16(tag));
+                        value << QString("%1").arg(s[j]->getValue16(tag));
                         break;
                     case 1: // Bool
-                        value+=QString(" ,\'%1\'").arg(s[j]->getValue16(tag)?1:0);
+                        value << QString("%1").arg(s[j]->getValue16(tag)?1:0);
                         break;
                     case 2: // Real
-                        value+=QString(" ,\'%1\'").arg(s[j]->getValueFloat(tag),5,'f',0);
+                        value << QString("%1").arg(s[j]->getValueFloat(tag),5,'f',0);
                         break;
                     case 3: // Timer
                     case 4: // Long
-                        value+=QString(" ,\'%1\'").arg(s[j]->getValue32(tag));
+                        value << QString("%1").arg(s[j]->getValue32(tag));
                         break;
                 }
             }
         }
         //qDebug() <<  QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
-        log << QString("INSERT INTO %1 (%2) VALUE (%3)").arg(tables[j]).arg(field).arg(value);
+        log << QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
         ++j;
     }
 
