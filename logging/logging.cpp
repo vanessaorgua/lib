@@ -84,9 +84,9 @@ void Logging::dbStore()
                 }
             }
         }
-        //qDebug() <<  QString("INSERT INTO %1 (%2) VALUE (%3)").arg("trend").arg(field).arg(value);
         log << QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
-        ++j;
+        //qDebug() <<  log.size() <<"-" <<  QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
+           ++j;
     }
 
 }
@@ -100,12 +100,17 @@ void Logging::timerEvent (QTimerEvent *)
 if(dbs.isOpen()) // якщо з’єднання відкрите тоді
 {
     QSqlQuery query(dbs);
+    //int si = log.size();
+    //qDebug() << "Queue size " << si;
 
     if(!log.empty()) // якщо в черзі є дані для запису
     {
+#ifndef WIN32
         if(dbs.transaction())
         {
-        //query.exec("START TRANSACTION");
+#else
+            query.exec("START TRANSACTION");
+#endif
             while(!log.empty())
             {
                 ++i;
@@ -115,17 +120,24 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
                          //qDebug() << query.lastQuery();
                 }
             }
-            //query.exec("COMMIT");
+#ifndef WIN32
             dbs.commit();
             //qDebug("Скинуто в базу %d записів",i);
         }
         else
         {
-            qDebug() << dbs.lastError().databaseText();
+            qDebug() << "No start transaction "
+             << dbs.lastError().databaseText();
+            log.clear();
         }
+#else
+        query.exec("COMMIT");
+#endif
 
-
-
+    }
+    else
+    {
+        qDebug() << "No records to store" ;
     }
     dbs.close();
 }
