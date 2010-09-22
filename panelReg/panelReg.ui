@@ -675,43 +675,6 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QPushButton" name="Setting">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>130</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>130</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="whatsThis">
-         <string>Кнопка доступу до налаштувань регулятора</string>
-        </property>
-        <property name="text">
-         <string>Налаштування</string>
-        </property>
-        <property name="autoDefault">
-         <bool>true</bool>
-        </property>
-        <property name="default">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="2">
        <widget class="QPushButton" name="Trend">
         <property name="enabled">
@@ -862,6 +825,49 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="flat">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="Setting">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>130</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>130</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="whatsThis">
+         <string>Кнопка доступу до налаштувань регулятора</string>
+        </property>
+        <property name="text">
+         <string>Налаштування</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -2035,5 +2041,22 @@ p, li { white-space: pre-wrap; }
   <tabstop>rRev</tabstop>
  </tabstops>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>Setting</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>RegParm</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>206</x>
+     <y>290</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>451</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

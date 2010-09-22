@@ -27,7 +27,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     //resize(size()-QSize(0,159)); // зменшити розмір вікна
     
     connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
-    connect(ui->Setting,SIGNAL(clicked()),this,SLOT(Control()));
+    //connect(ui->Setting,SIGNAL(clicked()),this,SLOT(Control()));
     connect(ui->Trend,SIGNAL(clicked()),this,SLOT(runTrend()));
 
     // реакції користувацького інтерфейсу
