@@ -465,11 +465,16 @@
       <item>
        <widget class="QComboBox" name="Interval">
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <property name="insertPolicy">
          <enum>QComboBox::NoInsert</enum>
         </property>
+        <item>
+         <property name="text">
+          <string>00:05:00</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string>00:15:00</string>

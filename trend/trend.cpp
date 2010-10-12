@@ -24,7 +24,7 @@
 
 namespace MyConst
 {
-    const int tmr[]={900,1800,3600,7200,14400,21600,43200};
+    const int tmr[]={300,900,1800,3600,7200,14400,21600,43200};
     const unsigned int LvCor = 2049136799;
     const Qt::GlobalColor DefColor[8]={Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow,Qt::white,Qt::darkRed};
 };
@@ -168,7 +168,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     
     
     for(int i=0;i<8;++i)
-	m_Color[i]=QColor(MyConst::DefColor[i]); // цю ініціалізацію треба переробити
+        m_Color << QColor(MyConst::DefColor[i]); // цю ініціалізацію треба переробити
 
     m_tw->setColors(m_Color);
 
@@ -411,7 +411,7 @@ void TrendWindow::colorChange()
     if(sender())
     {
 	i=sender()->objectName().mid(3,1).toInt();	
-	color=QColorDialog::getColor(m_Color[i]);
+        color=QColorDialog::getColor(m_Color[i],this);
 	if(color.isValid())
 	{
 	    QPalette pal;
@@ -424,7 +424,7 @@ void TrendWindow::colorChange()
 	    pl.setColor(QPalette::Highlight,m_Color[i]);
             m_ui->cursorVal->setPalette(pl);
 	
-	    m_tw->setColors(m_Color,m_trinfo->numPlot);
+            m_tw->setColors(m_Color);
 	    dataChange();
 	}
     }
@@ -516,6 +516,36 @@ else
 
 }
 
+
+void TrendWindow::setColors(QVector<QColor> &colors)
+{
+    QPalette pal;
+
+    QVector<QPushButton*> pb;
+    pb
+            << m_ui->pc_0
+            << m_ui->pc_1
+            << m_ui->pc_2
+            << m_ui->pc_3
+            << m_ui->pc_4
+            << m_ui->pc_5
+            << m_ui->pc_6
+            << m_ui->pc_7 ;
+
+    for(int i=0;i<colors.size();++i)
+    {
+        m_Color[i] = colors[i]; // цю ініціалізацію треба переробити
+        pal.setColor(QPalette::Button,m_Color[i]);
+        pb[i]->setPalette(pal);
+    }
+
+    pal.setColor(QPalette::Highlight,m_Color[0]);
+    m_ui->cursorVal->setPalette(pal);
+
+    m_tw->setColors(m_Color);
+    dataChange();
+}
+
 //--------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------
@@ -533,6 +563,8 @@ TrendView::TrendView(QWidget *p) : QWidget(p),
     repaint();
     m_bStart = false;
     m_nPlot=0; // на всяк пожарний 
+    m_pColor.fill(QColor(Qt::black),8);
+
 }
 
 TrendView::~TrendView()
@@ -598,13 +630,14 @@ void TrendView::draw() // власне по цій команді об'єкт m_
     repaint(); // а можливо це непотрібно ?
 }
 
-void TrendView::setColors(QColor *pColor,int numPlot)
+void TrendView::setColors(QVector<QColor> &pColor)
 {
     int i;
-    for(i=0;i<numPlot;++i)
+    for(i=0;i<pColor.size();++i)
     {
 	m_pColor[i]=pColor[i];	
     }
+
 }
 
 void TrendView::paintEvent(QPaintEvent *) // малюю вищенаведену картину на екрані.

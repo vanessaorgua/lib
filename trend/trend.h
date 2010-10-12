@@ -48,6 +48,7 @@ public slots:
     void plotChange();     
     void setCursor(int v=0);
     void slotExit();
+    void setColors(QVector<QColor> &colors);
 
 signals:
     void repaintRequest();
@@ -58,7 +59,7 @@ private:
     //QSqlDatabase dbs;
 
     QDateTime m_start,m_stop,m_cursor;
-    QColor m_Color[8];
+    QVector<QColor> m_Color;
     
 
     QString m_Field[8];   // назви полів 
@@ -94,7 +95,7 @@ public:
     inline QSize sizeHint() const {return QSize(400,300);}
     inline QSizePolicy sizePolicy() const {return QSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);}
 
-    void setColors(QColor *pColor,int numPlot=8);
+    void setColors(QVector<QColor> &pColor);
 
 public slots:
     void start(int nLen,int numPlot,int nHeight=4000); // тут створ.ється новий oб'єкт m_px
@@ -116,7 +117,7 @@ protected:
     double m_pfData[8]; // масив для зберігання координат попердньої точки
     double m_nX,m_nH; // координата х попередньої точки
     
-    QColor m_pColor[8];
+    QVector<QColor> m_pColor;
 
 
     void paintEvent(QPaintEvent *e); // малюю вищенаведену картину на екрані.
