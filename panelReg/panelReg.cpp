@@ -667,10 +667,12 @@ void RpanelReg::updateData() // поновлення даних у віджет�
     v.clear();
     
     // PV_1
-    if(src.scaleFull(RegDes[RegNum][Ri::PV_1])<50.0)
+    if(src.scaleFull(RegDes[RegNum][Ri::PV_1])<50.0 && src.scaleFull(RegDes[RegNum][Ri::PV_1])>20.0)
         ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),4,'f',1));
+    else if (src.scaleFull(RegDes[RegNum][Ri::PV_1])<=20.0)
+        ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),4,'f',2));
     else
-        ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),3,'f',0));
+       ui->lePV_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::PV_1]),3,'f',0));
 
     int t1 = src.getValueFloat(RegDes[RegNum][Ri::PV_1]);
     if(t1<0) t1=0;

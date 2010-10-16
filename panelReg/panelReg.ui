@@ -1186,6 +1186,9 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Коефіцієнт К1 розрахунку завдання</string>
            </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="maximum">
             <double>4000.000000000000000</double>
            </property>
@@ -1220,6 +1223,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Коефіцієнт К2 розрахунку завдання</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
            </property>
            <property name="maximum">
             <double>4000.000000000000000</double>
@@ -1256,6 +1262,9 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Коефіцієнт К3 розрахунку завдання</string>
            </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="maximum">
             <double>4000.000000000000000</double>
            </property>
@@ -1290,6 +1299,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Коефіцієнт К4 розрахунку завдання</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
            </property>
            <property name="maximum">
             <double>4000.000000000000000</double>
