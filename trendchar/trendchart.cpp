@@ -55,7 +55,7 @@ TrendChart::~TrendChart()
 //    qDebug() << "Mem clean";
 //  delete pGraph;
     if(vbl) delete vbl;
-    if(!slave) delete pY; // якщо свої дані - тоді видалити
+    if(!slave) delete [] pY; // якщо свої дані - тоді видалити
 }
 
 
