@@ -76,8 +76,14 @@ void IoNetClient::slotTimeout() // таймаут отримання даних 
 
 void IoNetClient::slotDisconnect() // від’єднання зі сторони сервера
 {
-    //qDebug() << "Signal slotDisconnect()";
-    // якщо сервер закрив з’єднання тоді спрбувати відкрити його знову
+    qDebug() << "Signal slotDisconnect()";
+    // видалити поточні джерела даних
+    foreach(NetIoDev* v,src) // звільнити пам’ять з-під даних
+    {
+        delete v;
+    }    // якщо сервер закрив з’єднання тоді спрбувати відкрити його знову
+    src.clear();
+
     rtmr->stop();
 }
 
