@@ -8,35 +8,39 @@
 
 int main(int argc, char *argv[])
 {
-    QSettings set("histclear.conf",QSettings::IniFormat);
+    QSettings set("~/histclear.conf",QSettings::IniFormat);
 
-    QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
-
-
-    dbs.setHostName(set.value("/db/host","localhost").toString());
-    dbs.setDatabaseName(set.value("/db/db","test").toString());
-    dbs.setUserName(set.value("/db/username","scada").toString());
-    dbs.setPassword(set.value("/db/passwd","").toString());
-
-    if(dbs.open()) // спробувати відкрити
     {
-        int tm=QDateTime::currentDateTime().toTime_t()-90*24*3600;
-        QSqlQuery qry(dbs);
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
 
-        set.beginGroup("table");
-        QStringList k=set.allKeys();
-        foreach(QString s,k)
+
+        dbs.setHostName(set.value("/db/host","localhost").toString());
+        dbs.setDatabaseName(set.value("/db/db","test").toString());
+        dbs.setUserName(set.value("/db/username","scada").toString());
+        dbs.setPassword(set.value("/db/passwd","").toString());
+
+        if(dbs.open()) // спробувати відкрити
         {
-            if(!qry.exec(QString("DELETE FROM %1 WHERE Dt<%2").arg(set.value(s).toString()).arg(tm)))
+            int tm=QDateTime::currentDateTime().toTime_t()-90*24*3600;
+            QSqlQuery qry(dbs);
+
+            set.beginGroup("table");
+            QStringList k=set.allKeys();
+            foreach(QString s,k)
             {
-                qDebug() << qry.lastError().databaseText();
+                if(!qry.exec(QString("DELETE FROM %1 WHERE Dt<%2").arg(set.value(s).toString()).arg(tm)))
+                {
+                    qDebug() << qry.lastError().databaseText();
+                }
             }
+            set.endGroup();
+            dbs.close();
         }
-        set.endGroup();
-        dbs.close();
+        else
+        {
+            qDebug() << "Can\'t open database" << dbs.lastError().driverText();
+        }
+
     }
-    else
-    {
-        qDebug() << "Can\'t open database" << dbs.lastError().driverText();
-    }
+        QSqlDatabase::removeDatabase("logging");
 }
