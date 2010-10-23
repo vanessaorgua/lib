@@ -1,5 +1,6 @@
 #include <QtCore/QCoreApplication>
 #include <QSettings>
+#include <QDir>
 #include <QDebug>
 #include <QStringList>
 #include <QtSql>
@@ -8,16 +9,18 @@
 
 int main(int argc, char *argv[])
 {
-    QSettings set("~/histclear.conf",QSettings::IniFormat);
 
     {
+        QSettings set(QDir::home().filePath("histclear.conf"),QSettings::IniFormat);
+
         QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
 
+        dbs.setHostName(set.value("db/host","localhost").toString());
+        dbs.setDatabaseName(set.value("db/db","test1").toString());
+        dbs.setUserName(set.value("db/username","scada").toString());
+        dbs.setPassword(set.value("db/passwd","").toString());
 
-        dbs.setHostName(set.value("/db/host","localhost").toString());
-        dbs.setDatabaseName(set.value("/db/db","test").toString());
-        dbs.setUserName(set.value("/db/username","scada").toString());
-        dbs.setPassword(set.value("/db/passwd","").toString());
+        //qDebug() << dbs.hostName() << dbs.databaseName() << dbs.userName() << dbs.password();
 
         if(dbs.open()) // спробувати відкрити
         {

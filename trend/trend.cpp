@@ -246,7 +246,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 
 TrendWindow::~TrendWindow()
 {
-    delete m_pnDt; 
+    delete [] m_pnDt;
     //qDebug("TrendWindow Кінець роботи");
     {
 	QSqlDatabase dbs=QSqlDatabase::database("history");
@@ -333,7 +333,7 @@ if(dbs.isOpen())
 	QVector<int> v(m_trinfo->numPlot);
 	//qDebug("Кількість записів %d",query.size());
 	if(m_pnDt)
-	    delete m_pnDt;
+            delete [] m_pnDt;
 	m_pnDt = new unsigned int[query.size()];
 	// ініціалізація об'єкта малювання графіку
 	m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
