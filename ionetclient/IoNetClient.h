@@ -22,7 +22,7 @@ public:
 
     // методи доступу
     NetIoDev *operator[](int i) { return i<src.size()? src[i] :  zero ; }
-    int size() {return src.size(); }
+    //int size() {return src.size(); }
 
 public slots: // це все має відношення до з’єднання із сервером
 	void slotNewConnect();
@@ -32,6 +32,7 @@ public slots: // це все має відношення до з’єднанн�
 	void slotReadServer();
 	void slotError(QAbstractSocket::SocketError);
         void slotSendQuery();
+        int size() {return src.size();}
 
 signals:
         void updateData();

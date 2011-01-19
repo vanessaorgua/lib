@@ -1,13 +1,15 @@
 #include "trendconstruct.h"
 #include "ui_trendconstruct.h"
 #include <QWidget>
+#include "../ionetclient/IoNetClient.h"
 
-TrendConstruct::TrendConstruct(IoDev &source,QWidget *parent) :
+TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
         src(source),
     QDialog(parent),
     ui(new Ui::TrendConstruct)
 {
     ui->setupUi(this);
+    ui->tagView->children();
 }
 
 TrendConstruct::~TrendConstruct()

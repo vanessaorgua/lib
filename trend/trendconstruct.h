@@ -2,8 +2,8 @@
 #define TRENDCONSTRUCT_H
 
 #include <QDialog>
-#include <iodev.h>
 
+class IoNetClient;
 namespace Ui {
     class TrendConstruct;
 }
@@ -11,7 +11,7 @@ namespace Ui {
 class TrendConstruct : public QDialog {
     Q_OBJECT
 public:
-    TrendConstruct(IoDev &source,QWidget *parent = 0);
+    TrendConstruct(IoNetClient &source,QWidget *parent = 0);
     ~TrendConstruct();
 
     QStringList tegList();
@@ -21,7 +21,7 @@ protected:
 
 private:
     Ui::TrendConstruct *ui;
-    IoDev &src;
+     IoNetClient &src;
 
 };
 
