@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
+    <width>743</width>
     <height>460</height>
    </rect>
   </property>
@@ -14,9 +14,6 @@
    <string>Конструктор</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="3" rowspan="3">
-    <widget class="QListView" name="tagList"/>
-   </item>
    <item row="5" column="3">
     <widget class="QPushButton" name="Exit">
      <property name="text">
@@ -64,8 +61,35 @@
      </property>
     </spacer>
    </item>
+   <item row="0" column="3" rowspan="3">
+    <widget class="QListWidget" name="listTag"/>
+   </item>
    <item row="0" column="1" rowspan="4">
-    <widget class="QTreeView" name="tagView"/>
+    <widget class="QTreeWidget" name="treeTag">
+     <column>
+      <property name="text">
+       <string>Список тегів</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Опис</string>
+      </property>
+     </column>
+     <item>
+      <property name="text">
+       <string>Top item</string>
+      </property>
+      <item>
+       <property name="text">
+        <string>Item</string>
+       </property>
+       <property name="text">
+        <string>tttt</string>
+       </property>
+      </item>
+     </item>
+    </widget>
    </item>
   </layout>
  </widget>

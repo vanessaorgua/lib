@@ -20,7 +20,7 @@ public:
     inline qint16 getIndex(QString &tag) { return tags.contains(tag) ? tags[tag][0]:qint16(-1);  }
     inline qint16 getAddress(QString &tag)  { return tags.contains(tag) ?tags[tag][1]:qint16(-1);  }
     inline qint16 fieldType(QString &tag) { return tags.contains(tag) ?tags[tag][2]:qint16(-1); }
-
+    inline bool isLogging(QString &tag) { return tags.contains(tag) ?(bool)tags[tag][4]:false; }
     inline const QVector<qint16> &getDataRaw() {return data_raw;}
 
     inline QHash<QString,QVector<double> > &getDataScaled() { return data_scale;}

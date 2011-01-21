@@ -2,8 +2,11 @@
 #define TRENDCONSTRUCT_H
 
 #include <QDialog>
+#include <QVector>
 
 class IoNetClient;
+class QTreeWidgetItem;
+
 namespace Ui {
     class TrendConstruct;
 }
@@ -22,6 +25,7 @@ protected:
 private:
     Ui::TrendConstruct *ui;
      IoNetClient &src;
+    QVector<QVector<QTreeWidgetItem*> > tags;
 
 };
 
