@@ -14,12 +14,6 @@ TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
 {
     ui->setupUi(this);
 
-    // Очистити все, на всяк випадок. Чи потрібно так складно
-    foreach(QVector<QTreeWidgetItem*> t,tags)
-    {
-        t.clear();
-    }
-    tags.clear();
 
     ui->treeTag->clear();
 
@@ -28,8 +22,6 @@ TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
     {
         //qDebug() << src[i]->getTags().keys();
         QHash<QString,QTreeWidgetItem*> groups;
-        QVector<QTreeWidgetItem*> t;
-        tags.append(t);
         QTreeWidgetItem *_qtwi = new QTreeWidgetItem(ui->treeTag);
         _qtwi->setText(0,QString(tr("ПЛС %1")).arg(i));
         ui->treeTag->addTopLevelItem(_qtwi);
@@ -55,7 +47,6 @@ TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
                 QTreeWidgetItem *_twc = new QTreeWidgetItem(p);
                 _twc->setText(0,tag);
                 _twc->setText(1,src[i]->getDescription(tag));
-                tags[i] << _twc;
             }
         }
     }
@@ -92,7 +83,12 @@ void TrendConstruct::changeEvent(QEvent *e)
 
 QStringList TrendConstruct::tegList()
 {
-
+    QStringList res;
+    for(int i=0;i<ui->listTag->count();++i)
+    {
+        res <<  ui->listTag->item(i)->data(Qt::ToolTipRole).toString();
+    }
+    return res;
 }
 
 void TrendConstruct::itemAdd(QTreeWidgetItem* item,int col)

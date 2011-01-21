@@ -31,7 +31,7 @@ protected:
 private:
     Ui::TrendConstruct *ui;
      IoNetClient &src;
-    QVector<QVector<QTreeWidgetItem*> > tags;
+
 
 };
 
