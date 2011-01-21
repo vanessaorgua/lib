@@ -2,6 +2,7 @@
 #include "ui_trendconstruct.h"
 #include <QWidget>
 #include <QTreeWidgetItem>
+#include <QListWidgetItem>
 #include <QHash>
 
 #include "../ionetclient/IoNetClient.h"
@@ -58,10 +59,21 @@ TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
             }
         }
     }
+    connect(ui->treeTag,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(itemAdd(QTreeWidgetItem*,int)));
+    connect(ui->listTag,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(itemRemove(QListWidgetItem*)));
+    connect(ui->addButton,SIGNAL(clicked()),this,SLOT(buttonAddItem()));
+    connect(ui->removeButton,SIGNAL(clicked()),this,SLOT(buttonRemoveItem()));
+
 }
 
 TrendConstruct::~TrendConstruct()
 {
+    while(ui->listTag->count())
+    {
+        QListWidgetItem *p=ui->listTag->item(0);
+        ui->listTag->removeItemWidget(p);
+        delete p;
+    }
     delete ui;
 }
 
@@ -83,4 +95,40 @@ QStringList TrendConstruct::tegList()
 
 }
 
+void TrendConstruct::itemAdd(QTreeWidgetItem* item,int col)
+{
+    if(! item->isDisabled() && item->text(1).size())
+    {
+        QListWidgetItem *li=new QListWidgetItem;
+        li->setText(item->text(1));
+        li->setData(Qt::ToolTipRole,item->text(0));
+        ui->listTag->addItem(li);
+        item->setDisabled(true);
+    }
+}
+
+void TrendConstruct::itemRemove(QListWidgetItem* item)
+{
+    if(item)
+    {
+        foreach(QTreeWidgetItem *p,ui->treeTag->findItems(item->data(Qt::ToolTipRole).toString(),Qt::MatchRecursive,0))
+        {
+            p->setDisabled(false);
+        }
+
+        ui->listTag->removeItemWidget(item);
+        delete item;
+    }
+}
+
+void TrendConstruct::buttonAddItem()
+{
+    itemAdd(ui->treeTag->currentItem(),0);
+}
+
+
+void TrendConstruct::buttonRemoveItem()
+{
+    itemRemove(ui->listTag->currentItem());
+}
 

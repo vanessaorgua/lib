@@ -6,6 +6,7 @@
 
 class IoNetClient;
 class QTreeWidgetItem;
+class QListWidgetItem;
 
 namespace Ui {
     class TrendConstruct;
@@ -18,6 +19,11 @@ public:
     ~TrendConstruct();
 
     QStringList tegList();
+private slots:
+      void itemAdd(QTreeWidgetItem*,int);
+      void itemRemove(QListWidgetItem*);
+      void buttonAddItem();
+      void buttonRemoveItem();
 
 protected:
     void changeEvent(QEvent *e);
