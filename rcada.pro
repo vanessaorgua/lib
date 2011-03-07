@@ -9,12 +9,14 @@ TEMPLATE = lib
 CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \
     logging/logging.cpp \
+    logsqlite/logsqlite.cpp \
     ionetserver/IoNetServer.cpp \
     iodev.cpp \
     scaledev.cpp \
     alert/alert.cpp
 HEADERS += modbus/RxModbus.h \
     logging/logging.h \
+    logsqlite/logsqlite.h \
     iodev.h \
     ionetserver/IoNetServer.h \
     header.h \
