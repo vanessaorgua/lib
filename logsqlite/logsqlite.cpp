@@ -5,7 +5,7 @@
 
 LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 {
-    QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
+    QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","logging");
 
     QSettings set;
 

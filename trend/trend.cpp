@@ -198,13 +198,23 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     
     m_sTmpl= "SELECT Dt%1 FROM %2 WHERE Dt BETWEEN %3 AND %4 ORDER BY Dt";// шаблон запиту
 
-    QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","history");
-    QSettings s;
 
-    dbs.setHostName(tri->host);
-    dbs.setDatabaseName(tri->db);
-    dbs.setUserName(tri->user);
-    dbs.setPassword(tri->passwd);
+    if(tri->host=="QSQLITE")
+    {
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","history");
+        dbs.setDatabaseName(tri->db);
+    }
+    else
+    {
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","history");
+
+        dbs.setHostName(tri->host);
+        dbs.setDatabaseName(tri->db);
+        dbs.setUserName(tri->user);
+        dbs.setPassword(tri->passwd);
+    }
+
+    QSqlDatabase dbs=QSqlDatabase::database("history");
 
     if(dbs.open())
     {
@@ -246,7 +256,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 
 TrendWindow::~TrendWindow()
 {
-    delete [] m_pnDt;
     //qDebug("TrendWindow Кінець роботи");
     {
 	QSqlDatabase dbs=QSqlDatabase::database("history");
@@ -320,7 +329,7 @@ void TrendWindow::dataChange()
     // фінальна побудова запиту
     s=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
 
-QSqlDatabase dbs=QSqlDatabase::database("history");
+    QSqlDatabase dbs=QSqlDatabase::database("history");
 if(dbs.isOpen())
 {
     QSqlQuery query(dbs);
@@ -332,23 +341,24 @@ if(dbs.isOpen())
 	//int *v= new int[m_trinfo->numPlot];
 	QVector<int> v(m_trinfo->numPlot);
 	//qDebug("Кількість записів %d",query.size());
-	if(m_pnDt)
-            delete [] m_pnDt;
-	m_pnDt = new unsigned int[query.size()];
-	// ініціалізація об'єкта малювання графіку
-	m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
-	// виймання даних
-	m_nLen=0;
-	while(query.next())
-	{
-	    m_pnDt[m_nLen++]=query.value(0).toUInt(); // зберегти масив точок
-	    
-	    for(i=0;i<m_trinfo->numPlot;++i)
-		v[i]=query.value(i+1).toInt();
-	    m_tw->setData(query.value(0).toUInt()-m_start.toTime_t(),v);
-	}
+        m_pnDt.clear();
 
-	query.clear();
+        qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
+        // ініціалізація об'єкта малювання графіку
+         m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
+            // виймання даних
+         m_nLen=0;
+         while(query.next())
+            {
+             m_nLen++;
+                m_pnDt << query.value(0).toUInt(); // зберегти масив точок
+	    
+                for(i=0;i<m_trinfo->numPlot;++i)
+                        v[i]=query.value(i+1).toInt();
+                m_tw->setData(query.value(0).toUInt()-m_start.toTime_t(),v);
+            }
+
+            query.clear();
 	m_tw->draw();
 	
 	//delete v;

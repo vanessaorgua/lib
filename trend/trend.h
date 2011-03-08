@@ -17,6 +17,8 @@ class TrendView;
 struct trendinfo
 {
     QString host,user,passwd,db; // інформація для зв'язку із БД
+    // тут буде додана підтримка SQLITE. Якщо значення параметра host=="QSQLITE" тоді ввачається що потрібно вживати рушій QSQLITE, варіант не самий гарний але кращого
+    // поки-що не придумав
 
     int numPlot;
     QString trend; // ім'я тренада, так назву об'єкт і це ім'я буде використовуватись для збереження параметрів
@@ -75,7 +77,7 @@ private:
     
     int m_nHeight;
 
-    unsigned int *m_pnDt; //масив, для пошуку поточного положення курсору
+    QVector<unsigned int> m_pnDt; //масив, для пошуку поточного положення курсору
     int m_nLen; // довжина масива
     Ui::Trend *m_ui;
 };
