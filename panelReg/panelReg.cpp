@@ -579,13 +579,24 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString conName;
 {
-    QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL");
     QSettings s;
 
-    dbs.setHostName(s.value("/db/hostname","localhost").toString());
-    dbs.setDatabaseName(s.value("/db/dbname","test").toString());
-    dbs.setUserName(s.value("/db/username","scada").toString());
-    dbs.setPassword(s.value("/db/passwd","").toString());
+    if(s.value("/db/hostname","localhost").toString()=="QSQLITE")
+    {
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","panelreg");
+        dbs.setDatabaseName(s.value("/db/dbname","test").toString());
+    }
+    else
+    {
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","panelreg");
+        dbs.setHostName(s.value("/db/hostname","localhost").toString());
+        dbs.setDatabaseName(s.value("/db/dbname","test").toString());
+        dbs.setUserName(s.value("/db/username","scada").toString());
+        dbs.setPassword(s.value("/db/passwd","").toString());
+    }
+
+    QSqlDatabase dbs=QSqlDatabase::database("panelreg");
+
     conName=dbs.connectionName();
     //qDebug() << conName;
     
@@ -596,7 +607,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 	trChart->fill(0);
 
 	QDateTime dt = QDateTime::currentDateTime();
-	QSqlQuery qry;
+        QSqlQuery qry(dbs);
         QString sQuery="SELECT Dt,%1 FROM %4 WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
         QString fields=RegDes[RegNum][Ri::PV_1];
 
@@ -625,7 +636,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         else
         {
     	QApplication::setOverrideCursor(Qt::ArrowCursor);
-	    QMessageBox::critical(this,tr("Помилка виконання запиту"),qry.lastError().databaseText());
+            QMessageBox::critical(this,tr("!!!Помилка виконання запиту"),qry.lastError().databaseText()+"\n!"+qry.lastQuery());
             qDebug() << qry.lastQuery();
 	}    
 	
