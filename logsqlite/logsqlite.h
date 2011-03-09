@@ -18,8 +18,6 @@ public:
 
     void setTables(QStringList list) { tables=list;}
 
-    void setFileName(QString fileName) { fName=fileName;}
-
 private slots:
     void dbStore();
 private:
@@ -29,7 +27,6 @@ private:
     QVector<QHash<QString,QVector<qint16> > > tags_list; // довбанута структура, буду надіятися що бібліотека Qt правильно все зрозуміє.
     QStringList tables;
 
-    QString fName;
 protected:
     virtual void timerEvent (QTimerEvent *e); // таймер
 };

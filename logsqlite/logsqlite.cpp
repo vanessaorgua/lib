@@ -9,10 +9,7 @@ LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 
     QSettings set;
 
-    dbs.setHostName(set.value("/db/host","localhost").toString());
     dbs.setDatabaseName(set.value("/db/db","test").toString());
-    dbs.setUserName(set.value("/db/username","scada").toString());
-    dbs.setPassword(set.value("/db/passwd","").toString());
     dbs.open(); // спробувати відкрити
 
     QTimer *tmr=new QTimer(this);
@@ -31,7 +28,7 @@ LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 LogSQLite::~LogSQLite()
 {
     {
-        QSqlDatabase dbs=QSqlDatabase::database("LogSQLite",true); // знайти моє з’єднання
+        QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
         dbs.close();
     }
     QSqlDatabase::removeDatabase("LogSQLite");
@@ -84,7 +81,7 @@ void LogSQLite::dbStore()
                 }
             }
         }
-        log << QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
+        log << QString("INSERT INTO %1 (%2) VALUES ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
         //qDebug() <<  log.size() <<"-" <<  QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
            ++j;
     }
@@ -95,11 +92,32 @@ void LogSQLite::dbStore()
 void LogSQLite::timerEvent (QTimerEvent *)
 {
     int i=0;
-    QSqlDatabase dbs=QSqlDatabase::database("LogSQLite",true); // знайти моє з’єднання
+    QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
 
 if(dbs.isOpen()) // якщо з’єднання відкрите тоді
 {
     QSqlQuery query(dbs);
+
+    // тут перевірка існування таблиць.
+    for(int i=0;i<tables.size();++i)
+    {
+        if(dbs.tables().indexOf(tables[i])<0) // якщо таблиці не існує то її індекс менше 0
+        { // тоді треба створити таблицю
+            QString s="CREATE TABLE ";
+            s +=tables[i] + " (Dt integer unsigned primary key";
+            foreach(QString tag ,tags_list[i].keys())
+            {
+                if(tags_list[i][tag][4]) // якщо поле записується в історію
+                {
+                    s+=", "+tag + " smallint default \'0\'";
+                }
+            }
+            s+=");";
+            qDebug() << s;
+            query.exec(s);
+        }
+    }
+
     //int si = log.size();
     //qDebug() << "Queue size " << si;
 
@@ -117,7 +135,7 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
                 if(!query.exec(log.dequeue()))
                 {
                          qDebug() << query.lastError();
-                         //qDebug() << query.lastQuery();
+                         qDebug() << query.lastQuery();
                 }
             }
 #ifndef WIN32
@@ -127,7 +145,7 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
         else
         {
             qDebug() << "No start transaction "
-             << dbs.lastError().databaseText();
+             << dbs.lastError().databaseText() ;
             log.clear();
         }
 #else

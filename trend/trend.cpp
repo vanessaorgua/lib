@@ -343,7 +343,7 @@ if(dbs.isOpen())
 	//qDebug("Кількість записів %d",query.size());
         m_pnDt.clear();
 
-        qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
+        // qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
         // ініціалізація об'єкта малювання графіку
          m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
             // виймання даних
