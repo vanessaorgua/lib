@@ -94,7 +94,7 @@ void LogSQLite::timerEvent (QTimerEvent *)
     int i=0;
     QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
 
-if(dbs.isOpen()) // якщо з’єднання відкрите тоді
+if(dbs.open()) // якщо з’єднання відкрите тоді
 {
     QSqlQuery query(dbs);
 
