@@ -5,12 +5,7 @@
 
 LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 {
-    QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","logging");
-
-    QSettings set;
-
-    dbs.setDatabaseName(set.value("/db/db","test").toString());
-    dbs.open(); // спробувати відкрити
+//    dbs.open(); // спробувати відкрити
 
     QTimer *tmr=new QTimer(this);
     connect(tmr,SIGNAL(timeout()),this,SLOT(dbStore()));
@@ -27,11 +22,12 @@ LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 
 LogSQLite::~LogSQLite()
 {
+/*
     {
         QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
         dbs.close();
     }
-    QSqlDatabase::removeDatabase("LogSQLite");
+    QSqlDatabase::removeDatabase("LogSQLite");*/
 }
 
 
@@ -92,14 +88,17 @@ void LogSQLite::dbStore()
 void LogSQLite::timerEvent (QTimerEvent *)
 {
     int i=0;
-    QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
+ {
+        QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","logging");
+        QSettings set;
+        dbs.setDatabaseName(set.value("/db/db","test").toString());
 
-if(dbs.open()) // якщо з’єднання відкрите тоді
-{
-    QSqlQuery query(dbs);
+    if(dbs.open()) // якщо з’єднання відкрите тоді
+    {
+        QSqlQuery query(dbs);
 
     // тут перевірка існування таблиць.
-    for(int i=0;i<tables.size();++i)
+        for(int i=0;i<tables.size();++i)
     {
         if(dbs.tables().indexOf(tables[i])<0) // якщо таблиці не існує то її індекс менше 0
         { // тоді треба створити таблицю
@@ -121,7 +120,7 @@ if(dbs.open()) // якщо з’єднання відкрите тоді
     //int si = log.size();
     //qDebug() << "Queue size " << si;
 
-    if(!log.empty()) // якщо в черзі є дані для запису
+        if(!log.empty()) // якщо в черзі є дані для запису
     {
 #ifndef WIN32
         if(dbs.transaction())
@@ -153,17 +152,18 @@ if(dbs.open()) // якщо з’єднання відкрите тоді
 #endif
 
     }
-    else
+        else
     {
         qDebug() << "No records to store" ;
     }
-    dbs.close();
+        dbs.close();
+    }
+    else
+    {
+        QDateTime dt= QDateTime::currentDateTime();
+        qDebug() << dt.toString("yyyy/MM/dd hh:mm:ss")  << " SQLite error:"<< dbs.lastError().databaseText() << "\n";
+        log.clear(); // очистити чергу
+    }
 }
-else
-{
-    QDateTime dt= QDateTime::currentDateTime();
-    qDebug() << dt.toString("yyyy/MM/dd hh:mm:ss")  << " MYSQL error:"<< dbs.lastError().databaseText() << "\n";
-    log.clear(); // очистити чергу
-}
-
+    QSqlDatabase::removeDatabase("LogSQLite");
 }
