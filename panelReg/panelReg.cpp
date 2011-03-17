@@ -99,6 +99,14 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     // Rev
     connect(ui->regRev,SIGNAL(stateChanged(int)),this,SLOT(setParmKprSig(int)));
 
+    // P0
+    connect(ui->sbP0,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
+    connect(ui->dialP0,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
+    ui->sbP0->setKeyboardTracking(false);
+    // Mode
+    connect(ui->regMode,SIGNAL(clicked(bool)),this,SLOT(setParamMode(bool)));
+
+
     // хеш для співставлення назв віджетів із індексами
     ctrlSearch["cbAM"]=Ri::AM;
     ctrlSearch["cbRej"]=Ri::Rej;
@@ -130,6 +138,11 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
 
     ctrlSearch["sbXmin"]=Ri::Xmin;
     ctrlSearch["sbXmax"]=Ri::Xmax;
+
+    ctrlSearch["dialP0"]=Ri::P0;
+    ctrlSearch["sbP0"]=Ri::P0;
+    ctrlSearch["cbMode"]=Ri::Mode;
+
     // --------------------------------------------------
 
     // завантажити дані
@@ -139,12 +152,14 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
         for(int i=0;!f.atEnd();++i)
         {
             QStringList sl=QString::fromUtf8(f.readLine()).trimmed().split("\t"); // читаємо дані із файла
-            if(sl.size()> 21) // якщо прочитано всі рядки
+            if(sl.size()> 22) // якщо прочитано всі рядки
             {
-                ui->regList->addItem(sl[21]); // додати до списку регуляторів
+                ui->regList->addItem(sl[Ri::Deskritp]); // додати до списку регуляторів
+                // sl.removeAt(0); // видалити перший елемент бо в ньому Опис регулятора
                 RegDes << sl; // зберегти
-                //qDebug() << i << sl ;
+                qDebug() << i << sl.size() << sl ;
             }
+
             else
             {
                 qDebug() << "Reg load error " << sl;
@@ -575,6 +590,40 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->gbRev->hide();
 
 
+    // P0
+    //qDebug() << RegDes[RegNum][Ri::P0];
+
+    if(src.getTags().contains(RegDes[RegNum][Ri::P0]))
+    {
+        ui->sbP0->show();
+        ui->sbP0->blockSignals(true);
+        ui->sbP0->setValue(src.getValueFloat(RegDes[RegNum][Ri::P0])/40.0);
+        ui->sbP0->blockSignals(false);
+
+        ui->dialP0->show();
+        ui->dialP0->blockSignals(true);
+        ui->dialP0->setValue(src.getValueFloat(RegDes[RegNum][Ri::P0])/40.0);
+        ui->dialP0->blockSignals(false);
+    }
+    else
+    {
+        ui->dialP0->hide();
+        ui->sbP0->hide();
+    }
+
+    // Mode
+    if(src.getTags().contains(RegDes[RegNum][Ri::Mode]))
+    {
+        ui->regMode->show();
+        ui->regMode->setChecked(src.getValue16(RegDes[RegNum][Ri::Mode]));
+    }
+    else
+    {
+        ui->regMode->hide();
+
+    }
+
+
 // завантаження даних на графік із історії
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QString conName;
@@ -611,7 +660,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         QString sQuery="SELECT Dt,%1 FROM %4 WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
         QString fields=RegDes[RegNum][Ri::PV_1];
 
-        for(i=1;i<8;++i)
+        for(i=2;i<9;++i)
         {
             fields+=",";
             if(RegDes[RegNum][i].size() > 0)
@@ -874,6 +923,13 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             ui->vsSP_3->setValue((v-src.scaleZero(RegDes[RegNum][ix]))/(src.scaleFull(RegDes[RegNum][ix]) - src.scaleZero(RegDes[RegNum][ix])) *4000.0);
             ui->vsSP_3->blockSignals(false);
 	    break;
+        case Ri::P0: // sbP0
+            src.sendValue(RegDes[RegNum][ix],v*40.0);
+
+            ui->dialP0->blockSignals(true);
+            ui->dialP0->setValue(v);
+            ui->dialP0->blockSignals(false);
+            break;
 	default: // якщо щось незрозуміле то не відправляти
             qDebug() << "Index not fount" << sender()->objectName();
 	    break;
@@ -937,6 +993,14 @@ void RpanelReg::setParmValue(int v)
             ui->sbTd->setValue((double)v/100.0);
             ui->sbTd->blockSignals(false);
 	    break;
+        case Ri::P0:
+            src.sendValue(RegDes[RegNum][ix],(double)v*40.0);
+
+            ui->sbP0->blockSignals(true);
+            ui->sbP0->setValue(v);
+            ui->sbP0->blockSignals(false);
+            break;
+
 	default: // якщо щось незрозуміле то не відправляти
             qDebug() << sender()->objectName();
 	    break;
@@ -1003,3 +1067,9 @@ void RpanelReg::setParmRev()
 }
 
 
+void RpanelReg::setParamMode(bool v)
+{
+    src.sendValue(RegDes[RegNum][Ri::Mode],qint16(v?-1:0));
+    src.sendValue("Save",qint16(-1));
+
+}

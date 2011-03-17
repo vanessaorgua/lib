@@ -6,6 +6,10 @@
 LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 {
 //    dbs.open(); // спробувати відкрити
+    QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","logging");
+    QSettings set;
+    dbs.setDatabaseName(set.value("/db/db","test").toString());
+    dbs.open();
 
     QTimer *tmr=new QTimer(this);
     connect(tmr,SIGNAL(timeout()),this,SLOT(dbStore()));
@@ -22,12 +26,12 @@ LogSQLite::LogSQLite(QVector<IoDev*> src,int collectInterval): s(src)
 
 LogSQLite::~LogSQLite()
 {
-/*
+
     {
         QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
         dbs.close();
     }
-    QSqlDatabase::removeDatabase("LogSQLite");*/
+    QSqlDatabase::removeDatabase("logging");
 }
 
 
@@ -88,17 +92,14 @@ void LogSQLite::dbStore()
 void LogSQLite::timerEvent (QTimerEvent *)
 {
     int i=0;
- {
-        QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","logging");
-        QSettings set;
-        dbs.setDatabaseName(set.value("/db/db","test").toString());
+    QSqlDatabase dbs=QSqlDatabase::database("logging",true); // знайти моє з’єднання
 
-    if(dbs.open()) // якщо з’єднання відкрите тоді
+    if(dbs.isOpen()) // якщо з’єднання відкрите тоді
     {
         QSqlQuery query(dbs);
 
     // тут перевірка існування таблиць.
-        for(int i=0;i<tables.size();++i)
+   for(int i=0;i<tables.size();++i)
     {
         if(dbs.tables().indexOf(tables[i])<0) // якщо таблиці не існує то її індекс менше 0
         { // тоді треба створити таблицю
@@ -120,7 +121,7 @@ void LogSQLite::timerEvent (QTimerEvent *)
     //int si = log.size();
     //qDebug() << "Queue size " << si;
 
-        if(!log.empty()) // якщо в черзі є дані для запису
+    if(!log.empty()) // якщо в черзі є дані для запису
     {
 #ifndef WIN32
         if(dbs.transaction())
@@ -152,11 +153,10 @@ void LogSQLite::timerEvent (QTimerEvent *)
 #endif
 
     }
-        else
+    else
     {
         qDebug() << "No records to store" ;
     }
-        dbs.close();
     }
     else
     {
@@ -164,6 +164,4 @@ void LogSQLite::timerEvent (QTimerEvent *)
         qDebug() << dt.toString("yyyy/MM/dd hh:mm:ss")  << " SQLite error:"<< dbs.lastError().databaseText() << "\n";
         log.clear(); // очистити чергу
     }
-}
-    QSqlDatabase::removeDatabase("LogSQLite");
 }

@@ -13,28 +13,31 @@ namespace Ui {
 
 namespace Ri
 {
-    enum Index {PV_1  = 0,
-                PV_2  = 1,
-                PV_3  = 2,
-                SPR_1 = 3,
-                X     = 4,
-                SP_1  = 5,
-                SP_2  = 6,
-                SP_3  = 7,
-                AM    = 8,
-                Rej   = 9,
-                Rev   = 10,
-                Kpr   = 11,
-                TI    = 12,
-                Td    = 13,
-                Xmin  = 14,
-                Xmax  = 15,
-                K_1   = 16,
-                K_2   = 17,
-                K_3   = 18,
-                K_4   = 19,
-                Kkor  = 20,
-                Deskritp = 21};
+    enum Index {Deskritp = 0,
+                PV_1  = 1,
+                PV_2  = 2,
+                PV_3  = 3,
+                SPR_1 = 4,
+                X     = 5,
+                SP_1  = 6,
+                SP_2  = 7,
+                SP_3  = 8,
+                AM    = 9,
+                Rej   = 10,
+                Rev   = 11,
+                Kpr   = 12,
+                TI    = 13,
+                Td    = 14,
+                Xmin  = 15,
+                Xmax  = 16,
+                K_1   = 17,
+                K_2   = 18,
+                K_3   = 19,
+                K_4   = 20,
+                Kkor  = 21,
+                Mode  = 22,
+                P0    = 23
+                };
 }
 
 
@@ -62,6 +65,7 @@ private slots:
     void setParmRej(int v);
     void setParmRev();
     void setParmKprSig(int v);
+    void setParamMode(bool v);
     
     void setGraph(); // слот на 5ти-секундний інтервал для виводу гріфіків
     
