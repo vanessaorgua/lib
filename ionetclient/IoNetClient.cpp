@@ -184,8 +184,11 @@ void IoNetClient::slotReadServer()
                         // отримання тегів
                         //qDebug()<< "Tags. connState.iD " << connState.iD << " packet len" << connState.Len;
                         if(connState.iD<src.size()) // перевірити чи є виділене місце у сховищі
+                        {
                             in >> src[connState.iD]->tags; // зберегти отримані наді, перевірки не портібно бо нацей момент пам’ять вже повинна бути виділена
                                                        // хоча тут може бути і проблема
+                            emit updateTags(connState.iD);
+                        }
                          //qDebug() << "Tags read is good";
                         if(connState.iD==src.size()-1) // із останнім списком тегів запустити періодичне опитування даних
                            rtmr->start();

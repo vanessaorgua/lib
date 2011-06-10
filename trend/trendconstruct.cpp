@@ -8,8 +8,8 @@
 #include "../ionetclient/IoNetClient.h"
 
 TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
-        src(source),
     QDialog(parent),
+    src(source),
     ui(new Ui::TrendConstruct)
 {
     ui->setupUi(this);
