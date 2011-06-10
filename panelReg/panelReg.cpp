@@ -157,7 +157,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
                 ui->regList->addItem(sl[Ri::Deskritp]); // додати до списку регуляторів
                 // sl.removeAt(0); // видалити перший елемент бо в ньому Опис регулятора
                 RegDes << sl; // зберегти
-                qDebug() << i << sl.size() << sl ;
+                //qDebug() << i << sl.size() << sl ;
             }
 
             else

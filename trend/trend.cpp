@@ -198,6 +198,12 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     
     m_sTmpl= "SELECT Dt%1 FROM %2 WHERE Dt BETWEEN %3 AND %4 ORDER BY Dt";// шаблон запиту
 
+    qDebug() << "Trend";
+    qDebug() << tri->host;
+    qDebug() << tri->db;
+    qDebug() << tri->user;
+    qDebug() << tri->passwd;
+
 
     if(tri->host=="QSQLITE")
     {

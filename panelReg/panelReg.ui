@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>908</width>
+    <width>912</width>
     <height>562</height>
    </rect>
   </property>
@@ -14,6 +14,12 @@
    <string>panelReg</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_9">
+   <property name="margin">
+    <number>4</number>
+   </property>
+   <property name="spacing">
+    <number>4</number>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="font">
@@ -378,6 +384,12 @@ QSlider::groove:vertical {
            <property name="whatsThis">
             <string>Постійне завдання на перший параметер</string>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
            <property name="decimals">
             <number>2</number>
            </property>
@@ -511,6 +523,12 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="whatsThis">
          <string>Вихід на клапан</string>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
         </property>
         <property name="decimals">
          <number>0</number>
@@ -710,6 +728,12 @@ p, li { white-space: pre-wrap; }
         <property name="text">
          <string>Історія</string>
         </property>
+        <property name="autoDefault">
+         <bool>true</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="4">
@@ -753,6 +777,12 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="accessibleName">
          <string>Коефіцієнт корекції розрахункового завдання</string>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::UpDownArrows</enum>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
         </property>
         <property name="decimals">
          <number>2</number>
@@ -827,16 +857,6 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>Вихід</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -933,6 +953,12 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Коефіцієнт пропорційності регулятора</string>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
@@ -948,6 +974,12 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Час ізодрому (час подвоєння)</string>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
            </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
@@ -967,6 +999,12 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>зміщення виходу для пропорційного регулятора</string>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
            </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
@@ -1200,6 +1238,12 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>зміщення виходу для пропорційного регулятора</string>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
            </property>
            <property name="maximum">
             <double>100.000000000000000</double>
@@ -1477,6 +1521,12 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Обмеження ходу робочого органа знину</string>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
            <property name="maximum">
             <double>100.000000000000000</double>
            </property>
@@ -1562,6 +1612,12 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Обмедення ходу робочого органа зверху</string>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
            </property>
            <property name="maximum">
             <double>100.000000000000000</double>
@@ -1718,6 +1774,12 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Завдання на другий параметер</string>
+           </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
            </property>
            <property name="decimals">
             <number>0</number>
@@ -2054,6 +2116,12 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Завдання на третій параметр</string>
            </property>
+           <property name="buttonSymbols">
+            <enum>QAbstractSpinBox::UpDownArrows</enum>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
            <property name="decimals">
             <number>0</number>
            </property>
@@ -2160,7 +2228,6 @@ p, li { white-space: pre-wrap; }
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>pushButton</tabstop>
   <tabstop>vsSPR_1</tabstop>
   <tabstop>vsSP_1</tabstop>
   <tabstop>Value_1</tabstop>
@@ -2210,12 +2277,12 @@ p, li { white-space: pre-wrap; }
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>206</x>
-     <y>290</y>
+     <x>280</x>
+     <y>377</y>
     </hint>
     <hint type="destinationlabel">
-     <x>451</x>
-     <y>367</y>
+     <x>455</x>
+     <y>557</y>
     </hint>
    </hints>
   </connection>

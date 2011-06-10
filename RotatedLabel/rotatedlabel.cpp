@@ -34,6 +34,7 @@ void RotatedLabel::setText(const QString &text)
 
 void RotatedLabel::updatePixmap()
 {
+    //_label.setPalette( qobject_cast<QWidget*>( parent())->palette());
     _label.setFont(this->font());
     _label.adjustSize();
     _pixmap = QPixmap(_label.size());
