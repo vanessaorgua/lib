@@ -213,6 +213,11 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     else
     {
         QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","history");
+        // заточка під drizzle, який створює сокети в /tmp
+        if(QFile::exists("/tmp/mysql.socket")) // якщо такий файл існує
+        {
+            dbs.setConnectOptions("UNIX_SOCKET=/tmp/mysql.socket");
+        }
 
         dbs.setHostName(tri->host);
         dbs.setDatabaseName(tri->db);

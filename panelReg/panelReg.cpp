@@ -638,6 +638,12 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     else
     {
         QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","panelreg");
+        // заточка під drizzle, який створює сокети в /tmp
+        if(QFile::exists("/tmp/mysql.socket")) // якщо такий файл існує
+        {
+            dbs.setConnectOptions("UNIX_SOCKET=/tmp/mysql.socket");
+        }
+
         dbs.setHostName(s.value("/db/hostname","localhost").toString());
         dbs.setDatabaseName(s.value("/db/dbname","test").toString());
         dbs.setUserName(s.value("/db/username","scada").toString());

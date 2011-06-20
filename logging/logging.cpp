@@ -8,6 +8,11 @@ Logging::Logging(QVector<IoDev*> src,int collectInterval): s(src)
     QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","logging");
 
     QSettings set;
+    // заточка під drizzle, який створює сокети в /tmp
+    if(QFile::exists("/tmp/mysql.socket")) // якщо такий файл існує
+    {
+        dbs.setConnectOptions("UNIX_SOCKET=/tmp/mysql.socket");
+    }
 
     dbs.setHostName(set.value("/db/host","localhost").toString());
     dbs.setDatabaseName(set.value("/db/db","test").toString());
@@ -26,6 +31,7 @@ Logging::Logging(QVector<IoDev*> src,int collectInterval): s(src)
         tags_list << v->getTags();
     }
     tables << "trend";
+
 }
 
 Logging::~Logging()
