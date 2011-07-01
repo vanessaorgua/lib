@@ -7,9 +7,12 @@
 class TrendChart;
 class IoDev;
 
-namespace Ui {
-    class panelReg;
-}
+//namespace Ui {
+//    class panelReg;
+//}
+// це для того, щоб його можна було наслідувати...
+#include "ui_panelReg.h"
+
 
 namespace Ri
 {
@@ -48,7 +51,7 @@ public:
     RpanelReg(IoDev &source,int n=0,QWidget *p=NULL,QString cfName=":/text/reg.txt",QString tableName="trend");
     ~RpanelReg();
 
-private slots:
+protected slots:
     void changeReg(int Index); // зміна регулятор
     void Control(); // відображення-приховувавння частини вікна з настройками регулятора
     void runTrend();
@@ -69,7 +72,7 @@ private slots:
     
     void setGraph(); // слот на 5ти-секундний інтервал для виводу гріфіків
     
-private:
+protected:
     Ui::panelReg *ui; // морда лиця
     int RegNum;
 

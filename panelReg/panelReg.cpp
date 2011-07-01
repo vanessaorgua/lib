@@ -1,5 +1,5 @@
 #include "panelReg.h"
-#include "ui_panelReg.h"
+// #include "ui_panelReg.h"
 
 #include "../iodev.h"
 #include "../trendchar/trendchart.h"
@@ -162,7 +162,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
 
             else
             {
-                qDebug() << "Reg load error " << sl;
+                qDebug() << "Reg load error " << sl.size() << sl ;
             }
         }
     }
@@ -197,6 +197,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
 
 RpanelReg::~RpanelReg()
 {
+
     delete ui;
 }
 
