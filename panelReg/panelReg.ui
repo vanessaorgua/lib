@@ -390,6 +390,9 @@ QSlider::groove:vertical {
            <property name="accelerated">
             <bool>true</bool>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>2</number>
            </property>
@@ -529,6 +532,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="accelerated">
          <bool>true</bool>
+        </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
         </property>
         <property name="decimals">
          <number>0</number>
@@ -784,6 +790,9 @@ p, li { white-space: pre-wrap; }
         <property name="accelerated">
          <bool>true</bool>
         </property>
+        <property name="keyboardTracking">
+         <bool>false</bool>
+        </property>
         <property name="decimals">
          <number>2</number>
         </property>
@@ -959,6 +968,9 @@ p, li { white-space: pre-wrap; }
            <property name="accelerated">
             <bool>true</bool>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
@@ -980,6 +992,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="maximum">
             <double>1000.000000000000000</double>
@@ -1006,8 +1021,14 @@ p, li { white-space: pre-wrap; }
            <property name="accelerated">
             <bool>true</bool>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="maximum">
-            <double>1000.000000000000000</double>
+            <double>10.000000000000000</double>
            </property>
            <property name="singleStep">
             <double>0.100000000000000</double>
@@ -1196,16 +1217,16 @@ p, li { white-space: pre-wrap; }
             <string>зміщення виходу для пропорційного регулятора</string>
            </property>
            <property name="maximum">
-            <number>500</number>
+            <number>10000</number>
            </property>
            <property name="wrapping">
             <bool>false</bool>
            </property>
            <property name="notchTarget">
-            <double>50.000000000000000</double>
+            <double>100.000000000000000</double>
            </property>
            <property name="notchesVisible">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -1245,6 +1266,12 @@ p, li { white-space: pre-wrap; }
            <property name="accelerated">
             <bool>true</bool>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
            <property name="maximum">
             <double>100.000000000000000</double>
            </property>
@@ -1253,34 +1280,22 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="0" column="6" rowspan="4" colspan="2">
-          <widget class="QDial" name="dialP0">
-           <property name="minimumSize">
-            <size>
-             <width>100</width>
-             <height>100</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>100</width>
-             <height>100</height>
-            </size>
-           </property>
-           <property name="whatsThis">
-            <string>зміщення виходу для пропорційного регулятора</string>
-           </property>
+         <item row="0" column="7" rowspan="4">
+          <widget class="QSlider" name="slP0">
            <property name="maximum">
-            <number>100</number>
+            <number>4000</number>
            </property>
-           <property name="wrapping">
-            <bool>false</bool>
+           <property name="singleStep">
+            <number>400</number>
            </property>
-           <property name="notchTarget">
-            <double>50.000000000000000</double>
+           <property name="pageStep">
+            <number>400</number>
            </property>
-           <property name="notchesVisible">
-            <bool>false</bool>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksAbove</enum>
            </property>
           </widget>
          </item>
@@ -1351,6 +1366,9 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Коефіцієнт К1 розрахунку завдання</string>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -1388,6 +1406,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Коефіцієнт К2 розрахунку завдання</string>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -1427,6 +1448,9 @@ p, li { white-space: pre-wrap; }
            <property name="whatsThis">
             <string>Коефіцієнт К3 розрахунку завдання</string>
            </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
+           </property>
            <property name="decimals">
             <number>3</number>
            </property>
@@ -1464,6 +1488,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="whatsThis">
             <string>Коефіцієнт К4 розрахунку завдання</string>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>3</number>
@@ -1526,6 +1553,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="maximum">
             <double>100.000000000000000</double>
@@ -1618,6 +1648,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="maximum">
             <double>100.000000000000000</double>
@@ -1780,6 +1813,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>0</number>
@@ -2121,6 +2157,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="keyboardTracking">
+            <bool>false</bool>
            </property>
            <property name="decimals">
             <number>0</number>

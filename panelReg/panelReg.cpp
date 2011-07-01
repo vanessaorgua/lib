@@ -33,61 +33,47 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     // реакції користувацького інтерфейсу
     connect(ui->vsX,SIGNAL(valueChanged(int)),this,SLOT(setCtrlValue(int)));
     connect(ui->sbX,SIGNAL(valueChanged(double)),this,SLOT(setCtrlValue(double)));
-    ui->sbX->setKeyboardTracking(false);
     // SP_1
     connect(ui->vsSP_1,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_1,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbSP_1->setKeyboardTracking(false);
 
     // SP_2
     connect(ui->vsSP_2,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_2,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbSP_2->setKeyboardTracking(false);
     // SP_3
     connect(ui->vsSP_3,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbSP_3,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbSP_3->setKeyboardTracking(false);
 
     // Kpr
     connect(ui->dialKpr,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbKpr,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbKpr->setKeyboardTracking(false);
 
     // Ti
     connect(ui->dialTi,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbTi,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbTi->setKeyboardTracking(false);
     // Td
     connect(ui->dialTd,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     connect(ui->sbTd,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbTd->setKeyboardTracking(false);
     // Xmin
     connect(ui->sbXmin,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbXmin->setKeyboardTracking(false);
 
     // Xmax
     connect(ui->sbXmax,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbXmax->setKeyboardTracking(false);
 
     // K_1
     connect(ui->sbK_1,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbK_1->setKeyboardTracking(false);
 
     // K_2
     connect(ui->sbK_2,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbK_2->setKeyboardTracking(false);
 
     // K_3
     connect(ui->sbK_3,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbK_3->setKeyboardTracking(false);
 
     // K_4
     connect(ui->sbK_4,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbK_4->setKeyboardTracking(false);
 
     // Kkor
     connect(ui->sbKkor,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    ui->sbKkor->setKeyboardTracking(false);
 
     // AM
     connect(ui->cbAM,SIGNAL(currentIndexChanged(int)),this,SLOT(setParmAM(int)));
@@ -101,8 +87,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
 
     // P0
     connect(ui->sbP0,SIGNAL(valueChanged(double)),this,SLOT(setParmValue(double)));
-    connect(ui->dialP0,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
-    ui->sbP0->setKeyboardTracking(false);
+    connect(ui->slP0,SIGNAL(valueChanged(int)),this,SLOT(setParmValue(int)));
     // Mode
     connect(ui->regMode,SIGNAL(clicked(bool)),this,SLOT(setParamMode(bool)));
 
@@ -139,7 +124,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ctrlSearch["sbXmin"]=Ri::Xmin;
     ctrlSearch["sbXmax"]=Ri::Xmax;
 
-    ctrlSearch["dialP0"]=Ri::P0;
+    ctrlSearch["slP0"]=Ri::P0;
     ctrlSearch["sbP0"]=Ri::P0;
     ctrlSearch["cbMode"]=Ri::Mode;
 
@@ -472,11 +457,11 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
     // KTd
     //qDebug() << "Td"<< RegDes[RegNum][Ri::Td] << ":" << src.getValueFloat(RegDes[RegNum][Ri::Td]);
     ui->sbTd->blockSignals(true);
-    ui->sbTd->setValue(src.getValueFloat(RegDes[RegNum][Ri::Td]));
+    ui->sbTd->setValue(src.getValueFloat(RegDes[RegNum][Ri::Td])/1000.0);
     ui->sbTd->blockSignals(false);
 
     ui->dialTd->blockSignals(true);
-    ui->dialTd->setValue(src.getValueFloat(RegDes[RegNum][Ri::Td])*100.0);
+    ui->dialTd->setValue(src.getValueFloat(RegDes[RegNum][Ri::Td]));
     ui->dialTd->blockSignals(false);
     
     // Xmin
@@ -601,14 +586,14 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
         ui->sbP0->setValue(src.getValueFloat(RegDes[RegNum][Ri::P0])/40.0);
         ui->sbP0->blockSignals(false);
 
-        ui->dialP0->show();
-        ui->dialP0->blockSignals(true);
-        ui->dialP0->setValue(src.getValueFloat(RegDes[RegNum][Ri::P0])/40.0);
-        ui->dialP0->blockSignals(false);
+        ui->slP0->show();
+        ui->slP0->blockSignals(true);
+        ui->slP0->setValue(src.getValueFloat(RegDes[RegNum][Ri::P0]));
+        ui->slP0->blockSignals(false);
     }
     else
     {
-        ui->dialP0->hide();
+        ui->slP0->hide();
         ui->sbP0->hide();
     }
 
@@ -888,7 +873,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             src.sendValue(RegDes[RegNum][Ri::Td],v);
 
             ui->dialTd->blockSignals(true);
-            ui->dialTd->setValue(v*100.0);
+            ui->dialTd->setValue(v*1000.0);
             ui->dialTd->blockSignals(false);
 	    break;
 
@@ -933,9 +918,9 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
         case Ri::P0: // sbP0
             src.sendValue(RegDes[RegNum][ix],v*40.0);
 
-            ui->dialP0->blockSignals(true);
-            ui->dialP0->setValue(v);
-            ui->dialP0->blockSignals(false);
+            ui->slP0->blockSignals(true);
+            ui->slP0->setValue(v*40.0);
+            ui->slP0->blockSignals(false);
             break;
 	default: // якщо щось незрозуміле то не відправляти
             qDebug() << "Index not fount" << sender()->objectName();
@@ -994,17 +979,17 @@ void RpanelReg::setParmValue(int v)
             ui->sbTi->blockSignals(false);
 	    break;
         case Ri::Td: // dialTd
-            src.sendValue(RegDes[RegNum][ix],(double)v/100.0);
+            src.sendValue(RegDes[RegNum][ix],(double)v);
 
             ui->sbTd->blockSignals(true);
-            ui->sbTd->setValue((double)v/100.0);
+            ui->sbTd->setValue((double)v/1000.0);
             ui->sbTd->blockSignals(false);
 	    break;
         case Ri::P0:
-            src.sendValue(RegDes[RegNum][ix],(double)v*40.0);
+            src.sendValue(RegDes[RegNum][ix],(double)v);
 
             ui->sbP0->blockSignals(true);
-            ui->sbP0->setValue(v);
+            ui->sbP0->setValue((double)v/40.0);
             ui->sbP0->blockSignals(false);
             break;
 
