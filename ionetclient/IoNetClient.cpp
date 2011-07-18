@@ -44,6 +44,18 @@ IoNetClient::~IoNetClient()
     delete zero;
 }
 
+void IoNetClient::changeEvent(QEvent *e)
+{
+    // QObject::changeEvent(e);
+    switch (e->type()) {
+    case QEvent::LanguageChange:
+        // тут треба вписати код перезавантаження списку тегів, ще тільки не зрозуміло як це робити.....
+        break;
+    default:
+        break;
+    }
+}
+
 void IoNetClient::slotConnected()
 {
     qDebug() << "Conected..";

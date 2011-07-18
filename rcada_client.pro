@@ -4,7 +4,7 @@
 QT += network \
     sql
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib uitools
 HEADERS += iodev.h \
     header.h \
     ionetclient/netiodev.h \
@@ -15,7 +15,8 @@ HEADERS += iodev.h \
     RotatedLabel/rotatedlabel.h \
     panelReg/panelReg.h \
     scale/scale.h \
-    trend/trendconstruct.h
+    trend/trendconstruct.h \
+    history/history.h
 SOURCES += ionetclient/IoNetClient.cpp \
     ionetclient/netiodev.cpp \
     iodev.cpp \
@@ -24,7 +25,8 @@ SOURCES += ionetclient/IoNetClient.cpp \
     RotatedLabel/rotatedlabel.cpp \
     panelReg/panelReg.cpp \
     scale/scale.cpp \
-    trend/trendconstruct.cpp
+    trend/trendconstruct.cpp \
+    history/history.cpp
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build
@@ -36,3 +38,4 @@ FORMS += trend/trend.ui \
     trend/datetime.ui \
     panelReg/panelReg.ui \
     trend/trendconstruct.ui
+INCLUDEPATH += include
