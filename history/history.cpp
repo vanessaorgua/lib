@@ -6,7 +6,7 @@
 
 #include <QDebug>
 #include <QHBoxLayout>
-
+#include <QList>
 
 
 UHistorySelect::UHistorySelect(QVector<IoNetClient*> &src,struct trendinfo *tp,QWidget *p /*=NULL*/,QString fileName) :
@@ -14,29 +14,22 @@ UHistorySelect::UHistorySelect(QVector<IoNetClient*> &src,struct trendinfo *tp,Q
         s(src),
         TrendParam(tp)
 {
-    QUiLoader *puil= new QUiLoader(this);
-    QFile file(fileName);
-
-    QWidget *pwgtForm = puil->load(&file); // завантажити файл із мордою
-
-    if(pwgtForm)
-    {
-        resize(pwgtForm->size()); // підігнати розміри
-
-        QHBoxLayout *bxLayout =new QHBoxLayout;
-        bxLayout->addWidget(pwgtForm);
-        setLayout(bxLayout);
-    }
-
+    initUi(fileName);
 
 }
 
+// цей конструктор залишено для сумісності із старими програма
 UHistorySelect::UHistorySelect(IoNetClient  &source,struct trendinfo *tp,QWidget *p,QString fileName) :
     QDialog(p),
     TrendParam(tp)
 
 {
     s << &source ;
+    initUi(fileName);
+}
+
+void UHistorySelect::initUi(QString fileName)
+{
     QUiLoader *puil= new QUiLoader(this);
     QFile file(fileName);
     QWidget *pwgtForm=puil->load(&file); // завантажити файл із мордою
@@ -45,12 +38,25 @@ UHistorySelect::UHistorySelect(IoNetClient  &source,struct trendinfo *tp,QWidget
     {
         resize(pwgtForm->size()); // підігнати розміри
 
+        connect(pwgtForm->findChild<QPushButton*>("Exit"),SIGNAL(clicked()),this,SLOT(reject()));
+        // QList<QPushButton*> bnts = pwgtForm->findChildren<QPushButton*> ();
+        foreach(QPushButton *p,pwgtForm->findChildren<QPushButton*> ())
+        {
+            if(p->objectName() != "Exit" || p->objectName() != "RunConstruct" )
+            {
+                connect(p,SIGNAL(clicked()),this,SLOT(slotAccept()));
+            }
+        }
+
+
         QHBoxLayout *bxLayout =new QHBoxLayout;
         bxLayout->addWidget(pwgtForm);
+        bxLayout->setMargin(0);
         setLayout(bxLayout);
     }
-
+    setWindowTitle(tr("Вибір графіків"));
 }
+
 UHistorySelect::~UHistorySelect()
 {
 
@@ -77,8 +83,23 @@ void UHistorySelect::slotAccept()
     QFile f(QString(":/text/%1").arg(nameTrend));
     QString t;
     QStringList sl;
-    
-    
+
+  if((s[NnetDev])->myName()=="")
+  {
+      QMessageBox::critical(this,tr("Проблема"),tr("Невідома назва NetIoDev\nПотрібно встановити параметер myName"));
+      reject();
+  }
+  else
+  {
+    QCoreApplication::setApplicationName("viparka");
+    QSettings set;
+
+    TrendParam->host=set.value("/db/hostname","localhost").toString();
+    TrendParam->db=set.value("/db/dbname","viparka").toString();
+    TrendParam->user=set.value("/db/username","scada").toString();
+    TrendParam->passwd=set.value("/db/passwd","").toString();
+
+
     if(f.open(QIODevice::ReadOnly))
     {
         int i;
@@ -132,7 +153,7 @@ void UHistorySelect::slotAccept()
     }
     else
 	reject(); // якщо не вдалося відкрити відповідний файл
-
+  }
 
 }
 

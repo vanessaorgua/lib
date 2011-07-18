@@ -23,6 +23,9 @@ public:
     // методи доступу
     NetIoDev *operator[](int i) { return i<src.size()? src[i] :  zero ; }
     //int size() {return src.size(); }
+    void setMyName(QString myName) {my_name=myName;}
+    QString myName() {return my_name;}
+
 protected:
     void changeEvent(QEvent *e);
 
@@ -61,6 +64,7 @@ private:
 
     friend class NetIoDev; // чи не забагато друзів, щоб не додавати зайві методи ?
 
+    QString my_name;
 };
 
 #endif

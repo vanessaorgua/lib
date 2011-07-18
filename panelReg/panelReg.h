@@ -11,7 +11,7 @@ class IoDev;
 //    class panelReg;
 //}
 // це для того, щоб його можна було наслідувати...
-#include "ui_panelReg.h"
+#include "../build/ui_panelReg.h"
 
 
 namespace Ri

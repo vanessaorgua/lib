@@ -23,12 +23,14 @@ public:
     //struct trendinfo* getTrendParam() { return &TrendParam ;}
 private slots:
     void slotAccept();
-    void slotConstruct();
+    // void slotConstruct();
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
+    void initUi(QString fileName);
+
     QString nameTrend;
     struct trendinfo *TrendParam;
     QVector<IoNetClient *> s;
