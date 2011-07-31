@@ -39,6 +39,7 @@ void NetIoDev::sendValue(QString tag,double v)
 
 void NetIoDev::sendValue(QString tag,QVector<qint16> &v)
 {
+    if(p->cMode) {
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
     qry.setVersion(QDataStream::Qt_4_2);
@@ -48,11 +49,13 @@ void NetIoDev::sendValue(QString tag,QVector<qint16> &v)
     qry << qint16(query.size()-7);
 
     p->pTcpSock->write(query);
+    }
     //qDebug() << tag << v;
 }
 
 void NetIoDev::sendValueScaled(QString tag,double v)
 {
+    if(p->cMode) {
     if(data_scale.contains(tag))
     {
         QByteArray query;
@@ -64,11 +67,12 @@ void NetIoDev::sendValueScaled(QString tag,double v)
 
         p->pTcpSock->write(query);
 
-    }
+    } }
 }
 
 void NetIoDev::setScaleZero(QString tag,double v)
 {
+    if(p->cMode) {
     if(data_scale.contains(tag))
     {
         //qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
@@ -81,12 +85,13 @@ void NetIoDev::setScaleZero(QString tag,double v)
 
         p->pTcpSock->write(query);
 
-    }
+    } }
 }
 
 
 void NetIoDev::setScaleFull(QString tag,double v)
 {
+    if(p->cMode) {
     if(data_scale.contains(tag))
     {
         //qDebug() << "NetIoDev::setScaleZero("<< tag << "," << v << ")";
@@ -99,7 +104,7 @@ void NetIoDev::setScaleFull(QString tag,double v)
 
         p->pTcpSock->write(query);
 
-    }
+    } }
 }
 
 

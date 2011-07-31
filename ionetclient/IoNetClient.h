@@ -25,6 +25,8 @@ public:
     //int size() {return src.size(); }
     void setMyName(QString myName) {my_name=myName;}
     QString myName() {return my_name;}
+    bool cmode( ) { return cMode ;}
+    void setCmode(bool mode) {cMode=mode;}
 
 protected:
     void changeEvent(QEvent *e);
@@ -38,6 +40,7 @@ public slots: // це все має відношення до з’єднанн�
 	void slotError(QAbstractSocket::SocketError);
         void slotSendQuery();
         int size() {return src.size();}
+
 
 signals:
         void updateData();
@@ -65,6 +68,8 @@ private:
     friend class NetIoDev; // чи не забагато друзів, щоб не додавати зайві методи ?
 
     QString my_name;
+    bool cMode; // режим управління, якщо true - управління дозволено
+
 };
 
 #endif

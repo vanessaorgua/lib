@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QMessageBox>
 
-IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort)
+IoNetClient::IoNetClient(QString hostname,int nPort) : host(hostname),Port(nPort),cMode(true)
 {
 
     // з’єднатися із сервером
