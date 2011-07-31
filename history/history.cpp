@@ -84,21 +84,21 @@ void UHistorySelect::slotAccept()
     QString t;
     QStringList sl;
 
-  if((s[NnetDev])->myName()=="")
+  if((s[NnetDev])->objectName()=="")
   {
-      QMessageBox::critical(this,tr("Проблема"),tr("Невідома назва NetIoDev\nПотрібно встановити параметер myName"));
+      QMessageBox::critical(this,tr("Проблема"),tr("Невідома назва NetIoDev\nПотрібно встановити параметер objectName"));
       reject();
   }
   else
   {
-    QCoreApplication::setApplicationName("viparka");
+
+    QCoreApplication::setApplicationName((s[NnetDev])->objectName());
     QSettings set;
 
     TrendParam->host=set.value("/db/hostname","localhost").toString();
-    TrendParam->db=set.value("/db/dbname","viparka").toString();
+    TrendParam->db=set.value("/db/dbname","scada").toString();
     TrendParam->user=set.value("/db/username","scada").toString();
     TrendParam->passwd=set.value("/db/passwd","").toString();
-
 
     if(f.open(QIODevice::ReadOnly))
     {
