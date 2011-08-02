@@ -6,6 +6,7 @@
 
 class TrendChart;
 class IoDev;
+class QTimer;
 
 //namespace Ui {
 //    class panelReg;
@@ -55,7 +56,8 @@ protected slots:
     void changeReg(int Index); // зміна регулятор
     void Control(); // відображення-приховувавння частини вікна з настройками регулятора
     void runTrend();
-    
+    void updateTrend(int);
+
     void updateData(); // поновлення даних у віджетах
     // і тут буде ще купа сигналів від різних контролів
     // Ctrl
@@ -84,6 +86,7 @@ protected:
     // масив для пошуку віджетів
     QHash<QString, Ri::Index> ctrlSearch;     // хеш для пошуку тегів
     QString tblName; // назва таблиці
+    QTimer *t1;
 
     double kk_1 ;  // коефіцієнт корекції для K_1
 };

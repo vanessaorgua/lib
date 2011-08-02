@@ -912,6 +912,35 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item row="0" column="2">
+       <widget class="QComboBox" name="cbInterval">
+        <item>
+         <property name="text">
+          <string>1 година</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>30 хвилин</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>15 хвилин</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Інтервал</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
