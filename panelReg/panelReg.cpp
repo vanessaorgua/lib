@@ -657,7 +657,8 @@ void RpanelReg::updateTrend(int len)
 
         if(  dbs.open())
         {
-            int i,tm[3]={3600,1800,900};
+            const int tm[3]={3600,1800,900},nLen[3]={1,2,4};
+            int i,sLen=nLen[len];
             // очистити поточний графік
             trChart->fill(0);
 
@@ -684,7 +685,8 @@ void RpanelReg::updateTrend(int len)
                     {
                         v << qry.value(i).toDouble();
                     }
-                    trChart->loadPoint(v);
+                    for(int n=0;n<sLen;++n) // заватажити точнку декілька раз, в залежністі від вибраної шкали
+                        trChart->loadPoint(v);
                 }
                 qry.clear();
             }
