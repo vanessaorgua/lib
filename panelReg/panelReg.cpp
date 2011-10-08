@@ -9,6 +9,8 @@
 #include <QStringList>
 
 #include <QtSql>
+#include <QEvent>
+
 
 RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfName,QString tableName) :QDialog(p),
     src(source)  ,
@@ -17,6 +19,13 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ui(new Ui::panelReg)
 {
     ui->setupUi(this);
+    QSettings set;
+
+
+    int w=set.value("ranelReg/width",912).toInt();
+    int h=set.value("ranelReg/height",562).toInt();
+    QRect pos=QRect((qApp->desktop()->size().width()-w)/2,(qApp->desktop()->size().height()-h)/2,w,h);
+    this->setGeometry(pos);
 
     // на замовлення Поліщученка
     ui->Trend->hide();
@@ -883,7 +892,7 @@ void RpanelReg::setParmValue(double v) // слот відправки даних
             ui->dialTi->blockSignals(false);
 	    break;
         case Ri::Td : // sbTd
-            src.sendValue(RegDes[RegNum][Ri::Td],v);
+            src.sendValue(RegDes[RegNum][Ri::Td],v*1000.0);
 
             ui->dialTd->blockSignals(true);
             ui->dialTd->setValue(v*1000.0);
@@ -1077,4 +1086,13 @@ void RpanelReg::setParamMode(bool v)
     src.sendValue(RegDes[RegNum][Ri::Mode],qint16(v?-1:0));
     src.sendValue("Save",qint16(-1));
 
+}
+
+void RpanelReg::closeEvent( QCloseEvent * event) // при закритті зберегти розміри вікна на майбутнє.
+{
+    QSettings set;
+    set.setValue("ranelReg/width",size().width());
+    set.setValue("ranelReg/height",size().height());
+
+    event->accept();
 }

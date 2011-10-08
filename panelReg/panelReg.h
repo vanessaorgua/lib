@@ -7,6 +7,7 @@
 class TrendChart;
 class IoDev;
 class QTimer;
+class QCloseEvent;
 
 //namespace Ui {
 //    class panelReg;
@@ -75,6 +76,8 @@ protected slots:
     void setGraph(); // слот на 5ти-секундний інтервал для виводу гріфіків
     
 protected:
+    void closeEvent( QCloseEvent * event);
+
     Ui::panelReg *ui; // морда лиця
     int RegNum;
 

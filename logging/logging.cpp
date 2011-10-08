@@ -122,8 +122,8 @@ if(dbs.isOpen()) // якщо з’єднання відкрите тоді
                 ++i;
                 if(!query.exec(log.dequeue()))
                 {
-                         qDebug() << query.lastError();
-                         //qDebug() << query.lastQuery();
+                    qDebug() << query.lastError() << "\n"
+                          << query.lastQuery();
                 }
             }
 #ifndef WIN32
