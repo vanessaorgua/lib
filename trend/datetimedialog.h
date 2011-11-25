@@ -17,7 +17,8 @@ public:
 	second->setValue(dtm.time().second());
 	date->setSelectedDate(dtm.date());
 	
-    };
+    }
+    ~myDateTimeDialog() {}
 };
 
 
