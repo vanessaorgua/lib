@@ -30,6 +30,9 @@ public:
     {
 	clr=v;
     }
+
+    QColor color(int i) {return clr[i];}
+
     void fill(double v);
 
 protected:
