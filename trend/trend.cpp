@@ -90,36 +90,45 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
     
     //connect(m_ui->cursorVal,SIGNAL(valueChanged(int)),m_ui->cursorLCD,SLOT(display(int)));
-        
+
+    QSettings s;
+
+    for(int i=0;i<8;++i)
+    {
+        m_Color << s.value(QString("/colors/%1/%2")
+                           .arg(tri->trend)
+                           .arg(tri->fields[i]),
+                           QColor(MyConst::DefColor[i])).value<QColor>(); // цю ініціалізацію треба переробити
+    }
     //фарбую кнопки
     QPalette pal;
     
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[0]));
+    pal.setColor(QPalette::Button,m_Color[0]);
     m_ui->pc_0->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[1]));
+    pal.setColor(QPalette::Button,m_Color[1]);
     m_ui->pc_1->setPalette(pal);
     
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[2]));
+    pal.setColor(QPalette::Button,m_Color[2]);
     m_ui->pc_2->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[3]));
+    pal.setColor(QPalette::Button,m_Color[3]);
     m_ui->pc_3->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[4]));
+    pal.setColor(QPalette::Button,m_Color[4]);
     m_ui->pc_4->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[5]));
+    pal.setColor(QPalette::Button,m_Color[5]);
     m_ui->pc_5->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[6]));
+    pal.setColor(QPalette::Button,m_Color[6]);
     m_ui->pc_6->setPalette(pal);
 
-    pal.setColor(QPalette::Button,QColor(MyConst::DefColor[7]));
+    pal.setColor(QPalette::Button,m_Color[7]);
     m_ui->pc_7->setPalette(pal);
 
     QPalette pl;
-    pl.setColor(QPalette::Highlight,QColor(MyConst::DefColor[0]));
+    pl.setColor(QPalette::Highlight,m_Color[0]);
     m_ui->cursorVal->setPalette(pl);
 
     m_ui->cursorVal->setValue(0);
@@ -167,9 +176,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     ps[7]=m_ui->ps_7;
     
     
-    for(int i=0;i<8;++i)
-        m_Color << QColor(MyConst::DefColor[i]); // цю ініціалізацію треба переробити
-
     m_tw->setColors(m_Color);
 
     m_stop=QDateTime::currentDateTime();
@@ -429,6 +435,12 @@ void TrendWindow::colorChange()
         color=QColorDialog::getColor(m_Color[i],this);
 	if(color.isValid())
 	{
+            // зберегти значення кольорів
+            QSettings s;
+            s.setValue(QString("/colors/%1/%2")
+                                       .arg(m_trinfo->trend)
+                                       .arg(m_trinfo->fields[i]),color);
+
 	    QPalette pal;
 	    m_Color[i]=color;
 
