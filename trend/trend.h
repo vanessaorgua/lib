@@ -73,7 +73,7 @@ private:
     
     struct trendinfo *m_trinfo; 
     
-    QCheckBox *pv[8];
+    QVector<QCheckBox*> pv;
     QRadioButton *ps[8];
     
     int m_nHeight;

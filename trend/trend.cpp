@@ -59,6 +59,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->calendarButton,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->last,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->Interval,SIGNAL(activated(int)),this,SLOT(dataChange()));
+
     // кнопки вибору кольору
     connect(m_ui->pc_0,SIGNAL(clicked()),this,SLOT(colorChange()));
     connect(m_ui->pc_1,SIGNAL(clicked()),this,SLOT(colorChange()));
@@ -68,6 +69,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->pc_5,SIGNAL(clicked()),this,SLOT(colorChange()));
     connect(m_ui->pc_6,SIGNAL(clicked()),this,SLOT(colorChange()));
     connect(m_ui->pc_7,SIGNAL(clicked()),this,SLOT(colorChange()));
+
     // перемикач вибору поля курсоку
     connect(m_ui->ps_0,SIGNAL(clicked()),this,SLOT(plotChange()));
     connect(m_ui->ps_1,SIGNAL(clicked()),this,SLOT(plotChange()));
@@ -77,6 +79,15 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->ps_5,SIGNAL(clicked()),this,SLOT(plotChange()));
     connect(m_ui->ps_6,SIGNAL(clicked()),this,SLOT(plotChange()));
     connect(m_ui->ps_7,SIGNAL(clicked()),this,SLOT(plotChange()));
+
+
+    // сигнал від перегрядача трендів, запит наперемалювання
+    connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
+
+    QSettings s;
+
+
+
     // чекбокси вмикання графіку
     connect(m_ui->pv_0,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->pv_1,SIGNAL(clicked()),this,SLOT(dataChange()));
@@ -86,12 +97,10 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->pv_5,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->pv_6,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->pv_7,SIGNAL(clicked()),this,SLOT(dataChange()));
-    // сигнал від перегрядача трендів, запит наперемалювання
-    connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
+
     
     //connect(m_ui->cursorVal,SIGNAL(valueChanged(int)),m_ui->cursorLCD,SLOT(display(int)));
 
-    QSettings s;
 
     for(int i=0;i<8;++i)
     {
@@ -99,6 +108,23 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
                            .arg(tri->trend)
                            .arg(tri->fields[i]),
                            QColor(MyConst::DefColor[i])).value<QColor>(); // цю ініціалізацію треба переробити
+    }
+
+    pv << m_ui->pv_0
+    << m_ui->pv_1
+    << m_ui->pv_2
+    << m_ui->pv_3
+    << m_ui->pv_4
+    << m_ui->pv_5
+    << m_ui->pv_6
+    << m_ui->pv_7;
+
+
+    foreach(QCheckBox *p,pv)
+    {
+        p->setChecked(s.value(QString("%1/checked/%2")
+                              .arg(tri->trend)
+                              .arg(tri->fields[p->objectName().right(1).toInt()] ),true).toBool());
     }
 
     // управління сіткою
@@ -155,24 +181,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     m_ui->view->setPalette(pn);
 
     m_ui->ps_0->setChecked(true);
-    
-    m_ui->pv_0->setChecked(true);
-    m_ui->pv_1->setChecked(true);
-    m_ui->pv_2->setChecked(true);
-    m_ui->pv_3->setChecked(true);
-    m_ui->pv_4->setChecked(true);
-    m_ui->pv_5->setChecked(true);
-    m_ui->pv_6->setChecked(true);
-    m_ui->pv_7->setChecked(true);
-    
-    pv[0]=m_ui->pv_0;
-    pv[1]=m_ui->pv_1;
-    pv[2]=m_ui->pv_2;
-    pv[3]=m_ui->pv_3;
-    pv[4]=m_ui->pv_4;
-    pv[5]=m_ui->pv_5;
-    pv[6]=m_ui->pv_6;
-    pv[7]=m_ui->pv_7;
     
     ps[0]=m_ui->ps_0;
     ps[1]=m_ui->ps_1;
@@ -281,6 +289,29 @@ TrendWindow::~TrendWindow()
 	dbs.close();
     }
     QSqlDatabase::removeDatabase("history");
+
+    QSettings s;
+
+
+    foreach(QCheckBox *p,pv)
+    {
+        QString f=m_trinfo->fields[p->objectName().right(1).toInt()];
+
+        if( p->isChecked())
+        {
+            s.remove(QString("%1/checked/%2")
+                     .arg(m_trinfo->trend)
+                     .arg(f));
+        }
+        else
+        {
+            s.setValue(QString("%1/checked/%2")
+                       .arg(m_trinfo->trend)
+                       .arg(f),false);
+        }
+    }
+
+
     delete m_ui;
 
 }
