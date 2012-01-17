@@ -385,6 +385,16 @@
        <number>2</number>
       </property>
       <item>
+       <widget class="QCheckBox" name="gridEnable">
+        <property name="text">
+         <string>Сітка</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

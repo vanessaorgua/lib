@@ -95,11 +95,19 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 
     for(int i=0;i<8;++i)
     {
-        m_Color << s.value(QString("/colors/%1/%2")
+        m_Color << s.value(QString("%1/colors/%2")
                            .arg(tri->trend)
                            .arg(tri->fields[i]),
                            QColor(MyConst::DefColor[i])).value<QColor>(); // цю ініціалізацію треба переробити
     }
+
+    // управління сіткою
+    m_ui->gridEnable->setChecked(s.value(QString("%1/grid")
+                                         .arg(tri->trend),true).toBool());
+    connect(m_ui->gridEnable,SIGNAL(clicked(bool)),this,SLOT(setGrid(bool)));
+    // встановити прапор в класі-малювалці
+    m_tw->setGrid(m_ui->gridEnable->isChecked());
+
     //фарбую кнопки
     QPalette pal;
     
@@ -437,7 +445,7 @@ void TrendWindow::colorChange()
 	{
             // зберегти значення кольорів
             QSettings s;
-            s.setValue(QString("/colors/%1/%2")
+            s.setValue(QString("%1/colors/%2")
                                        .arg(m_trinfo->trend)
                                        .arg(m_trinfo->fields[i]),color);
 
@@ -573,6 +581,16 @@ void TrendWindow::setColors(QVector<QColor> &colors)
     dataChange();
 }
 
+void TrendWindow::setGrid(bool v)
+{
+    QSettings s;
+    s.setValue(QString("%1/grid")
+               .arg(m_trinfo->trend),v);
+    m_tw->setGrid(v);
+    dataChange();
+}
+
+
 //--------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------
@@ -614,7 +632,41 @@ void TrendView::start(int nLen,int numPlot,int nHeight /*=4000*/) // тут ст
 	m_paint.begin(m_px);
 	m_paint.scale((double)m_px->width()/(double)nLen,(double)m_px->height()/(double)nHeight);
 
+
         m_px->fill(Qt::black);     // замалювати фон
+
+        // намалювати сітку якщо увімкнута
+        if(m_grid)
+        {
+            QPen m_tPen;
+            m_tPen.setColor(Qt::darkGray);
+            m_tPen.setWidth(0);
+
+            QVector<qreal> dashes;
+            dashes << 1.0 << 2.0
+                   << 1.0 << 2.0
+                   << 1.0 << 2.0
+                   << 1.0 << 5.0 ;
+
+            m_tPen.setDashPattern(dashes);
+
+            m_paint.setPen(m_tPen);
+            int nStep=nHeight/4;
+            for(int i=1;i<4;++i)
+            {
+                m_paint.drawLine(0,nStep*i,nLen,nStep*i);
+                // qDebug() << i <<nHeight/i;
+            }
+
+            nStep=nLen/4;
+            for(int i=1;i<4;++i)
+            {
+                m_paint.drawLine(nStep*i,0,nStep*i,nHeight);
+                // qDebug() << i <<nHeight/i;
+            }
+
+
+        }
         m_nPlot=numPlot;
         m_bStart=true;
     

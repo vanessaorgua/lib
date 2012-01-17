@@ -51,6 +51,7 @@ public slots:
     void setCursor(int v=0);
     void slotExit();
     void setColors(QVector<QColor> &colors);
+    void setGrid(bool);
 
 signals:
     void repaintRequest();
@@ -98,12 +99,14 @@ public:
     inline QSizePolicy sizePolicy() const {return QSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);}
 
     void setColors(QVector<QColor> &pColor);
+    bool grid() {return m_grid;}
 
 public slots:
     void start(int nLen,int numPlot,int nHeight=4000); // тут створ.ється новий oб'єкт m_px
     void setData(double nX,QVector<int>& Data); // цей слот приймає дані для малювання.
     void draw(); // власне по цій команді об'єкт m_px відображається на екрані
-    
+    void setGrid(bool v) {m_grid=v;}
+
 signals:     
     void _redraw();
     void cursorMoved(int pos);
@@ -115,6 +118,7 @@ protected:
     QPixmap *m_px; // картинка, на якій малюються графіки
     int m_nPlot;
     bool m_bStart;
+    bool m_grid;
 
     double m_pfData[8]; // масив для зберігання координат попердньої точки
     double m_nX,m_nH; // координата х попередньої точки
