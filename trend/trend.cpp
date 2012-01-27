@@ -20,6 +20,8 @@
 
 // Функції-члени класу TrendWindow
 
+#include "historythread.h"
+
 #define TR_HEIGHT 10000
 
 namespace MyConst
@@ -30,7 +32,7 @@ namespace MyConst
 };
 
 TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget(p)
-    ,m_nHeight(nHeight),m_pnDt(NULL),m_ui(new Ui::Trend)
+  ,m_nHeight(nHeight),m_pnDt(0),m_ui(new Ui::Trend),mState(0)
 {    
     //qDebug("Настройка вікна");
 
@@ -220,78 +222,33 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     
     m_sTmpl= "SELECT Dt%1 FROM %2 WHERE Dt BETWEEN %3 AND %4 ORDER BY Dt";// шаблон запиту
 
-
-    if(tri->host=="QSQLITE")
-    {
-        QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","history");
-        dbs.setDatabaseName(tri->db);
-    }
-    else
-    {
-        QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","history");
-        // заточка під drizzle, який створює сокети в /tmp
-        if(QFile::exists("/tmp/mysql.socket")) // якщо такий файл існує
-        {
-            dbs.setConnectOptions("UNIX_SOCKET=/tmp/mysql.socket");
-        }
-
-        dbs.setHostName(tri->host);
-        dbs.setDatabaseName(tri->db);
-        dbs.setUserName(tri->user);
-        dbs.setPassword(tri->passwd);
-    }
-
-    QSqlDatabase dbs=QSqlDatabase::database("history");
-
-    if(dbs.open())
-    {
-	//qDebug() << "Connect to DB.";
-
-	QSqlQuery query(dbs);
 	// визначення чісового інтервалу наявних даних
-	if(query.exec(QString("SELECT min(Dt) ,max(Dt) from %1").arg(m_trinfo->table)))
-	{
-	    QDateTime tmp;
-	    query.next();
-	    
-	    //qDebug("min(Dt)=%u",query.value(0).toUInt());
-	    //qDebug("max(Dt)=%u",query.value(1).toUInt());	    
-	    
-	    tmp.setTime_t(query.value(0).toUInt());
-            m_ui->db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
+	//if(query.exec(QString("SELECT min(Dt) ,max(Dt) from %1").arg(m_trinfo->table)))
+        //tmp.setTime_t(query.value(0).toUInt());
+        //m_ui->db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
+	//tmp.setTime_t(query.value(1).toUInt());
+        //m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
 
-	    tmp.setTime_t(query.value(1).toUInt());
-            m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
-	    query.clear();
-	}
-	else
-	{
-	    //qDebug() << query.lastError();
-	}
-	// перемалювання графіку
-        //dataChange();
-	//setCursor(0);
+    // запуск потоку роботи із бд
+    htr=new HistoryThread(tri->host,tri->db,tri->user,tri->passwd);
+    htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
 
-    }
-    else
-    {
-	// якщо не зв’язалися із БД
-	//qDebug() << dbs.lastError();
-    }
-    //}
+    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection);
+    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
+    connect(this,SIGNAL(execQuery(QString)),htr,SLOT(runQuery(QString)),Qt::QueuedConnection);
+
+    // connect(this,SIGNAL(destroyed()),htr,SLOT(quit()),Qt::QueuedConnection); // це зруйнує класс
+
+    QTimer::singleShot(0,this,SLOT(dataChange()));
+
 }
+
 
 TrendWindow::~TrendWindow()
 {
     //qDebug("TrendWindow Кінець роботи");
-    {
-	QSqlDatabase dbs=QSqlDatabase::database("history");
-	dbs.close();
-    }
-    QSqlDatabase::removeDatabase("history");
 
     QSettings s;
-
 
     foreach(QCheckBox *p,pv)
     {
@@ -313,6 +270,11 @@ TrendWindow::~TrendWindow()
 
 
     delete m_ui;
+
+    htr->quit();
+    htr->wait();
+    delete htr;
+
 
 }
 
@@ -362,7 +324,7 @@ void TrendWindow::dataChange()
     }
 
     // початок виконання запиту та малювання графіку
-    QApplication::setOverrideCursor(Qt::WaitCursor);
+    // QApplication::setOverrideCursor(Qt::WaitCursor);
     
     m_start=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
 
@@ -377,90 +339,11 @@ void TrendWindow::dataChange()
     //qDebug() << "FL s=" << s << "m_trinfo->numPlot = " << m_trinfo->numPlot;
     
     // фінальна побудова запиту
-    s=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
+    sQuery=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
 
-    QSqlDatabase dbs=QSqlDatabase::database("history");
-if(dbs.isOpen())
-{
-    QSqlQuery query(dbs);
-
-    //qDebug() << s;
-    if(query.exec(s))
-    {
-	//qDebug() << m_trinfo->numPlot;
-	//int *v= new int[m_trinfo->numPlot];
-	QVector<int> v(m_trinfo->numPlot);
-	//qDebug("Кількість записів %d",query.size());
-        m_pnDt.clear();
-
-        // qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
-        // ініціалізація об'єкта малювання графіку
-         m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
-            // виймання даних
-         m_nLen=0;
-         while(query.next())
-            {
-             m_nLen++;
-                m_pnDt << query.value(0).toUInt(); // зберегти масив точок
-	    
-                for(i=0;i<m_trinfo->numPlot;++i)
-                        v[i]=query.value(i+1).toInt();
-                m_tw->setData(query.value(0).toUInt()-m_start.toTime_t(),v);
-            }
-
-            query.clear();
-	m_tw->draw();
-	
-	//delete v;
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
-	setCursor(-1);
-    }
-    else
-    {
-        QApplication::setOverrideCursor(Qt::ArrowCursor);
-	QMessageBox::critical(this,tr("Помилка виконання запиту"),query.lastError().databaseText());
-    }        
-    
-    s.clear();
-    for(i=0;i<m_trinfo->numPlot;++i)
-    {
-	s+=pv[i]->checkState()==Qt::Checked?",min("+m_trinfo->fields[i]+"),avg("+m_trinfo->fields[i]+"),max("+m_trinfo->fields[i]+")" :",-1,-1,-1";
-    }
-    s=QString("SELECT COUNT(Dt)%1 FROM %2 WHERE Dt BETWEEN %3 AND %4").arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
-//    qDebug() << s;
-    
-    if(query.exec(s))
-    {
-	double min,avg,max;
-	
-	query.next();
-
-	for(i=0;i<m_trinfo->numPlot;++i)
-	{
-	    min=query.value(i*3+1).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-            m_ui->twAgr->item(i,1)->setText(QString("%1").arg(min,6,'f',2));
-	    	    
-	    avg=query.value(i*3+2).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-            m_ui->twAgr->item(i,2)->setText(QString("%1").arg(avg,6,'f',2));
-	    
-	    max=query.value(i*3+3).toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
-            m_ui->twAgr->item(i,3)->setText(QString("%1").arg(max,6,'f',2));
-	}
-	query.clear();
-
-    }
-    else
-    {
-	//qDebug() << query.lastError();
-    }
-	
-    //qDebug() << "End";
-}
-else
-{
-    QApplication::setOverrideCursor(Qt::ArrowCursor);
-    QMessageBox::critical(this,tr("Помилка"),dbs.lastError().databaseText());
-}
+    // робимо все асинхронно !!!!
+    //QTimer::singleShot(0,this,SLOT(sendQuery()));
+    emit execQuery(sQuery);
 
 }
 
@@ -519,9 +402,6 @@ void TrendWindow::setCursor(int v)
     else
 	ov=v;
 
-QSqlDatabase dbs=QSqlDatabase::database("history");
-if(dbs.isOpen())
-{
     
     pos=m_start.toTime_t()+ MyConst::tmr[m_ui->Interval->currentIndex()]*v/m_tw->width();
 
@@ -541,7 +421,7 @@ if(dbs.isOpen())
 	}while (step>0);
 	step=i; // зберегти значення
 	
-	QSqlQuery qry(dbs);
+//	QSqlQuery qry(dbs);
 	QString s;
 
         for(i=0;i<m_trinfo->numPlot;++i)
@@ -549,7 +429,7 @@ if(dbs.isOpen())
 	    s+=",";
     	    s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
 	}
-	
+/*
 	if(qry.exec(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step])))
 	{
 	    qry.next();	    
@@ -569,16 +449,9 @@ if(dbs.isOpen())
 	    }
 	    qry.clear();
 	}
-	else
-	{
-	    //qDebug() << qry.lastError();
-	}
+*/
     }
-}
-else
-{
-    QMessageBox::critical(this,tr("Помилка"),dbs.lastError().driverText());
-}
+
 
 }
 
@@ -619,6 +492,16 @@ void TrendWindow::setGrid(bool v)
                .arg(m_trinfo->trend),v);
     m_tw->setGrid(v);
     dataChange();
+}
+
+void TrendWindow::processRow(QStringList row) // це отримує дані
+{
+
+}
+
+void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
+{
+
 }
 
 

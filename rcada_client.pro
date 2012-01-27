@@ -16,7 +16,8 @@ HEADERS += iodev.h \
     panelReg/panelReg.h \
     scale/scale.h \
     trend/trendconstruct.h \
-    history/history.h
+    history/history.h \
+    trend/historythread.h
 SOURCES += ionetclient/IoNetClient.cpp \
     ionetclient/netiodev.cpp \
     iodev.cpp \
@@ -26,7 +27,8 @@ SOURCES += ionetclient/IoNetClient.cpp \
     panelReg/panelReg.cpp \
     scale/scale.cpp \
     trend/trendconstruct.cpp \
-    history/history.cpp
+    history/history.cpp \
+    trend/historythread.cpp
 MOC_DIR = build
 OBJECTS_DIR = build
 UI_DIR = build

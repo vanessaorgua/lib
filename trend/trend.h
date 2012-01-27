@@ -13,6 +13,7 @@
 #include <QtSql>
 
 class TrendView;
+class HistoryThread;
 
 struct trendinfo
 {
@@ -53,9 +54,18 @@ public slots:
     void setColors(QVector<QColor> &colors);
     void setGrid(bool);
 
+// слоти для взаємодії із класом виймання історії
+    void processRow(QStringList); // це отримує дані
+    void changeState();     // це викликається в кінці обробки запиту;
+
+
+
+
 signals:
     void repaintRequest();
     void finished();
+    void execQuery(QString);
+
 private:
     TrendView *m_tw;
     
@@ -68,7 +78,7 @@ private:
     QString m_Field[8];   // назви полів 
     double m_fA[8],m_fB[8]; //коефіцієнти масштабування
 
-    QString m_sTmpl; // це буде шаблон запиту  до бази
+    QString m_sTmpl,sQuery; // це буде шаблон запиту  до бази
 
     
     struct trendinfo *m_trinfo; 
@@ -81,6 +91,10 @@ private:
     QVector<unsigned int> m_pnDt; //масив, для пошуку поточного положення курсору
     int m_nLen; // довжина масива
     Ui::Trend *m_ui;
+
+    HistoryThread *htr;
+    int mState; // змінна стану для вибоку дії з обробки рядків
+
 };
 
 
