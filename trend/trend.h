@@ -54,10 +54,13 @@ public slots:
     void setColors(QVector<QColor> &colors);
     void setGrid(bool);
 
+    void startHtr();
+
 // слоти для взаємодії із класом виймання історії
     void processRow(QStringList); // це отримує дані
     void changeState();     // це викликається в кінці обробки запиту;
 
+    void showErrorText(QString);
 
 
 

@@ -34,9 +34,12 @@ namespace MyConst
 TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget(p)
   ,m_nHeight(nHeight),m_pnDt(0),m_ui(new Ui::Trend),mState(0)
 {    
-    //qDebug("Настройка вікна");
+    qDebug() << "Setup window starterd";
 
+    setObjectName("TrendWindow_1");
     m_ui->setupUi(this);
+    qDebug() << "Setup window finished";
+
     //setAttribute( Qt::WA_DeleteOnClose); // ??? це що таке
     connect(m_ui->Exit,SIGNAL(clicked()),this,SLOT(slotExit()));
 
@@ -229,24 +232,28 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 	//tmp.setTime_t(query.value(1).toUInt());
         //m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
 
-    // запуск потоку роботи із бд
-    htr=new HistoryThread(tri->host,tri->db,tri->user,tri->passwd);
-    htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
+     //  QTimer::singleShot(0,this,SLOT(startHtr()));
 
-    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection);
-    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
-    connect(this,SIGNAL(execQuery(QString)),htr,SLOT(runQuery(QString)),Qt::QueuedConnection);
+    qDebug() << "TrendWindow init finished";
+}
+
+void TrendWindow::startHtr()
+{
+    // запуск потоку роботи із бд
 
     // connect(this,SIGNAL(destroyed()),htr,SLOT(quit()),Qt::QueuedConnection); // це зруйнує класс
 
-    QTimer::singleShot(0,this,SLOT(dataChange()));
-
+    qDebug() << "htr alloc";
+    htr=new HistoryThread(this, m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
+    qDebug() << "htr created";
+    htr->setObjectName("HystoryTrendThread");
+    htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
+    qDebug() << "htr started";
 }
-
 
 TrendWindow::~TrendWindow()
 {
-    //qDebug("TrendWindow Кінець роботи");
+    qDebug() << "TrendWindow end";
 
     QSettings s;
 
@@ -268,12 +275,11 @@ TrendWindow::~TrendWindow()
         }
     }
 
-
     delete m_ui;
 
-    htr->quit();
-    htr->wait();
-    delete htr;
+//    htr->quit();
+//    htr->wait();
+//    htr->deleteLater();
 
 
 }
@@ -285,7 +291,8 @@ void TrendWindow::slotExit()
 
 void TrendWindow::dataChange()
 {
-    //qDebug() << "start" << sender();
+    qDebug() << "start" << sender();
+
     QString s="";
     int i ;
     
@@ -343,7 +350,7 @@ void TrendWindow::dataChange()
 
     // робимо все асинхронно !!!!
     //QTimer::singleShot(0,this,SLOT(sendQuery()));
-    emit execQuery(sQuery);
+    //emit execQuery(sQuery);
 
 }
 
@@ -374,7 +381,9 @@ void TrendWindow::colorChange()
             m_ui->cursorVal->setPalette(pl);
 	
             m_tw->setColors(m_Color);
-	    dataChange();
+	    //dataChange();
+            QTimer::singleShot(0,this,SLOT(dataChange()));
+
 	}
     }
 }
@@ -482,7 +491,9 @@ void TrendWindow::setColors(QVector<QColor> &colors)
     m_ui->cursorVal->setPalette(pal);
 
     m_tw->setColors(m_Color);
-    dataChange();
+    //dataChange();
+    QTimer::singleShot(0,this,SLOT(dataChange()));
+
 }
 
 void TrendWindow::setGrid(bool v)
@@ -491,17 +502,24 @@ void TrendWindow::setGrid(bool v)
     s.setValue(QString("%1/grid")
                .arg(m_trinfo->trend),v);
     m_tw->setGrid(v);
-    dataChange();
+    //dataChange();
+    QTimer::singleShot(0,this,SLOT(dataChange()));
+
 }
 
 void TrendWindow::processRow(QStringList row) // це отримує дані
 {
-
+   qDebug() << "sender" << sender()->objectName(); // << "value" << row;
 }
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
 
+}
+
+void TrendWindow::showErrorText(QString v)
+{
+    QMessageBox::critical(this,tr("Error"),v);
 }
 
 
@@ -514,6 +532,7 @@ void TrendWindow::changeState()     // це викликається в кінц
 TrendView::TrendView(QWidget *p) : QWidget(p),
     m_nH(4000)
 {
+    setObjectName("TrendView_1");
     m_px=new QPixmap(2000,2000);
     m_px->fill(QColor(Qt::black));
 

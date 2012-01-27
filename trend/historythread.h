@@ -5,6 +5,9 @@
 #include <QThread>
 #include <QString>
 #include <QStringList>
+#include <QSqlRecord>
+#include <trend.h>
+
 
 /* В цей клам буде винесена робота із базою даних. Можливо варто зробити його досить універсальним та використати в інших частинах програми.
   наприклад буде цікаво використати його також в класі RPanelReg
@@ -14,7 +17,7 @@ class HistoryThread : public QThread
 {
     Q_OBJECT
 public:
-    HistoryThread(QString host="localhost",QString base="test",QString user="",QString passwd="");
+    HistoryThread(TrendWindow *parentObject, QString host="localhost",QString base="test",QString user="",QString passwd="");
     ~HistoryThread();
 
 
@@ -30,6 +33,8 @@ signals:
 
 private:
     QString dbHost,dbBase,dbUser,dbPasswd;
+
+    TrendWindow *p;
 
 };
 

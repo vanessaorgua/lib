@@ -6,11 +6,13 @@
 #include <QDebug>
 
 
-HistoryThread::HistoryThread(QString host,QString base,QString user,QString passwd):
+HistoryThread::HistoryThread(TrendWindow *parentObject,QString host,QString base,QString user,QString passwd):
+    // QThread(parentObject),
     dbHost(host),
     dbBase(base),
     dbUser(user),
-    dbPasswd(passwd)
+    dbPasswd(passwd),
+    p(parentObject)
 {
 
 }
@@ -51,10 +53,33 @@ void HistoryThread::run()
     {
         QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 
-        dbs.open();
+        if(dbs.open())             // важко сказати чи так правильно....
+        {
+            // з’єднати класи
+            connect(this,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList))); // ,Qt::QueuedConnection
+            connect(this,SIGNAL(endQuery()),p,SLOT(changeState()));
+            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)));
 
+            connect(p,SIGNAL(execQuery(QString)),this,SLOT(runQuery(QString)));
+
+            qDebug() << "Start HistoryThread";
+
+            exec(); // але це має бути в саому кінці....
+
+            qDebug() << "Stop HistoryThread";
+
+        }
+        else
+        {
+            emit dbError(QString(tr("Open database\n%1\n%2"))
+                     .arg(dbs.lastError().driverText())
+                     .arg(dbs.lastError().databaseText())); // випустити сигнал про помилку
+            qDebug() << this->objectName() <<
+                        QString(tr("Open database\n%1\n%2"))
+                                             .arg(dbs.lastError().driverText())
+                                             .arg(dbs.lastError().databaseText());
+        }
         // запустити цикл обробки подій, пісдя отримання сигналу quit()
-        exec(); // але це має бути в саому кінці....
     }
 
     // після виконання цього роз’єднатися із бд
@@ -75,7 +100,43 @@ void HistoryThread::run()
 
 void HistoryThread::runQuery(QString v)
 {
-    qDebug() << v;
+     QSqlDatabase dbs=QSqlDatabase::database("historyThread");
+
+     if(dbs.isOpenError()) // якщо сталася помилка при відкритті бази даних тоді
+     {
+        emit dbError(QString(tr("Exec query\n%1\n%2"))
+                     .arg(dbs.lastError().driverText())
+                     .arg(dbs.lastError().databaseText())); // випустити сигнал про помилку
+        // хоча тут можлива ситуація коли тре
+     }
+     else // інакше можна виконувати запит
+     {
+        QSqlQuery query(dbs);
+
+        if(query.exec(v))
+        {
+            QStringList rows;
+            while(query.next())
+            {
+                QSqlRecord r=query.record();
+                int len=r.count();
+                rows.clear();
+                for(int i=0;i<len;++i)
+                    rows << r.value(i).toString();
+
+                emit pullRows(rows);
+            }
+            query.clear();
+
+        }
+        else
+        {
+            emit dbError(query.lastError().databaseText());
+        }
+     }
+
+
+
 }
 
 
