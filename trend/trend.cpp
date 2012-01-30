@@ -289,7 +289,9 @@ TrendWindow::~TrendWindow()
     delete m_ui;
 
     htr->quit();
-    htr->wait();
+    if(!htr->wait(5000))
+        htr->terminate();
+
     //htr->deleteLater();  // це треба перевірити валгріндом, тут може бути протікання....
     delete htr;
 
