@@ -237,6 +237,9 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     qDebug() << "TrendWindow init finished";
 }
 
+// це працює але чи необхідно так скодно все робити ? і ще питання: як його завернути в скінченний автомат?
+// є думка зарядити все в чергу ....
+
 void TrendWindow::startHtr()
 {
     // запуск потоку роботи із бд
@@ -350,6 +353,9 @@ void TrendWindow::dataChange()
 
     // робимо все асинхронно !!!!
     //QTimer::singleShot(0,this,SLOT(sendQuery()));
+
+    mState=1;
+    m_tw->start();
     emit execQuery(sQuery);
 
 }
@@ -509,12 +515,26 @@ void TrendWindow::setGrid(bool v)
 
 void TrendWindow::processRow(QStringList row) // це отримує дані
 {
+    switch(mState)
+    {
+        case 0: // це буде потрібне для визначення дати початку і кінця
+            break;
+
+        case 1: // виймати дані і запихати їх на графік
+
+            break;
+        \
+        default:
+            break;
+
+
+    }
    qDebug() << "value" << row;
 }
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
-
+    mState=0; // тут будемо дописувати .....
 }
 
 void TrendWindow::showErrorText(QString v)

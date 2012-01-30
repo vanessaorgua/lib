@@ -127,6 +127,7 @@ void HistoryThread::runQuery(QString v)
                 emit pullRows(rows);
             }
             query.clear();
+            emit endQuery();
 
         }
         else
