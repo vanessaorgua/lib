@@ -251,6 +251,13 @@ void TrendWindow::startHtr()
 
     connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
 
+    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
+    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
+    connect(htr,SIGNAL(dbError(QString)),this,SLOT(showErrorText(QString)),Qt::QueuedConnection);
+
+    connect(this,SIGNAL(execQuery(QString)),htr,SLOT(runQuery(QString)),Qt::QueuedConnection);
+
+
     htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
     qDebug() << "htr started";
 
