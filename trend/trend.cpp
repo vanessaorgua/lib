@@ -355,8 +355,15 @@ void TrendWindow::dataChange()
     //QTimer::singleShot(0,this,SLOT(sendQuery()));
 
     mState=1;
-    m_tw->start();
-    emit execQuery(sQuery);
+    m_pnDt.clear();
+
+    // qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
+    // ініціалізація об'єкта малювання графіку
+     m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
+        // виймання даних
+     m_nLen=0;
+
+     emit execQuery(sQuery);
 
 }
 
@@ -521,6 +528,15 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
             break;
 
         case 1: // виймати дані і запихати їх на графік
+            m_nLen++;
+           m_pnDt << row[0].toUInt(); // зберегти масив точок
+            {
+                QVector<int> v(m_trinfo->numPlot);
+
+                for(int i=0;i<m_trinfo->numPlot;++i)
+                       v[i]=row[i+1].toInt();
+                m_tw->setData(row[0].toUInt()-m_start.toTime_t(),v);
+             }
 
             break;
         \
@@ -529,12 +545,21 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
 
 
     }
-   qDebug() << "value" << row;
+   // qDebug() << "value" << row;
 }
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
-    mState=0; // тут будемо дописувати .....
+    switch(mState)
+    {
+    case 1:
+        m_tw->draw();
+    default:
+        mState=0; // тут будемо дописувати .....
+        break;
+
+    }
+
 }
 
 void TrendWindow::showErrorText(QString v)
