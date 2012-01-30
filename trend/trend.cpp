@@ -539,7 +539,21 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
              }
 
             break;
-        \
+        case 2: // це буде запит на виймання середніх значень.
+            for(int i=0;i<m_trinfo->numPlot;++i)
+            {
+                double min,avg,max;
+
+                min=row[i*3+1].toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
+                m_ui->twAgr->item(i,1)->setText(QString("%1").arg(min,6,'f',2));
+
+                avg=row[i*3+2].toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
+                m_ui->twAgr->item(i,2)->setText(QString("%1").arg(avg,6,'f',2));
+
+                max=row[i*3+3].toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
+                m_ui->twAgr->item(i,3)->setText(QString("%1").arg(max,6,'f',2));
+            }
+
         default:
             break;
 
@@ -554,6 +568,23 @@ void TrendWindow::changeState()     // це викликається в кінц
     {
     case 1:
         m_tw->draw();
+        // а після цього треба заватажити таблицю
+        {
+            QString s;
+            for(int i=0;i<m_trinfo->numPlot;++i)
+            {
+                s+=pv[i]->checkState()==Qt::Checked?",min("+m_trinfo->fields[i]+"),avg("+m_trinfo->fields[i]+"),max("+m_trinfo->fields[i]+")" :",-1,-1,-1";
+            }
+            s=QString("SELECT COUNT(Dt)%1 FROM %2 WHERE Dt BETWEEN %3 AND %4").arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
+
+            emit execQuery(s);
+            mState=2;
+        }
+        break;
+
+    case 2:
+
+
     default:
         mState=0; // тут будемо дописувати .....
         break;
