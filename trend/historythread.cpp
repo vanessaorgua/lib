@@ -56,11 +56,11 @@ void HistoryThread::run()
         if(dbs.open())             // важко сказати чи так правильно....
         {
             // з’єднати класи
-            connect(this,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList))); // ,Qt::QueuedConnection
-            connect(this,SIGNAL(endQuery()),p,SLOT(changeState()));
-            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)));
+            connect(this,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
+            connect(this,SIGNAL(endQuery()),p,SLOT(changeState()),Qt::QueuedConnection);
+            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
 
-            connect(p,SIGNAL(execQuery(QString)),this,SLOT(runQuery(QString)));
+            connect(p,SIGNAL(execQuery(QString)),this,SLOT(runQuery(QString)),Qt::QueuedConnection);
 
             qDebug() << "Start HistoryThread";
 

@@ -232,7 +232,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 	//tmp.setTime_t(query.value(1).toUInt());
         //m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
 
-     //  QTimer::singleShot(0,this,SLOT(startHtr()));
+     QTimer::singleShot(0,this,SLOT(startHtr()));
 
     qDebug() << "TrendWindow init finished";
 }
@@ -277,9 +277,9 @@ TrendWindow::~TrendWindow()
 
     delete m_ui;
 
-//    htr->quit();
-//    htr->wait();
-//    htr->deleteLater();
+    htr->quit();
+    htr->wait();
+//    htr->deleteLater();  // це треба перевірити валгріндом, тут може бути протікання....
 
 
 }
@@ -350,7 +350,7 @@ void TrendWindow::dataChange()
 
     // робимо все асинхронно !!!!
     //QTimer::singleShot(0,this,SLOT(sendQuery()));
-    //emit execQuery(sQuery);
+    emit execQuery(sQuery);
 
 }
 
@@ -509,7 +509,7 @@ void TrendWindow::setGrid(bool v)
 
 void TrendWindow::processRow(QStringList row) // це отримує дані
 {
-   qDebug() << "sender" << sender()->objectName(); // << "value" << row;
+   qDebug() << "value" << row;
 }
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
