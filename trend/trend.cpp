@@ -237,17 +237,16 @@ void TrendWindow::startHtr()
     // connect(this,SIGNAL(destroyed()),htr,SLOT(quit()),Qt::QueuedConnection); // це зруйнує класс
 
     // qDebug() << "htr alloc";
-    htr=new HistoryThread(m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
+    htr=new HistoryThread(this,m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
     // qDebug() << "htr created";
     htr->setObjectName("HystoryTrendThread");
 
     connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
 
-    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
-    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
-    connect(htr,SIGNAL(dbError(QString)),this,SLOT(showErrorText(QString)),Qt::QueuedConnection);
-
-    connect(this,SIGNAL(execQuery(QString)),htr,SLOT(runQuery(QString)),Qt::QueuedConnection);
+//    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
+//    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
+//    connect(htr,SIGNAL(dbError(QString)),this,SLOT(showErrorText(QString)),Qt::QueuedConnection);
+//    connect(this,SIGNAL(execQuery(QString)),htr,SLOT(runQuery(QString)),Qt::QueuedConnection);
 
 
     htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.

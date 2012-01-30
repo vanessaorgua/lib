@@ -6,12 +6,13 @@
 #include <QDebug>
 
 
-HistoryThread::HistoryThread(QString host,QString base,QString user,QString passwd):
+HistoryThread::HistoryThread(TrendWindow *parentObject,QString host,QString base,QString user,QString passwd):
     // QThread(parentObject),
     dbHost(host),
     dbBase(base),
     dbUser(user),
-    dbPasswd(passwd)
+    dbPasswd(passwd),
+    p(parentObject)
 {
 
 }
@@ -50,16 +51,20 @@ void HistoryThread::run()
     }
 
     {
+        QSqlRunner s;
+
         QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 
         if(dbs.open())             // важко сказати чи так правильно....
         {
             // з’єднати класи
-//            connect(this,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
-//            connect(this,SIGNAL(endQuery()),p,SLOT(changeState()),Qt::QueuedConnection);
-//            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
+            connect(&s,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
+            connect(&s,SIGNAL(endQuery()),p,SLOT(changeState()),Qt::QueuedConnection);
+            connect(&s,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
 
-//            connect(p,SIGNAL(execQuery(QString)),this,SLOT(runQuery(QString)),Qt::QueuedConnection);
+            connect(p,SIGNAL(execQuery(QString)),&s,SLOT(runQuery(QString)),Qt::QueuedConnection);
+
+            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
 
             qDebug() << "Start HistoryThread";
 
@@ -97,7 +102,7 @@ void HistoryThread::run()
 }
 
 
-void HistoryThread::runQuery(QString v)
+void QSqlRunner::runQuery(QString v)
 {
      QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 

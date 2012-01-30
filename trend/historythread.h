@@ -13,15 +13,35 @@
   наприклад буде цікаво використати його також в класі RPanelReg
 */
 
+// це обгортка для запуску бд в паралельному потоці
 class HistoryThread : public QThread
 {
     Q_OBJECT
 public:
-    HistoryThread(QString host="localhost",QString base="test",QString user="",QString passwd="");
+    HistoryThread(TrendWindow *parentObject,QString host="localhost",QString base="test",QString user="",QString passwd="");
     ~HistoryThread();
 
-
     void run();
+
+signals:
+    void dbError(QString);
+
+private:
+    QString dbHost,dbBase,dbUser,dbPasswd;
+
+    TrendWindow *p;
+
+};
+
+
+class QSqlRunner : public QObject
+{
+    Q_OBJECT
+public:
+    QSqlRunner()
+    {
+
+    }
 
 public slots:
     void runQuery(QString);
@@ -30,11 +50,6 @@ signals:
     void dbError(QString);
     void pullRows(QStringList);
     void endQuery();
-
-private:
-    QString dbHost,dbBase,dbUser,dbPasswd;
-
-    TrendWindow *p;
 
 };
 
