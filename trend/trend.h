@@ -45,7 +45,7 @@ public:
     TrendWindow(QWidget *p=0,struct trendinfo *tri=NULL,int nHeight=4000);
     ~TrendWindow();
     
-public slots:
+private slots:
     void dataChange(); // реакція на навігаційні кнопки зміни дати
     void colorChange();
     void plotChange();     
@@ -54,15 +54,13 @@ public slots:
     void setColors(QVector<QColor> &colors);
     void setGrid(bool);
 
-    void startHtr();
 
-// слоти для взаємодії із класом виймання історії
+    // слоти для взаємодії із класом виймання історії
+    void startHtr();
+    void slotStart();
     void processRow(QStringList); // це отримує дані
     void changeState();     // це викликається в кінці обробки запиту;
-
     void showErrorText(QString);
-
-    void slotStart();
 
 
 

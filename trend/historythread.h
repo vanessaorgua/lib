@@ -17,7 +17,7 @@ class HistoryThread : public QThread
 {
     Q_OBJECT
 public:
-    HistoryThread(TrendWindow *parentObject, QString host="localhost",QString base="test",QString user="",QString passwd="");
+    HistoryThread(QString host="localhost",QString base="test",QString user="",QString passwd="");
     ~HistoryThread();
 
 

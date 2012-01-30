@@ -34,11 +34,9 @@ namespace MyConst
 TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget(p)
   ,m_nHeight(nHeight),m_pnDt(0),m_ui(new Ui::Trend),mState(0)
 {    
-    qDebug() << "Setup window starterd";
 
     setObjectName("TrendWindow_1");
     m_ui->setupUi(this);
-    qDebug() << "Setup window finished";
 
     //setAttribute( Qt::WA_DeleteOnClose); // ??? це що таке
     connect(m_ui->Exit,SIGNAL(clicked()),this,SLOT(slotExit()));
@@ -84,12 +82,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->ps_6,SIGNAL(clicked()),this,SLOT(plotChange()));
     connect(m_ui->ps_7,SIGNAL(clicked()),this,SLOT(plotChange()));
 
-
-
-    QSettings s;
-
-
-
     // чекбокси вмикання графіку
     connect(m_ui->pv_0,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->pv_1,SIGNAL(clicked()),this,SLOT(dataChange()));
@@ -100,9 +92,10 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->pv_6,SIGNAL(clicked()),this,SLOT(dataChange()));
     connect(m_ui->pv_7,SIGNAL(clicked()),this,SLOT(dataChange()));
 
-    
+
     //connect(m_ui->cursorVal,SIGNAL(valueChanged(int)),m_ui->cursorLCD,SLOT(display(int)));
 
+    QSettings s;
 
     for(int i=0;i<8;++i)
     {
@@ -244,7 +237,7 @@ void TrendWindow::startHtr()
     // connect(this,SIGNAL(destroyed()),htr,SLOT(quit()),Qt::QueuedConnection); // це зруйнує класс
 
     // qDebug() << "htr alloc";
-    htr=new HistoryThread(this, m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
+    htr=new HistoryThread(m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
     // qDebug() << "htr created";
     htr->setObjectName("HystoryTrendThread");
 
@@ -298,7 +291,8 @@ TrendWindow::~TrendWindow()
 
     htr->quit();
     htr->wait();
-//    htr->deleteLater();  // це треба перевірити валгріндом, тут може бути протікання....
+    //htr->deleteLater();  // це треба перевірити валгріндом, тут може бути протікання....
+    delete htr;
 
 
 }

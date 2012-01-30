@@ -6,13 +6,12 @@
 #include <QDebug>
 
 
-HistoryThread::HistoryThread(TrendWindow *parentObject,QString host,QString base,QString user,QString passwd):
+HistoryThread::HistoryThread(QString host,QString base,QString user,QString passwd):
     // QThread(parentObject),
     dbHost(host),
     dbBase(base),
     dbUser(user),
-    dbPasswd(passwd),
-    p(parentObject)
+    dbPasswd(passwd)
 {
 
 }
