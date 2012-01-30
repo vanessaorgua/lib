@@ -86,8 +86,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     connect(m_ui->ps_7,SIGNAL(clicked()),this,SLOT(plotChange()));
 
 
-    // сигнал від перегрядача трендів, запит наперемалювання
-    connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
 
     QSettings s;
 
@@ -250,9 +248,21 @@ void TrendWindow::startHtr()
     htr=new HistoryThread(this, m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
     qDebug() << "htr created";
     htr->setObjectName("HystoryTrendThread");
+
+    connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
+
     htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
     qDebug() << "htr started";
+
+
+
 }
+
+void TrendWindow::slotStart()
+{
+    emit execQuery(QString("SELECT min(Dt) ,max(Dt) from %1").arg(m_trinfo->table));
+}
+
 
 TrendWindow::~TrendWindow()
 {
@@ -294,7 +304,7 @@ void TrendWindow::slotExit()
 
 void TrendWindow::dataChange()
 {
-    qDebug() << "start" << sender();
+//     qDebug() << "start" << sender();
 
     QString s="";
     int i ;
@@ -363,6 +373,9 @@ void TrendWindow::dataChange()
         // виймання даних
      m_nLen=0;
 
+     QApplication::setOverrideCursor(Qt::WaitCursor);
+
+     qDebug() << "execQuery" << sQuery;
      emit execQuery(sQuery);
 
 }
@@ -525,6 +538,16 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
     switch(mState)
     {
         case 0: // це буде потрібне для визначення дати початку і кінця
+            {
+                QDateTime tmp;
+
+                tmp.setTime_t(row[0].toUInt());
+                m_ui->db_startDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
+
+                tmp.setTime_t(row[1].toUInt());
+                m_ui->db_stopDate->setText(tmp.toString("hh:mm:ss\ndd:MM:yy"));
+
+            }
             break;
 
         case 1: // виймати дані і запихати їх на графік
@@ -564,8 +587,18 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
+    qDebug() << "changeState" << mState;
+
     switch(mState)
     {
+    case 0:
+
+        // сигнал від перегрядача трендів, запит наперемалювання
+        connect(m_tw,SIGNAL(_redraw()),this,SLOT(dataChange()));
+        QTimer::singleShot(0,this,SLOT(dataChange()));
+
+        break;
+
     case 1:
         m_tw->draw();
         // а після цього треба заватажити таблицю
@@ -583,7 +616,9 @@ void TrendWindow::changeState()     // це викликається в кінц
         break;
 
     case 2:
+	QApplication::setOverrideCursor(Qt::ArrowCursor);
 
+        QTimer::singleShot(0,this,SLOT(setCursor()));
 
     default:
         mState=0; // тут будемо дописувати .....

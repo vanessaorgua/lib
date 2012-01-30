@@ -62,6 +62,8 @@ public slots:
 
     void showErrorText(QString);
 
+    void slotStart();
+
 
 
 signals:
