@@ -52,7 +52,6 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
     vbl->addWidget(m_tw);    
     m_ui->trend->setLayout(vbl);
     
-    connect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
     
     m_ui->trendHead->setText(m_trinfo->trendHead);
 
@@ -232,7 +231,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 
      QTimer::singleShot(0,this,SLOT(startHtr()));
 
-    qDebug() << "TrendWindow init finished";
+    // qDebug() << "TrendWindow init finished";
 }
 
 // це працює але чи необхідно так скодно все робити ? і ще питання: як його завернути в скінченний автомат?
@@ -244,9 +243,9 @@ void TrendWindow::startHtr()
 
     // connect(this,SIGNAL(destroyed()),htr,SLOT(quit()),Qt::QueuedConnection); // це зруйнує класс
 
-    qDebug() << "htr alloc";
+    // qDebug() << "htr alloc";
     htr=new HistoryThread(this, m_trinfo->host,m_trinfo->db,m_trinfo->user,m_trinfo->passwd);
-    qDebug() << "htr created";
+    // qDebug() << "htr created";
     htr->setObjectName("HystoryTrendThread");
 
     connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
@@ -259,7 +258,7 @@ void TrendWindow::startHtr()
 
 
     htr->start(QThread::LowestPriority); // запустити із низьким пріоритетом.
-    qDebug() << "htr started";
+    // qDebug() << "htr started";
 
 
 
@@ -312,6 +311,11 @@ void TrendWindow::slotExit()
 void TrendWindow::dataChange()
 {
 //     qDebug() << "start" << sender();
+
+    if(mState==1)
+        return ;
+
+    disconnect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
 
     QString s="";
     int i ;
@@ -382,7 +386,8 @@ void TrendWindow::dataChange()
 
      QApplication::setOverrideCursor(Qt::WaitCursor);
 
-     qDebug() << "execQuery" << sQuery;
+     // qDebug() << "execQuery" << sQuery;
+
      emit execQuery(sQuery);
 
 }
@@ -438,7 +443,10 @@ void TrendWindow::setCursor(int v)
     int i,step;
     unsigned int pos;
     static int ov=0;
-    
+
+    if(mState==3)
+        return;
+
     if(v==-1)
 	v=ov;
     else
@@ -471,6 +479,10 @@ void TrendWindow::setCursor(int v)
 	    s+=",";
     	    s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
 	}
+
+        mState=3;
+        emit execQuery(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step]));
+
 /*
 	if(qry.exec(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step])))
 	{
@@ -583,6 +595,23 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
                 max=row[i*3+3].toDouble() *(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0])/m_nHeight + m_trinfo->fScale[i][0];
                 m_ui->twAgr->item(i,3)->setText(QString("%1").arg(max,6,'f',2));
             }
+            connect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
+
+        case 3:
+            double val;
+            for(int i=0;i<m_trinfo->numPlot;++i)
+            {
+                //qDebug() << i+1 << qry.value(i+1).toDouble() << m_trinfo->fScale[i][1] << m_trinfo->fScale[i][0] << m_nHeight;
+
+                val=(row[i+1].toDouble()*	(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0]))/(double)m_nHeight + m_trinfo->fScale[i][0];
+                m_ui->twAgr->item(i,0)->setText(QString("%1").arg(val,6,'f',2));
+                if(ps[i]->isChecked())
+                {
+                    m_ui->cursorVal->setValue(row[i+1].toInt());
+                    m_ui->cursorLCD->display(fabs(val)<1.5?ceil(val):val);
+
+                }
+            }
 
         default:
             break;
@@ -594,7 +623,7 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
-    qDebug() << "changeState" << mState;
+    //qDebug() << "changeState" << mState;
 
     switch(mState)
     {

@@ -49,7 +49,7 @@ public slots:
     void dataChange(); // реакція на навігаційні кнопки зміни дати
     void colorChange();
     void plotChange();     
-    void setCursor(int v=0);
+    void setCursor(int v=-1);
     void slotExit();
     void setColors(QVector<QColor> &colors);
     void setGrid(bool);
