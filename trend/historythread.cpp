@@ -55,7 +55,7 @@ void HistoryThread::run()
 
         QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 
-        if(dbs.open())             // важко сказати чи так правильно....
+        if(dbs.isOpen())             // важко сказати чи так правильно....
         {
             // з’єднати класи
             connect(&s,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
