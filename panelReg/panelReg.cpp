@@ -11,6 +11,7 @@
 #include <QtSql>
 #include <QEvent>
 
+#include "trendloadthead.h"
 
 RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfName,QString tableName) :QDialog(p),
     src(source)  ,
@@ -188,12 +189,19 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     ui->regList->setCurrentIndex(n);
     connect(ui->regList,SIGNAL(currentIndexChanged(int)),this,SLOT(changeReg(int)));
     changeReg(n);
+
+    // -------------
+    trLoader = new TrendLoadThead(trChart);
+    connect(trLoader,SIGNAL(finished()),t1,SLOT(start()));
+
 }
 
 RpanelReg::~RpanelReg()
 {
 
     delete ui;
+
+    delete trLoader;
 }
 
 void RpanelReg::changeReg(int Index) // зміна регулятор
@@ -628,92 +636,26 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 void RpanelReg::updateTrend(int len)
 {
     // перезарядити таймер
-    int ti[3]={5000,2500,1250};
+    int ti[3]={5000,2500,1250},tm[3]={3600,1800,900};
     t1->stop();
     t1->setInterval(ti[len]);
-    t1->start();
 
-    // завантаження даних на графік із історії
-        QApplication::setOverrideCursor(Qt::WaitCursor);
-        QString conName;
+    QString sQuery="SELECT Dt,%1 FROM %4 WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
+    QString fields=RegDes[RegNum][Ri::PV_1];
+
+    for(int i=2;i<9;++i)
     {
-        QSettings s;
-
-        if(s.value("/db/hostname","localhost").toString()=="QSQLITE")
-        {
-            QSqlDatabase dbs=QSqlDatabase::addDatabase("QSQLITE","panelreg");
-            dbs.setDatabaseName(s.value("/db/dbname","test").toString());
-        }
+        fields+=",";
+        if(RegDes[RegNum][i].size() > 0)
+            fields+=RegDes[RegNum][i];
         else
-        {
-            QSqlDatabase dbs=QSqlDatabase::addDatabase("QMYSQL","panelreg");
-            // заточка під drizzle, який створює сокети в /tmp
-            if(QFile::exists("/tmp/mysql.socket")) // якщо такий файл існує
-            {
-                dbs.setConnectOptions("UNIX_SOCKET=/tmp/mysql.socket");
-            }
-
-            dbs.setHostName(s.value("/db/hostname","localhost").toString());
-            dbs.setDatabaseName(s.value("/db/dbname","test").toString());
-            dbs.setUserName(s.value("/db/username","scada").toString());
-            dbs.setPassword(s.value("/db/passwd","").toString());
-        }
-
-        QSqlDatabase dbs=QSqlDatabase::database("panelreg");
-
-        conName=dbs.connectionName();
-        //qDebug() << conName;
-
-        if(  dbs.open())
-        {
-            const int tm[3]={3600,1800,900},nLen[3]={1,2,4};
-            int i,sLen=nLen[len];
-            // очистити поточний графік
-            trChart->fill(0);
-
-            QDateTime dt = QDateTime::currentDateTime();
-            QSqlQuery qry(dbs);
-            QString sQuery="SELECT Dt,%1 FROM %4 WHERE Dt BETWEEN %2 AND %3 ORDER BY Dt";
-            QString fields=RegDes[RegNum][Ri::PV_1];
-
-            for(i=2;i<9;++i)
-            {
-                fields+=",";
-                if(RegDes[RegNum][i].size() > 0)
-                    fields+=RegDes[RegNum][i];
-                else
-                    fields+="0";
-            }
-            //qDebug() << sQuery.arg(RegDes[RegNum].field).arg(dt.toTime_t()-3600).arg(dt.toTime_t());
-            if(qry.exec(sQuery.arg(fields).arg(dt.toTime_t()-tm[len]).arg(dt.toTime_t()).arg(tblName)))
-            {
-                while(qry.next())
-                {
-                    v.clear(); // cюди будуть завантажуватися дані
-                    for(i=1;i<9;++i)
-                    {
-                        v << qry.value(i).toDouble();
-                    }
-                    for(int n=0;n<sLen;++n) // заватажити точнку декілька раз, в залежністі від вибраної шкали
-                        trChart->loadPoint(v);
-                }
-                qry.clear();
-            }
-            else
-            {
-            QApplication::setOverrideCursor(Qt::ArrowCursor);
-                QMessageBox::critical(this,tr("!!!Помилка виконання запиту"),qry.lastError().databaseText()+"\n!"+qry.lastQuery());
-                qDebug() << qry.lastQuery();
-            }
-
-
-        }
-        else
-            QMessageBox::critical(this,tr("Не вдалося з\'єднатися із базою даних історії"),dbs.lastError().databaseText());
+            fields+="0";
     }
-        QSqlDatabase::removeDatabase(conName);
+    //qDebug() << sQuery.arg(RegDes[RegNum].field).arg(dt.toTime_t()-3600).arg(dt.toTime_t());
+    QDateTime dt=QDateTime::currentDateTime();
+    trLoader->setQuery(sQuery.arg(fields).arg(dt.toTime_t()-tm[len]).arg(dt.toTime_t()).arg(tblName));
 
-        QApplication::setOverrideCursor(Qt::ArrowCursor);
+
 }
 
 void RpanelReg::runTrend() // зміна регулятор
@@ -1096,3 +1038,10 @@ void RpanelReg::closeEvent( QCloseEvent * event) // при закритті зб
 
     event->accept();
 }
+
+/*
+void RpanelReg::startTimer()
+{
+    t1->start();
+}
+*/

@@ -8,6 +8,7 @@ class TrendChart;
 class IoDev;
 class QTimer;
 class QCloseEvent;
+class TrendLoadThead;
 
 //namespace Ui {
 //    class panelReg;
@@ -74,7 +75,8 @@ protected slots:
     void setParamMode(bool v);
     
     void setGraph(); // слот на 5ти-секундний інтервал для виводу гріфіків
-    
+    //void startTimer();
+
 protected:
     void closeEvent( QCloseEvent * event);
 
@@ -92,6 +94,7 @@ protected:
     QTimer *t1;
 
     double kk_1 ;  // коефіцієнт корекції для K_1
+    TrendLoadThead *trLoader;
 };
 
 
