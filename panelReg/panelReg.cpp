@@ -202,6 +202,11 @@ RpanelReg::~RpanelReg()
 
     delete ui;
 
+    if(trLoader->isRunning())
+    {
+        trLoader->terminate();
+    }
+
     delete trLoader;
 }
 
@@ -656,6 +661,7 @@ void RpanelReg::updateTrend(int len)
 
     QDateTime dt=QDateTime::currentDateTime();
     trLoader->setQuery(sQuery.arg(fields).arg(dt.toTime_t()-tm[len]).arg(dt.toTime_t()).arg(tblName));
+    trLoader->setLen(len);
 
     trLoader->start();
 
