@@ -186,13 +186,14 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     t1->start();
     connect(t1,SIGNAL(timeout()),this,SLOT(setGraph()));
 
-    ui->regList->setCurrentIndex(n);
-    connect(ui->regList,SIGNAL(currentIndexChanged(int)),this,SLOT(changeReg(int)));
-    changeReg(n);
 
     // -------------
     trLoader = new TrendLoadThead(trChart);
     connect(trLoader,SIGNAL(finished()),t1,SLOT(start()));
+
+    ui->regList->setCurrentIndex(n);
+    connect(ui->regList,SIGNAL(currentIndexChanged(int)),this,SLOT(changeReg(int)));
+    changeReg(n);
 
 }
 
@@ -652,8 +653,11 @@ void RpanelReg::updateTrend(int len)
             fields+="0";
     }
     //qDebug() << sQuery.arg(RegDes[RegNum].field).arg(dt.toTime_t()-3600).arg(dt.toTime_t());
+
     QDateTime dt=QDateTime::currentDateTime();
     trLoader->setQuery(sQuery.arg(fields).arg(dt.toTime_t()-tm[len]).arg(dt.toTime_t()).arg(tblName));
+
+    trLoader->start();
 
 
 }

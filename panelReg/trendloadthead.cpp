@@ -2,9 +2,12 @@
 #include "../trendchar/trendchart.h"
 
 #include <QtSql>
+#include <QDebug>
 
 TrendLoadThead::TrendLoadThead(TrendChart *v):
-        trChart(v)
+        trChart(v),
+        len(0),
+        sQuery("")
 {
 }
 
@@ -14,7 +17,10 @@ void TrendLoadThead::run()
 
     // завантаження даних на графік із історії
     // QApplication::setOverrideCursor(Qt::WaitCursor);
-        QString conName;
+    // QString conName;
+    qDebug() << sQuery;
+    int countRec=0;
+
     {
         QSettings s;
 
@@ -40,12 +46,12 @@ void TrendLoadThead::run()
 
         QSqlDatabase dbs=QSqlDatabase::database("panelreg");
 
-        conName=dbs.connectionName();
-        //qDebug() << conName;
+        // conName=dbs.connectionName();
+        // qDebug() << conName;
 
         if(  dbs.isOpen())
         {
-            const int tm[3]={3600,1800,900},nLen[3]={1,2,4};
+            const int nLen[3]={1,2,4}; // tm[3]={3600,1800,900}
             int i,sLen=nLen[len];
             // очистити поточний графік
             trChart->fill(0);
@@ -64,22 +70,24 @@ void TrendLoadThead::run()
                     }
                     for(int n=0;n<sLen;++n) // заватажити точнку декілька раз, в залежністі від вибраної шкали
                         trChart->loadPoint(v);
+                    countRec++;
                 }
                 qry.clear();
             }
-            else
-            {
+//            else
+//            {
 //            QApplication::setOverrideCursor(Qt::ArrowCursor);
 //                QMessageBox::critical(this,tr("!!!Помилка виконання запиту"),qry.lastError().databaseText()+"\n!"+qry.lastQuery());
 //                qDebug() << qry.lastQuery();
-            }
+//            }
 
 
         }
 //        else
 //            QMessageBox::critical(this,tr("Не вдалося з\'єднатися із базою даних історії"),dbs.lastError().databaseText());
     }
-        QSqlDatabase::removeDatabase(conName);
+        QSqlDatabase::removeDatabase("panelreg");
+    qDebug() << "TrendLoadThead fineshed. countRec" << countRec;
 
         //QApplication::setOverrideCursor(Qt::ArrowCursor);
 
