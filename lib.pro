@@ -8,3 +8,4 @@ SUBDIRS  = rcada.pro \
 #            lib/test 
 #            lib/testscale
 
+CFLAGS += -ffast-math

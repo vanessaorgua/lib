@@ -18,6 +18,8 @@
 #include <QHeaderView>
 #include <QTableWidgetItem>
 
+#include <QMutex>
+
 // Функції-члени класу TrendWindow
 
 #include "historythread.h"
@@ -224,6 +226,7 @@ TrendWindow::TrendWindow(QWidget *p,struct trendinfo *tri,int nHeight) : QWidget
 
      QTimer::singleShot(0,this,SLOT(startHtr()));
 
+     mutex=new QMutex;
     // qDebug() << "TrendWindow init finished";
 }
 
@@ -295,6 +298,7 @@ TrendWindow::~TrendWindow()
     //htr->deleteLater();  // це треба перевірити валгріндом, тут може бути протікання....
     delete htr;
 
+    delete mutex;
 
 }
 
@@ -307,85 +311,92 @@ void TrendWindow::dataChange()
 {
 //     qDebug() << "start" << sender();
 
-    if(mState==1)
-        return ;
-
-    disconnect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
-
-    QString s="";
-    int i ;
-    
-    if(sender()!=NULL) // обробка зміни часу від навігаційних кнопок
+//    if(mState==1)
+//        return ;
+    if (mutex->tryLock())
     {
-	QString sndr=sender()->objectName();
-	if(sndr=="last")
-	{
-	    m_stop=QDateTime::currentDateTime();
-	}
-	else if(sndr=="forward")
-	{
-            m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]);
-	}
-	else if(sndr=="forwardHalf")
-	{
-            m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]/2);
-	}
-	else if(sndr=="backwardHalf")
-	{
-            m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]/2);
-	}
-	else if(sndr=="backward")
-	{
-            m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
-	}
-	else if(sndr=="calendarButton")
-	{
-	    myDateTimeDialog dt(this,m_stop);
-	    if(dt.exec()==QDialog::Accepted)
-	    {
-		m_stop.setDate(dt.date->selectedDate());
-		m_stop.setTime(QTime(dt.hour->value(),dt.minute->value(),dt.second->value()));
-	    }
-	}
+        disconnect(m_tw,SIGNAL(cursorMoved(int)),this,SLOT(setCursor(int)));
+
+        QString s="";
+        int i ;
+
+        if(sender()!=NULL) // обробка зміни часу від навігаційних кнопок
+        {
+            QString sndr=sender()->objectName();
+            if(sndr=="last")
+            {
+                m_stop=QDateTime::currentDateTime();
+            }
+            else if(sndr=="forward")
+            {
+                m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]);
+            }
+            else if(sndr=="forwardHalf")
+            {
+                m_stop=m_stop.addSecs(MyConst::tmr[m_ui->Interval->currentIndex()]/2);
+            }
+            else if(sndr=="backwardHalf")
+            {
+                m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]/2);
+            }
+            else if(sndr=="backward")
+            {
+                m_stop=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
+            }
+            else if(sndr=="calendarButton")
+            {
+                myDateTimeDialog dt(this,m_stop);
+                if(dt.exec()==QDialog::Accepted)
+                {
+                    m_stop.setDate(dt.date->selectedDate());
+                    m_stop.setTime(QTime(dt.hour->value(),dt.minute->value(),dt.second->value()));
+                }
+            }
+        }
+
+        // початок виконання запиту та малювання графіку
+        // QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        m_start=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
+
+        m_ui->startDate->setText(m_start.toString("hh:mm:ss\ndd:MM:yy"));
+        m_ui->stopDate->setText(m_stop.toString("hh:mm:ss\ndd:MM:yy"));
+
+        for(i=0;i<m_trinfo->numPlot;++i)  //визначення полів запиту. ті які не відображаються == -1 щоб бути поза зоною відображення
+        {
+            s+=",";
+            s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
+        }
+        //qDebug() << "FL s=" << s << "m_trinfo->numPlot = " << m_trinfo->numPlot;
+
+        // фінальна побудова запиту
+        sQuery=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
+
+        // робимо все асинхронно !!!!
+        //QTimer::singleShot(0,this,SLOT(sendQuery()));
+
+        mState=1;
+        m_pnDt.clear();
+
+        // qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
+        // ініціалізація об'єкта малювання графіку
+         m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
+            // виймання даних
+         m_nLen=0;
+
+         QApplication::setOverrideCursor(Qt::WaitCursor);
+
+         // qDebug() << "execQuery" << sQuery;
+
+         emit execQuery(sQuery);
+
+    }
+    else
+    {
+        qDebug() << "Mutex locked";
     }
 
-    // початок виконання запиту та малювання графіку
-    // QApplication::setOverrideCursor(Qt::WaitCursor);
-    
-    m_start=m_stop.addSecs(-MyConst::tmr[m_ui->Interval->currentIndex()]);
-
-    m_ui->startDate->setText(m_start.toString("hh:mm:ss\ndd:MM:yy"));
-    m_ui->stopDate->setText(m_stop.toString("hh:mm:ss\ndd:MM:yy"));
-
-    for(i=0;i<m_trinfo->numPlot;++i)  //визначення полів запиту. ті які не відображаються == -1 щоб бути поза зоною відображення
-    {	
-	s+=",";	
-	s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
-    }
-    //qDebug() << "FL s=" << s << "m_trinfo->numPlot = " << m_trinfo->numPlot;
-    
-    // фінальна побудова запиту
-    sQuery=m_sTmpl.arg(s).arg(m_trinfo->table).arg(m_start.toTime_t()).arg(m_stop.toTime_t());
-
-    // робимо все асинхронно !!!!
-    //QTimer::singleShot(0,this,SLOT(sendQuery()));
-
-    mState=1;
-    m_pnDt.clear();
-
-    // qDebug() << "Query :" << query.lastQuery() << " size:"  << query.size() ;
-    // ініціалізація об'єкта малювання графіку
-     m_tw->start(m_stop.toTime_t()-m_start.toTime_t(),m_trinfo->numPlot,m_nHeight);
-        // виймання даних
-     m_nLen=0;
-
-     QApplication::setOverrideCursor(Qt::WaitCursor);
-
-     // qDebug() << "execQuery" << sQuery;
-
-     emit execQuery(sQuery);
-
-}
+ }
 
 void TrendWindow::colorChange()
 {
@@ -435,70 +446,54 @@ void TrendWindow::plotChange()
 
 void TrendWindow::setCursor(int v)
 {
-    int i,step;
-    unsigned int pos;
-    static int ov=0;
-
-    if(mState==3)
-        return;
-
-    if(v==-1)
-	v=ov;
-    else
-	ov=v;
-
-    
-    pos=m_start.toTime_t()+ MyConst::tmr[m_ui->Interval->currentIndex()]*v/m_tw->width();
-
-    m_cursor.setTime_t(pos);    
-    m_ui->cursorDate->setText(m_cursor.toString("hh:mm:ss\ndd:MM:yy"));
-    
-    if(m_nLen > 1)
+    if(mutex->tryLock())
     {
-	step=i=m_nLen/2; // пошук найближчого значення. метод ловлі лева в пуслелі (метод дихотомії)
-	do
-	{	
-	    step>>=1;
-	    if(m_pnDt[i]>pos)
-		i-=step;
-	    else
-		i+=step;		
-	}while (step>0);
-	step=i; // зберегти значення
-	
-//	QSqlQuery qry(dbs);
-	QString s;
+        int i,step;
+        unsigned int pos;
+        static int ov=0;
 
-        for(i=0;i<m_trinfo->numPlot;++i)
+        if(v==-1)
+            v=ov;
+        else
+            ov=v;
+
+
+        pos=m_start.toTime_t()+ MyConst::tmr[m_ui->Interval->currentIndex()]*v/m_tw->width();
+
+        m_cursor.setTime_t(pos);
+        m_ui->cursorDate->setText(m_cursor.toString("hh:mm:ss\ndd:MM:yy"));
+
+        if(m_nLen > 1)
         {
-	    s+=",";
-    	    s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
-	}
+            step=i=m_nLen/2; // пошук найближчого значення. метод ловлі лева в пуслелі (метод дихотомії)
+            do
+            {
+                step>>=1;
+                if(m_pnDt[i]>pos)
+                    i-=step;
+                else
+                    i+=step;
+            }while (step>0);
+            step=i; // зберегти значення
 
-        mState=3;
-        emit execQuery(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step]));
+    //	QSqlQuery qry(dbs);
+            QString s;
 
-/*
-	if(qry.exec(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step])))
-	{
-	    qry.next();	    
-	    double val;	    
-	    for(i=0;i<m_trinfo->numPlot;++i)
-	    {
-                //qDebug() << i+1 << qry.value(i+1).toDouble() << m_trinfo->fScale[i][1] << m_trinfo->fScale[i][0] << m_nHeight;
+            for(i=0;i<m_trinfo->numPlot;++i)
+            {
+                s+=",";
+                s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
+            }
 
-                val=(qry.value(i+1).toDouble()*	(m_trinfo->fScale[i][1]-m_trinfo->fScale[i][0]))/(double)m_nHeight + m_trinfo->fScale[i][0];
-                m_ui->twAgr->item(i,0)->setText(QString("%1").arg(val,6,'f',2));
-		if(ps[i]->isChecked())
-		{
-                    m_ui->cursorVal->setValue(qry.value(i+1).toInt());
-                    m_ui->cursorLCD->display(fabs(val)<1.5?ceil(val):val);
+            mState=3;
+            emit execQuery(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step]));
 
-		}
-	    }
-	    qry.clear();
-	}
-*/
+        }
+
+    }
+    else
+    {
+        qDebug() << "setCursor: Mutex locked";
     }
 
 
@@ -618,7 +613,7 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
 
 void TrendWindow::changeState()     // це викликається в кінці обробки запиту;
 {
-    //qDebug() << "changeState" << mState;
+    qDebug() << "changeState" << mState;
 
     switch(mState)
     {
@@ -651,8 +646,15 @@ void TrendWindow::changeState()     // це викликається в кінц
 
         QTimer::singleShot(0,this,SLOT(setCursor()));
 
+
     default:
+
+        mutex->unlock();
+
+        qDebug() << "Mutex unlock";
+
         mState=0; // тут будемо дописувати .....
+
         break;
 
     }

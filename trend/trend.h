@@ -14,6 +14,7 @@
 
 class TrendView;
 class HistoryThread;
+class QMutex;
 
 struct trendinfo
 {
@@ -97,6 +98,9 @@ private:
 
     HistoryThread *htr;
     int mState; // змінна стану для вибоку дії з обробки рядків
+
+    QMutex *mutex;
+
 
 };
 
