@@ -28,3 +28,6 @@ UI_DIR = build
 RCC_DIR = build
 VERSION = 0.1.0
 FORMS += 
+
+QMAKE_CXXFLAGS_RELEASE += -ffast-math
+

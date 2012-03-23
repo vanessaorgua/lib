@@ -44,3 +44,5 @@ FORMS += trend/trend.ui \
     panelReg/panelReg.ui \
     trend/trendconstruct.ui
 INCLUDEPATH += include
+
+QMAKE_CXXFLAGS_RELEASE += -ffast-math
