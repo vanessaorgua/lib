@@ -3,13 +3,6 @@
 #include <QString>
 #include <QTimer>
 
-#define GETMCR 1
-#define PUTSCR 5
-#define PUTMCR 15
-
-#define GETMHR 3
-#define PUTSHR 6
-#define PUTMHR 16
 
 
 RxMelsec::RxMelsec(): nPort(5002) ,nC(0),plcAddr(1) // кноструктор, треба уточнити
@@ -136,7 +129,7 @@ void RxMelsec::slotRead()
 
         if(nLen==0) // читати заголовок
         {
-            if(pS->bytesAvailable()<11) // якщо тут мало байт
+            if(pS->bytesAvailable()<9) // якщо тут мало байт
             {
                 break;
             }
@@ -147,8 +140,7 @@ void RxMelsec::slotRead()
             in >> v16;
 
             in >> v16; // вичитати довжину
-            nLen=v16-2; // зкорегувати та зберегти довжину
-            in >> v16; // знову мусор
+            nLen=v16; // зкорегувати та зберегти довжину
 
             qDebug() << "nLen" << nLen;
 
@@ -158,15 +150,41 @@ void RxMelsec::slotRead()
             break;
         }
 
+        in >> v16; // знову мусор
         // отримано весь пакунок, розібрати на частини
         //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
-        QString data="";
-        for(int i=0;i<nLen;++i)
-        {
-            in >> bc;
-            data+=QString("%1 ").arg(qint32(bc)&0xff,2,16,QChar('0'));
+
+        //тепер тут є чотири варіанти
+        // 1 - отримано певну кількісит слів, котрі є регістрами D
+        // 2 - отримано певну кількість тетрад (спакованих в байти) котрі є бітами
+        // 3 - нічого не отримано, якщо перед цим була передача даних
+        // 4 - отримано якесь повідомлення про помилку у відповідь на передачу даних.
+        if(nC<query_list.size())  // якщо попереду був пакунок із query_list
+        { // тоді треба зберегти отримані від контролера дані
+            if(query_list[nC][18]==0xA8) // що то за дані якщо 0xA8 згачить D-регістри
+            {
+                for(int i=0;i<(nLen-2)/2;++i) // читати слова
+                {
+                    in >> v16;
+                    data_raw[Index[nC]+i]=v16;
+                }
+            }
+            else  // інакще там біти
+            {
+                for(int i=0;i<nLen-2;++i)
+                {
+                    in >> v8;
+                    data_raw[Index[nC]+i*2]=v8&0x10?-1:0;  // якось так.
+                    data_raw[Index[nC]+i*2+1]=v8&0x1?-1:0;
+                }
+            }
         }
-            qDebug() << data;
+        else // інакще щоб там не було споржнити до кінця
+        {
+            while(!in.atEnd()) // чи це спрацює ? треба ретельно перевірити....
+                in >> v8;
+        }
+
 
 #ifdef ASYNC
       //qDebug() << "nC " << nC  << "query_list.size()" << query_list.size() ;
@@ -208,6 +226,9 @@ void RxMelsec::slotRead()
     }
     connTimeout->stop();
     connTimeout->start();
+
+    qDebug() << data_raw;
+
 }
 
 int RxMelsec::loadList(QString fileName)
@@ -327,6 +348,9 @@ int RxMelsec::loadList(QString fileName)
                    // (current_ft==5 && last_ft!=5) ||  // кратність читання
                    // (current_ft!=5 && last_ft==5))    // чи зміну типу
                 {
+                    // Зберегти індекс в масиві даних
+                    Index << wc_last;
+
                     if(query.size()) // якщо щось є,
                     {
                         query_list <<  query; // зберегти

@@ -77,8 +77,8 @@ private:
     QQueue<QByteArray> query_queue; // черга на відправку даних в контролер
 #endif
 
-    int nC;
-    qint16 Index;
+    int nC;  // порядковий номер в query_list або прапор-вказівник на query_queue
+    QVector<int> Index; // сюди занесені індекси, куди писати дані.
 
 };
 
