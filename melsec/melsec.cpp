@@ -125,7 +125,7 @@ void RxMelsec::slotRead()
 {
     QDataStream in(pS);
     qint16 v16;
-    quint8 bc;
+    quint8 v8,bc;
 
     in.setByteOrder(QDataStream::LittleEndian); // встановити порядок байт
 
@@ -140,11 +140,17 @@ void RxMelsec::slotRead()
             {
                 break;
             }
-            in.device()->seek(7);
-            in  >> v16;
-            nLen=v16;
+            // вичитати мусор, можливо воно щось означає...
+            in >> v8;
+            in >> v16;
+            in >> v16;
             in >> v16;
 
+            in >> v16; // вичитати довжину
+            nLen=v16-2; // зкорегувати та зберегти довжину
+            in >> v16; // знову мусор
+
+            qDebug() << "nLen" << nLen;
 
         }
         if(pS->bytesAvailable()<nLen)
