@@ -26,7 +26,7 @@ RxMelsec::RxMelsec(): nPort(5002) ,nC(0),plcAddr(1) // кноструктор, �
     connect(connWait,SIGNAL(timeout()),this,SLOT(slotNewConnect()));
     // таймер для відліку таймайту з’єднання
     connTimeout=new QTimer(this);
-    connTimeout->setInterval(10000);
+    connTimeout->setInterval(30000);
     connect(connTimeout,SIGNAL(timeout()),this,SLOT(slotTimeout()));
 
     // сокет для здійснення обміну даними
@@ -52,6 +52,7 @@ void RxMelsec::slotConnected () // приєдналися
     qDebug() <<  "Connected to host" << sHostname;
     // slotSend(); // розпочати обмін
     pS->write(query_list[0]);
+    qDebug() << "query_list[0]" << query_list[0].size();
     nC=0;
     emit Alert(QString("Connected to PLC: %1:%2").arg(sHostname).arg(nPort));
 }
@@ -124,23 +125,27 @@ void RxMelsec::slotRead()
 {
     QDataStream in(pS);
     qint16 v16;
-    qint8  as,fc;
     quint8 bc;
 
-    in.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
+    in.setByteOrder(QDataStream::LittleEndian); // встановити порядок байт
+
+    qDebug() << "slotRead()" <<  pS->bytesAvailable() ;
 
     for(;;)
     {
+
         if(nLen==0) // читати заголовок
         {
-            if(pS->bytesAvailable()<6) // якщо тут мало байт
+            if(pS->bytesAvailable()<11) // якщо тут мало байт
             {
                 break;
             }
-            in >> Index; // id транзакції воно ж зміщення індекса в масиві даних
-            in >> v16; // id протоколу
-            in >> v16; // довжина пакунка
+            in.device()->seek(7);
+            in  >> v16;
             nLen=v16;
+            in >> v16;
+
+
         }
         if(pS->bytesAvailable()<nLen)
         {
@@ -148,57 +153,14 @@ void RxMelsec::slotRead()
         }
 
         // отримано весь пакунок, розібрати на частини
-        in >> as; // адреса ведомого
-        in >> fc; // код функції
         //qDebug() << "Start packet proccess Index" << Index << "nLen" << nLen << "as " << as << "fc" << fc;
-        switch(fc)
+        QString data="";
+        for(int i=0;i<nLen;++i)
         {
-            case GETMCR:
-                in >> bc; // прочитати кількість байт
-                //qDebug() <<  "dataLen " << dataLen[nC];
-                for(int i=0;i<bc;++i)
-                {
-                    qint8 v;
-                    in >> v; // a тепер це треба правильно розпакувати..........
-                    for(int j=0;j<8;++j)
-                    {
-                        int ix=i*8+j;
-                        if(ix<dataLen[nC])
-                        {
-                            data_raw[Index+ix]=qint16(v&0x01?-1:0); // все так от тільки чи влізе воно?
-                        }
-                        else
-                            break;
-                            v>>=1;
-                    }
-                }
-                break;
-            case GETMHR:
-                in >> bc; // прочитати кількість байт
-                bc >>= 1; // розрахувати кількість слів
-                //qDebug() << "bc" << bc;
-
-                for(int i=0;i<bc;++i) // в циклі
-                {
-                        in >> v16; // прочитати слова
-                        data_raw[Index+i]=v16; // та записати в масив даних
-                }
-
-                break;
-
-            case PUTSCR:
-            case PUTMCR:
-            case PUTSHR:
-            case PUTMHR:
-                //qDebug() << "Ok fc "<< fc << "nLen " << nLen;
-                for(int i=2;i<nLen;++i)
-                    in >>bc;
-                break;
-            default: // якщо якась неочікувана функція то просто очистити весь буфер
-                qDebug() << "Uncnown fc" << fc;
-                for(int i=2;i<nLen;++i)
-                    in >>bc;
+            in >> bc;
+            data+=QString("%1 ").arg(qint32(bc)&0xff,2,16,QChar('0'));
         }
+            qDebug() << data;
 
 #ifdef ASYNC
       //qDebug() << "nC " << nC  << "query_list.size()" << query_list.size() ;
@@ -377,7 +339,7 @@ int RxMelsec::loadList(QString fileName)
                         << qint8(1)                     // netv No
                         << plcAddr                      // Addres PLC
                         << qint8(0xFF) << qint8(0x03) << qint8(0x0) // не знаю що це
-                        << qint8(0xc0) << qint8(0x0)     // data length
+                        << qint8(0x0c) << qint8(0x0)     // data length
                         << qint8(0x30) << qint8(0x0)    // timer
                         << qint8(0x01) << qint8(0x4)    // command
                         << (type=="D" ?qint8(0x0):qint8(1)) << qint8(0x0)     // subcommand
@@ -522,6 +484,7 @@ void RxMelsec::start()
 
 void RxMelsec::sendValue(QString tag,qint16 v)
 {
+    /*
    QByteArray q;
    QDataStream qry(&q,QIODevice::WriteOnly);
 
@@ -548,11 +511,12 @@ void RxMelsec::sendValue(QString tag,qint16 v)
 #ifdef ASYNC
         query_queue.enqueue(q); // поставити в чергу на відправку в контролер
 #endif
-    }
+    } */
 }
 
 void RxMelsec::sendValue(QString tag,qint32 v)
 {
+    /*
     QVector<qint16> t(2);
     *((qint32*)t.data())=v;
 
@@ -560,13 +524,13 @@ void RxMelsec::sendValue(QString tag,qint32 v)
         data_scale[tag][0]=((double)v/4000.0*(data_scale[tag][2]-data_scale[tag][1])+data_scale[tag][1]);
 
     sendValue(tag,t);
-
+*/
 }
 
 
 void RxMelsec::sendValue(QString tag,double v)
 {
-    QVector<qint16> t(2);
+/*    QVector<qint16> t(2);
     *((float*)t.data())=(float)v;
 
     if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
@@ -575,12 +539,12 @@ void RxMelsec::sendValue(QString tag,double v)
         qDebug() << "tag "  << tag << " value " <<  v << "scaled " << data_scale[tag][0];
     }
 
-    sendValue(tag,t);
+    sendValue(tag,t); */
 }
 
 void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 {
-   QByteArray q;
+    /*   QByteArray q;
    QDataStream qry(&q,QIODevice::WriteOnly);
 
    qry.setByteOrder(QDataStream::BigEndian);
@@ -619,7 +583,7 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 
         }
 
-    }
+    } */
 }
 
 
