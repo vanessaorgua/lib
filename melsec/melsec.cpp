@@ -12,7 +12,7 @@
 #define PUTMHR 16
 
 
-RxMelsec::RxMelsec(): nPort(502) ,nC(0) // кноструктор, треба уточнити
+RxMelsec::RxMelsec(): nPort(5002) ,nC(0),plcAddr(1) // кноструктор, треба уточнити
 {
 
     // теймер для періодичної відправки запитів
@@ -249,6 +249,7 @@ int RxMelsec::loadList(QString fileName)
     int i;
     QString s;
     QStringList sl;
+    QString type,type_old;
     int wc=0, wc_last=0; // лічильник слів
 
     qint16 next_addr=0,current_addr=0; //адреси
@@ -259,6 +260,7 @@ int RxMelsec::loadList(QString fileName)
 
     QByteArray query;
     QDataStream qry(&query,QIODevice::WriteOnly);
+    qry.setByteOrder(QDataStream::LittleEndian);
 
     QHash<QString,QString> tag_scale; // тут будуть теги, які шкалюються по іншому параметру
 
@@ -266,7 +268,12 @@ int RxMelsec::loadList(QString fileName)
     ft << "Integer" << "Bool" << "Real" << "Timer" << "Long" << "EBOOL" ;
     qint16 current_ft=0,last_ft=0; // пити полів, для виявлення EBOOL
 
-    qry.setByteOrder(QDataStream::BigEndian); // встановити порядок байт
+    QHash<QString,qint8>  cmdpref;
+    cmdpref["D"]=qint8(0xA8);
+    cmdpref["X"]=qint8(0x9C);
+    cmdpref["Y"]=qint8(0x9D);
+    cmdpref["M"]=qint8(0x90);
+    cmdpref["L"]=qint8(0x92);
 
     //qDebug() << "file " << fileName;
 
@@ -288,25 +295,42 @@ int RxMelsec::loadList(QString fileName)
             {
                 s= sl[0]; // назва тега
                 //qDebug() << s;
-                current_addr=sl[1].toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
+
+                type_old=type;
+                type=sl[1].left(1);
+                if(type=="X" || type=="Y") // це кодується в 16-й системі
+                    current_addr=sl[1].right(sl[1].size()-1).toInt(0,16);
+                else
+                    current_addr=sl[1].right(sl[1].size()-1).toInt(); // індекс, тут би для повного щася треба б було перевірити чи воно правильно перетворилося на число
+
+
                 tags[s] << wc             // 0-index
                         << current_addr ; // 1- address
+
                 current_rf=sl[3].toInt();
                 wc_last=wc; // це потрібно для правильного формування поля id транзакції яке містить зміщення індексу в масиві даних
                             // метод не зовсім стандартний, на інших контролерах може і не буде працювати
 
                 // розпізнати типи даних
-                if(sl[2]=="Integer" || sl[2]=="Bool" )
+                if(type=="D")
                 {
-                    ++wc;
-                    current_len=1;
+                    if(sl[2]=="Integer"  )
+                    {
+                        ++wc;
+                        current_len=1;
+                    }
+                    else if (sl[2]=="Real" || sl[2]=="Timer" || sl[2]=="Long" )
+                    {
+                        wc+=2;
+                        current_len=2;
+                    }
+                    else
+                    {
+                        qDebug() << tr("Unknown data type") << sl[2] << sl;
+                        ::exit(1);
+                    }
                 }
-                else if (sl[2]=="Real" || sl[2]=="Timer" || sl[2]=="Long" )
-                {
-                    wc+=2;
-                    current_len=2;
-                }
-                else if(sl[2]=="EBOOL") // це спеціально для шнайдера
+                else if(type=="M" || type=="L" || type=="X" || type=="Y") // це точно байт
                 {
                     ++wc;
                     current_len=1;
@@ -314,7 +338,7 @@ int RxMelsec::loadList(QString fileName)
                 }
                 else // невідомий тип даних
                 {
-                    qDebug() << tr("Unknown data type") << sl[2] << sl;
+                    qDebug() << tr("Unknown data type") << type << sl[2] << sl;
                     ::exit(1);
                 }
 
@@ -323,11 +347,17 @@ int RxMelsec::loadList(QString fileName)
                 tags[s] << current_ft   // 2-довжина !!! це місце треба перевірити
                         << current_rf   // 3-кратність читання
                         << sl[4].toInt() // 4-прапори запису історії
-                        << 0 ; // 5 шкаліровка, може мінятися далі в програмі
+                        << 0  // 5 шкаліровка, може мінятися далі в програмі
+                        << type.at(0).unicode() ; // 6 тип змінної
 
                 packet_len+=current_len;
 
-                if(packet_len>124 || current_addr>next_addr || current_rf!=last_rf || (current_ft==5 && last_ft!=5) || (current_ft!=5 && last_ft==5)) //виявити дірки, межі пакунків, кратність читання чи зміну типу
+                if( // packet_len>124 ||
+                   current_addr>next_addr ||         // виявити дірки,
+                   current_rf!=last_rf ||            // межі пакунків,
+                   type != type_old )                 // зміна типу
+                   // (current_ft==5 && last_ft!=5) ||  // кратність читання
+                   // (current_ft!=5 && last_ft==5))    // чи зміну типу
                 {
                     if(query.size()) // якщо щось є,
                     {
@@ -342,7 +372,19 @@ int RxMelsec::loadList(QString fileName)
                     query.clear();
                     // сформувати заголовок
                     packet_len=current_len;
-                    qry << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1); // ід транзакції << ід протокола << довжина << адреса слейва << код функції << стартова адреса
+                        // сформувати запит
+                        qry << qint8(0x50) << qint8(0)  // subheader
+                        << qint8(1)                     // netv No
+                        << plcAddr                      // Addres PLC
+                        << qint8(0xFF) << qint8(0x03) << qint8(0x0) // не знаю що це
+                        << qint8(0xc0) << qint8(0x0)     // data length
+                        << qint8(0x30) << qint8(0x0)    // timer
+                        << qint8(0x01) << qint8(0x4)    // command
+                        << (type=="D" ?qint8(0x0):qint8(1)) << qint8(0x0)     // subcommand
+                        << current_addr << qint8(0x0)     // start
+                                                        // адреса задається в трома байтами, тут старший завжди нуль, відповідно можна отримати тільки 65536 слів
+                        << cmdpref[type] ;                  // Data type
+                        //<< qint16(0x0);    // len
                                                                                           //^^^^^^^^^^^^^^^^^^^^^^ можливо для інших контролерів цей декримент непотрібен
                     //qDebug() << qint16(wc_last) << qint16(0) << qint16(6) << qint8(1) <<  qint8(sl[2]=="EBOOL"?GETMCR:GETMHR) << qint16(current_addr-1);
                     query_read << current_rf; //прапор read на пакунок
@@ -442,6 +484,17 @@ int RxMelsec::loadList(QString fileName)
         //qDebug() << tags.keys();
 
         //loadScale(fileName);
+        qDebug() << "Query list ------------";
+        foreach(QByteArray ba, query_list)
+        {
+            QString out="";
+            foreach(qint8 b,ba)
+            {
+                out+=QString("0x%1,\n").arg(qint32(b)&0xFF,2,16,QChar('0'));
+            }
+            qDebug() << ba.size() << "--\n" << out << "--";
+        }
+        qDebug() << "-----------------------";
         return i;
     }
     else

@@ -8,7 +8,6 @@ QT += network \
 TEMPLATE = lib
 CONFIG += staticlib
 SOURCES += modbus/RxModbus.cpp \
-    melsec\melsec.cpp \
     logging/logging.cpp \
     logsqlite/logsqlite.cpp \
     ionetserver/IoNetServer.cpp \
@@ -17,7 +16,6 @@ SOURCES += modbus/RxModbus.cpp \
     alert/alert.cpp \
     melsec/melsec.cpp
 HEADERS += modbus/RxModbus.h \
-    melsec\melsec.cpp \
     logging/logging.h \
     logsqlite/logsqlite.h \
     iodev.h \

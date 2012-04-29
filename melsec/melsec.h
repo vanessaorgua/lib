@@ -58,6 +58,7 @@ private:
     QTcpSocket *pS; //сокет для зв’язку
     QString sHostname; // ім’я чи IP-адреса контролера
     int nPort; // номер порта, за замовчанням має бути 502
+    qint8 plcAddr;
     qint16 nI; // це буде індекс пакунка
     int nLen; // довжина наступноно бока даних
 
@@ -70,7 +71,7 @@ private:
     QVector<QByteArray> query_list;
     QVector<int> dataLen; // довжина відповіді в словах
 
-    QVector<qint16> query_read,local_read;
+    QVector<qint16> query_read,local_read; // це що таке ?
 
 #ifdef ASYNC
     QQueue<QByteArray> query_queue; // черга на відправку даних в контролер
