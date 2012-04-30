@@ -80,6 +80,8 @@ private:
     int nC;  // порядковий номер в query_list або прапор-вказівник на query_queue
     QVector<int> Index; // сюди занесені індекси, куди писати дані.
 
+    QHash<QString,qint8>  cmdpref; // це буде перекодувальник типу адреси
+
 };
 
 

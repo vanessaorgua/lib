@@ -29,6 +29,11 @@ RxMelsec::RxMelsec(): nPort(5002) ,nC(0),plcAddr(1) // кноструктор, �
     connect(pS,SIGNAL(readyRead()),this,SLOT(slotRead()));
     connect(pS,SIGNAL(disconnected()),this,SLOT(slotDisconnect()));
 
+    cmdpref["D"]=qint8(0xA8);
+    cmdpref["X"]=qint8(0x9C);
+    cmdpref["Y"]=qint8(0x9D);
+    cmdpref["M"]=qint8(0x90);
+    cmdpref["L"]=qint8(0x92);
     // десь тут ще потрібно сформувати пакунок на запити
 }
 
@@ -45,7 +50,7 @@ void RxMelsec::slotConnected () // приєдналися
     qDebug() <<  "Connected to host" << sHostname;
     // slotSend(); // розпочати обмін
     pS->write(query_list[0]);
-    qDebug() << "query_list[0]" << query_list[0].size();
+    // qDebug() << "query_list[0]" << query_list[0].size();
     nC=0;
     emit Alert(QString("Connected to PLC: %1:%2").arg(sHostname).arg(nPort));
 }
@@ -122,7 +127,7 @@ void RxMelsec::slotRead()
 
     in.setByteOrder(QDataStream::LittleEndian); // встановити порядок байт
 
-    qDebug() << "slotRead()" <<  pS->bytesAvailable() ;
+    // qDebug() << "slotRead()" <<  pS->bytesAvailable() ;
 
     for(;;)
     {
@@ -142,7 +147,7 @@ void RxMelsec::slotRead()
             in >> v16; // вичитати довжину
             nLen=v16; // зкорегувати та зберегти довжину
 
-            qDebug() << "nLen" << nLen;
+            // qDebug() << "nLen" << nLen;
 
         }
         if(pS->bytesAvailable()<nLen)
@@ -227,7 +232,7 @@ void RxMelsec::slotRead()
     connTimeout->stop();
     connTimeout->start();
 
-    qDebug() << data_raw;
+    // qDebug() << data_raw;
 
 }
 
@@ -257,12 +262,7 @@ int RxMelsec::loadList(QString fileName)
     ft << "Integer" << "Bool" << "Real" << "Timer" << "Long" << "EBOOL" ;
     qint16 current_ft=0,last_ft=0; // пити полів, для виявлення EBOOL
 
-    QHash<QString,qint8>  cmdpref;
-    cmdpref["D"]=qint8(0xA8);
-    cmdpref["X"]=qint8(0x9C);
-    cmdpref["Y"]=qint8(0x9D);
-    cmdpref["M"]=qint8(0x90);
-    cmdpref["L"]=qint8(0x92);
+
 
     //qDebug() << "file " << fileName;
 
@@ -337,7 +337,7 @@ int RxMelsec::loadList(QString fileName)
                         << current_rf   // 3-кратність читання
                         << sl[4].toInt() // 4-прапори запису історії
                         << 0  // 5 шкаліровка, може мінятися далі в програмі
-                        << type.at(0).unicode() ; // 6 тип змінної
+                        << cmdpref[type] ; // 6 тип змінної
 
                 packet_len+=current_len;
 
@@ -476,6 +476,7 @@ int RxMelsec::loadList(QString fileName)
         //qDebug() << tags.keys();
 
         //loadScale(fileName);
+/*
         qDebug() << "Query list ------------";
         foreach(QByteArray ba, query_list)
         {
@@ -486,7 +487,8 @@ int RxMelsec::loadList(QString fileName)
             }
             qDebug() << ba.size() << "--\n" << out << "--";
         }
-        qDebug() << "-----------------------";
+        qDebug() << "-----------------------"; */
+
         return i;
     }
     else
@@ -574,26 +576,77 @@ void RxMelsec::sendValue(QString tag,double v)
 
 void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 {
-    /*   QByteArray q;
+
+   QByteArray q;
    QDataStream qry(&q,QIODevice::WriteOnly);
 
-   qry.setByteOrder(QDataStream::BigEndian);
+   qry.setByteOrder(QDataStream::LittleEndian);
+   QVector<qint8> vp; // масив, у якому будуть підгтовані для передачі дані
 
    if(tags.contains(tag) ) // перевірити наявність заданого тега
    {
-        qry << qint16(0) << qint16(0) << qint16((v.size()<<1)+7)  // TCP заголовок
-           << qint8(1) << qint8(PUTMHR)               // модбас заголовок
-           << qint16(tags[tag][1]-1)             // адреса даних
-           << qint16(v.size())                     // довжина даних
-           << qint8(v.size()<< 1);                 // кількість байт
-        int x=tags[tag][0];
-        foreach(qint16 t,v)
+
+   if(quint8(tags[tag][6])!=0xA8)  // якщо D-регістер
+   {
+       if(tags[tag][6]==0x9D) // якщ там Y-решісти
+           return; // далі можна не продовжувати
+       if(v.size()%2) // кількість змінних має бути парною, інакше буде проблема
+       {
+           if(data_raw.size()>tags[tag][0]+v.size()) // треба б перевірити чи він існує
+             v << data_raw[tags[tag][0]+v.size() ]; // додати ще один елемент,
+           else
+             v << 0; // якщо даних немає тоді запхнути ’0’ але тут може бути проблема якщо в контролері в програми цей адрес використовується
+
+       }
+       for(int i=0;i<v.size();i+=2)
+           vp << qint8( (v[i]==0?0:0x10 )|v[i+1]==0?0:0x01  );
+   }
+
+   //qDebug() << tag << QString("%1").arg(qint32(tags[tag][6])&0xff,2,16,QChar('0')) <<  v;
+
+
+       qry << qint8(0x50) << qint8(0)                                 // subheader
+       << qint8(1)                                                    // netv No
+       << plcAddr                                                     // Addres PLC
+       << qint8(0xFF) << qint8(0x03) << qint8(0x0)                    // не знаю що це
+       << qint16((quint8(tags[tag][6])==0xA8?(v.size()*2):vp.size())+12)          // data length
+       << qint8(0x30) << qint8(0x0)                                   // timer
+       << qint8(0x01) << qint8(0x14)                                  // command
+       << ( tags[tag][6]==0xA8 ?qint8(0x1):qint8(0)) << qint8(0x0)    // subcommand
+
+       << qint16(tags[tag][1]) << qint8(0x0)     // start
+                                                 // адреса задається в трома байтами, тут старший завжди нуль, відповідно можна отримати тільки 65536 слів
+       << qint8(tags[tag][6])                           // Data type
+       << qint16(v.size()) ;                     // Розмір масиву з даними.
+
+       int x=tags[tag][0];
+
+        if(quint8(tags[tag][6])==0xA8)
         {
+            foreach(qint16 t,v)
+            {
              qry << t; // завантажити дані
              data_raw[x++]=t; // записати в буфер
+            }
         }
+/*        else
+        {
+            foreach(qint8 t,vp)
+            {
+             qry << t; // завантажити дані
+            }
+        } */
+
+        {       QString s="";
+        qDebug() << "sendValue() ----------------------------";
+        foreach (quint8 val, q) {
+            s+=QString("%1 ").arg(quint32(val)&0xFF,2,16,QChar('0'));
+        }
+        qDebug() << "Size" << q.size() << "\n" << s;
+        qDebug() << "-----------------------------------------";
+ }
 #ifdef ASYNC
-        query_queue.enqueue(q); // поставити в чергу на відправку в контролер
+       query_queue.enqueue(q); // поставити в чергу на відправку в контролер
 #endif
         if(data_scale.contains(tag) && v.size()==2) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його і записувалося одиночне значення
         {
@@ -613,7 +666,7 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 
         }
 
-    } */
+    }
 }
 
 
