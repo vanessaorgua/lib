@@ -296,6 +296,7 @@ int RxMelsec::loadList(QString fileName)
                 tags[s] << wc             // 0-index
                         << current_addr ; // 1- address
 
+
                 current_rf=sl[3].toInt();
                 wc_last=wc; // це потрібно для правильного формування поля id транзакції яке містить зміщення індексу в масиві даних
                             // метод не зовсім стандартний, на інших контролерах може і не буде працювати
@@ -582,6 +583,8 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 
    qry.setByteOrder(QDataStream::LittleEndian);
    QVector<qint8> vp; // масив, у якому будуть підгтовані для передачі дані
+   qint16 pLen,vLen=v.size();
+
 
    if(tags.contains(tag) ) // перевірити наявність заданого тега
    {
@@ -591,15 +594,16 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
        if(tags[tag][6]==0x9D) // якщ там Y-решісти
            return; // далі можна не продовжувати
        if(v.size()%2) // кількість змінних має бути парною, інакше буде проблема
-       {
-           if(data_raw.size()>tags[tag][0]+v.size()) // треба б перевірити чи він існує
-             v << data_raw[tags[tag][0]+v.size() ]; // додати ще один елемент,
-           else
-             v << 0; // якщо даних немає тоді запхнути ’0’ але тут може бути проблема якщо в контролері в програми цей адрес використовується
+           v << 0; // дописати нуль, контролер його проігнорує
+     for(int i=0;i<v.size();i+=2)
+           vp << qint8( (v[i]?0x10:0 )| (v[i+1]?0x01:0)  );
 
-       }
-       for(int i=0;i<v.size();i+=2)
-           vp << qint8( (v[i]==0?0:0x10 )|v[i+1]==0?0:0x01  );
+     pLen=vp.size();
+     qDebug() << "vp" <<  vp;
+   }
+   else
+   {
+       pLen=v.size()*2;
    }
 
    //qDebug() << tag << QString("%1").arg(qint32(tags[tag][6])&0xff,2,16,QChar('0')) <<  v;
@@ -609,33 +613,37 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
        << qint8(1)                                                    // netv No
        << plcAddr                                                     // Addres PLC
        << qint8(0xFF) << qint8(0x03) << qint8(0x0)                    // не знаю що це
-       << qint16((quint8(tags[tag][6])==0xA8?(v.size()*2):vp.size())+12)          // data length
+       << qint16(pLen+12)          // data length
        << qint8(0x30) << qint8(0x0)                                   // timer
        << qint8(0x01) << qint8(0x14)                                  // command
-       << ( tags[tag][6]==0xA8 ?qint8(0x1):qint8(0)) << qint8(0x0)    // subcommand
+       << ( quint8(tags[tag][6])==0xA8 ?qint8(0x0):qint8(1)) << qint8(0x0)    // subcommand
+       // << qint8(0x1) << qint8(0x0)    // subcommand
 
        << qint16(tags[tag][1]) << qint8(0x0)     // start
                                                  // адреса задається в трома байтами, тут старший завжди нуль, відповідно можна отримати тільки 65536 слів
        << qint8(tags[tag][6])                           // Data type
-       << qint16(v.size()) ;                     // Розмір масиву з даними.
+       << vLen ;                     // Розмір масиву з даними.
 
-       int x=tags[tag][0];
 
         if(quint8(tags[tag][6])==0xA8)
         {
             foreach(qint16 t,v)
             {
              qry << t; // завантажити дані
-             data_raw[x++]=t; // записати в буфер
             }
         }
-/*        else
+        else
         {
             foreach(qint8 t,vp)
             {
              qry << t; // завантажити дані
             }
-        } */
+        }
+
+        // наступний фрагмент занесе змінені дані в сховище
+        int x=tags[tag][0];
+        foreach(qint16 t,v)
+            data_raw[x++]=t; // записати в буфер
 
         {       QString s="";
         qDebug() << "sendValue() ----------------------------";
