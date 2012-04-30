@@ -517,39 +517,13 @@ void RxMelsec::start()
 
 void RxMelsec::sendValue(QString tag,qint16 v)
 {
-    /*
-   QByteArray q;
-   QDataStream qry(&q,QIODevice::WriteOnly);
-
-   qry.setByteOrder(QDataStream::BigEndian);
-
-   if(tags.contains(tag) ) // перевірити наявність заданого тега
-   {
-        qry << qint16(0) << qint16(0) << qint16(6)  // TCP заголовок
-           << qint8(1) ;
-        if(tags[tag][2]!=5)
-        {
-            qry << qint8(PUTSHR)             // модбас заголовок
-           << qint16(tags[tag][1]-1)                // адреса даних
-           << v;                            // самі дані
-        }
-        else
-        {
-            qry << qint8(PUTSCR)             // модбас заголовок
-           << qint16(tags[tag][1]-1)                // адреса даних
-           << qint16(v?0xFF00:0);                            // самі дані
-        }
-
-        data_raw[tags[tag][0]]=v; // записати в буфер
-#ifdef ASYNC
-        query_queue.enqueue(q); // поставити в чергу на відправку в контролер
-#endif
-    } */
+    QVector<qint16> t;
+    t << v;
+    sendValue(tag,t);
 }
 
 void RxMelsec::sendValue(QString tag,qint32 v)
 {
-    /*
     QVector<qint16> t(2);
     *((qint32*)t.data())=v;
 
@@ -557,13 +531,12 @@ void RxMelsec::sendValue(QString tag,qint32 v)
         data_scale[tag][0]=((double)v/4000.0*(data_scale[tag][2]-data_scale[tag][1])+data_scale[tag][1]);
 
     sendValue(tag,t);
-*/
 }
 
 
 void RxMelsec::sendValue(QString tag,double v)
 {
-/*    QVector<qint16> t(2);
+    QVector<qint16> t(2);
     *((float*)t.data())=(float)v;
 
     if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
@@ -572,7 +545,7 @@ void RxMelsec::sendValue(QString tag,double v)
         qDebug() << "tag "  << tag << " value " <<  v << "scaled " << data_scale[tag][0];
     }
 
-    sendValue(tag,t); */
+    sendValue(tag,t);
 }
 
 void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
@@ -591,7 +564,7 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 
    if(quint8(tags[tag][6])!=0xA8)  // якщо D-регістер
    {
-       if(tags[tag][6]==0x9D) // якщ там Y-решісти
+       if(tags[tag][6]==0x9C) // якщ там X-регісти
            return; // далі можна не продовжувати
        if(v.size()%2) // кількість змінних має бути парною, інакше буде проблема
            v << 0; // дописати нуль, контролер його проігнорує
@@ -599,7 +572,7 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
            vp << qint8( (v[i]?0x10:0 )| (v[i+1]?0x01:0)  );
 
      pLen=vp.size();
-     qDebug() << "vp" <<  vp;
+     // qDebug() << "vp" <<  vp;
    }
    else
    {
@@ -645,14 +618,15 @@ void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
         foreach(qint16 t,v)
             data_raw[x++]=t; // записати в буфер
 
-        {       QString s="";
+        /*{       QString s="";
         qDebug() << "sendValue() ----------------------------";
         foreach (quint8 val, q) {
             s+=QString("%1 ").arg(quint32(val)&0xFF,2,16,QChar('0'));
         }
         qDebug() << "Size" << q.size() << "\n" << s;
         qDebug() << "-----------------------------------------";
- }
+ }*/
+
 #ifdef ASYNC
        query_queue.enqueue(q); // поставити в чергу на відправку в контролер
 #endif
