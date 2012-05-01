@@ -1,5 +1,6 @@
-#ifndef RXMODBUS_H
-#define RXMODBUS_H
+#ifndef __RXMELSEC_H__
+#define __RXMELSEC_H__
+
 
 // даний клас реалізує інтерфейс доступу до пам’яті контролера.
 
