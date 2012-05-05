@@ -2,6 +2,7 @@
 
 #include <QString>
 #include <QTimer>
+#include <QDebug>
 
 
 
@@ -517,6 +518,8 @@ void RxMelsec::start()
 
 void RxMelsec::sendValue(QString tag,qint16 v)
 {
+//    qDebug() << "sendValue(qint16" << tag << "," << v << ") type" << tags[tag][2];
+
     QVector<qint16> t;
     t << v;
     sendValue(tag,t);
@@ -524,6 +527,8 @@ void RxMelsec::sendValue(QString tag,qint16 v)
 
 void RxMelsec::sendValue(QString tag,qint32 v)
 {
+//    qDebug() << "sendValue(qint32 " << tag << "," << v << ") type" << tags[tag][2];
+
     QVector<qint16> t(2);
     *((qint32*)t.data())=v;
 
@@ -537,6 +542,9 @@ void RxMelsec::sendValue(QString tag,qint32 v)
 void RxMelsec::sendValue(QString tag,double v)
 {
     QVector<qint16> t(2);
+
+//    qDebug() << "sendValue(doulbe " << tag << "," << v << ") type" << tags[tag][2];
+
     switch(tags[tag][2])
     {
         case 2:
@@ -544,14 +552,11 @@ void RxMelsec::sendValue(QString tag,double v)
             sendValue(tag,t);
             break;
         case 0:
-            t.clear();
-            t<< v;
-            sendValue(tag,t);
+            sendValue(tag,qint16(v));
             break;
         case 3:
         case 4:
-            *((qint32*)t.data())=qint32(v);
-            sendValue(tag,t);
+            sendValue(tag,qint32(v));
             break;
     }
 
@@ -566,7 +571,9 @@ void RxMelsec::sendValue(QString tag,double v)
 void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
 {
 
-   QByteArray q;
+//    qDebug() << "sendValue(QVector<qint16> " << tag << "," << v << ") type" << tags[tag][2];
+
+    QByteArray q;
    QDataStream qry(&q,QIODevice::WriteOnly);
 
    qry.setByteOrder(QDataStream::LittleEndian);
