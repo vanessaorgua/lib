@@ -44,10 +44,32 @@ public:
         return tags.contains(tag)?*(qint32*)(data_raw.data()+tags[tag][0]):0;
     }
 
-    inline float getValueFloat(QString tag)
+
+
+    double getValueFloat(QString tag)
     {
-        return tags.contains(tag) && tags[tag][0]<data_raw.size() ? *(float*)(data_raw.data()+tags[tag][0]):0.0;
+        double v=0.0;
+        if (tags.contains(tag) && tags[tag][0]<data_raw.size() )
+        {
+            switch(tags[tag][2]) // перевірити тип змінної
+            {   case 2:
+                    v= *(float*)(data_raw.data()+tags[tag][0]);
+                    break;
+                case 0:
+                    v=data_raw[tags[tag][0]];
+                    break;
+                case 3:
+                case 4:
+                    v=*(qint32*)(data_raw.data()+tags[tag][0]);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return v;
     }
+
+
 
 
 

@@ -514,7 +514,26 @@ void RxModbus::sendValue(QString tag,qint32 v)
 void RxModbus::sendValue(QString tag,double v)
 {
     QVector<qint16> t(2);
-    *((float*)t.data())=(float)v;
+
+    switch(tags[tag][2])
+    {
+        case 2:
+            *((float*)t.data())=(float)v;
+            sendValue(tag,t);
+            break;
+        case 0:
+            t.clear();
+            t<< v;
+            sendValue(tag,t);
+            break;
+        case 3:
+        case 4:
+            *((qint32*)t.data())=qint32(v);
+            sendValue(tag,t);
+            break;
+    }
+
+
 
     if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
     {

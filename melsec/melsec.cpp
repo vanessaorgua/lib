@@ -123,7 +123,7 @@ void RxMelsec::slotRead()
 {
     QDataStream in(pS);
     qint16 v16;
-    quint8 v8,bc;
+    quint8 v8;
 
     in.setByteOrder(QDataStream::LittleEndian); // встановити порядок байт
 
@@ -166,7 +166,7 @@ void RxMelsec::slotRead()
         // 4 - отримано якесь повідомлення про помилку у відповідь на передачу даних.
         if(nC<query_list.size())  // якщо попереду був пакунок із query_list
         { // тоді треба зберегти отримані від контролера дані
-            if(query_list[nC][18]==0xA8) // що то за дані якщо 0xA8 згачить D-регістри
+            if(quint8(query_list[nC][18])==0xA8) // що то за дані якщо 0xA8 згачить D-регістри
             {
                 for(int i=0;i<(nLen-2)/2;++i) // читати слова
                 {
@@ -537,7 +537,23 @@ void RxMelsec::sendValue(QString tag,qint32 v)
 void RxMelsec::sendValue(QString tag,double v)
 {
     QVector<qint16> t(2);
-    *((float*)t.data())=(float)v;
+    switch(tags[tag][2])
+    {
+        case 2:
+            *((float*)t.data())=(float)v;
+            sendValue(tag,t);
+            break;
+        case 0:
+            t.clear();
+            t<< v;
+            sendValue(tag,t);
+            break;
+        case 3:
+        case 4:
+            *((qint32*)t.data())=qint32(v);
+            sendValue(tag,t);
+            break;
+    }
 
     if(data_scale.contains(tag)) // якщо датий  тег присутній в масиві шкальованих значень тоді відшкалювати його
     {
@@ -545,7 +561,6 @@ void RxMelsec::sendValue(QString tag,double v)
         qDebug() << "tag "  << tag << " value " <<  v << "scaled " << data_scale[tag][0];
     }
 
-    sendValue(tag,t);
 }
 
 void RxMelsec::sendValue(QString tag,QVector<qint16> &v)
