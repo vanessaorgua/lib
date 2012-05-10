@@ -55,16 +55,20 @@ void HistoryThread::run()
 
         QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 
+
+
+        connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
+
+
         if(dbs.isOpen())             // важко сказати чи так правильно....
         {
             // з’єднати класи
             connect(&s,SIGNAL(pullRows(QStringList)),p,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
             connect(&s,SIGNAL(endQuery()),p,SLOT(changeState()),Qt::QueuedConnection);
-            connect(&s,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
+            connect(&s,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection); // під’єднати повідомлення про помилку.
 
             connect(p,SIGNAL(execQuery(QString)),&s,SLOT(runQuery(QString)),Qt::QueuedConnection);
 
-            connect(this,SIGNAL(dbError(QString)),p,SLOT(showErrorText(QString)),Qt::QueuedConnection);
 
             qDebug() << "Start HistoryThread";
 

@@ -20,8 +20,9 @@ void NetIoDev::sendValue(QString tag,qint16 v)
 {
     QVector<qint16> t;
 
-    switch(tags[tag][2])
-    {
+    if(tags.contains(tag)){
+        switch(tags[tag][2])
+        {
         case 2: // Real
             t << 0 << 0;
             *((float*)t.data())=(float)v;
@@ -43,11 +44,18 @@ void NetIoDev::sendValue(QString tag,qint16 v)
         default:
             break;
    }
+    }
+    else
+    {
+        qDebug() << "sendValue: tag" << tag << "not found";
+    }
 }
 
 void NetIoDev::sendValue(QString tag,qint32 v)
 {
     QVector<qint16> t(2);
+
+    if(tags.contains(tag)){
 
     switch(tags[tag][2])
     {
@@ -68,6 +76,11 @@ void NetIoDev::sendValue(QString tag,qint32 v)
         default:
             break;
    }
+    }
+    else
+    {
+        qDebug() << "sendValue: tag" << tag << "not found";
+    }
 
 }
 
@@ -77,6 +90,7 @@ void NetIoDev::sendValue(QString tag,double v)
 //    *(float*)t.data()  = (float)v;
 //    sendValue(tag,t);
 
+    if(tags.contains(tag)){
 
     // qDebug() << "sendValue(doulbe " << tag << "," << v << ") type" << tags[tag][2];
         switch(tags[tag][2])
@@ -97,6 +111,11 @@ void NetIoDev::sendValue(QString tag,double v)
             default:
                 break;
         }
+    }
+    else
+    {
+        qDebug() << "sendValue: tag" << tag << "not found";
+    }
 
 }
 

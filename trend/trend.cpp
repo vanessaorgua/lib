@@ -663,6 +663,7 @@ void TrendWindow::changeState()     // це викликається в кінц
 
 void TrendWindow::showErrorText(QString v)
 {
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
     QMessageBox::critical(this,tr("Error"),v);
 }
 

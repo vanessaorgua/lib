@@ -45,14 +45,15 @@ class TrendWindow: public QWidget //, public Ui::Trend
 public:
     TrendWindow(QWidget *p=0,struct trendinfo *tri=NULL,int nHeight=4000);
     ~TrendWindow();
-    
+
+    void setColors(QVector<QColor> &colors);
+
 private slots:
     void dataChange(); // реакція на навігаційні кнопки зміни дати
     void colorChange();
     void plotChange();     
     void setCursor(int v=-1);
     void slotExit();
-    void setColors(QVector<QColor> &colors);
     void setGrid(bool);
 
 
