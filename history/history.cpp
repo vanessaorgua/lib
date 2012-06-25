@@ -42,10 +42,13 @@ void UHistorySelect::initUi(QString fileName)
         // QList<QPushButton*> bnts = pwgtForm->findChildren<QPushButton*> ();
         foreach(QPushButton *p,pwgtForm->findChildren<QPushButton*> ())
         {
-            if(p->objectName() != "Exit" || p->objectName() != "RunConstruct" )
+            if(p->objectName() != "Exit" && p->objectName().split("_").at(0) != "construct" )
             {
                 connect(p,SIGNAL(clicked()),this,SLOT(slotAccept()));
             }
+
+            if(p->objectName().split("_").at(0) == "construct")
+                connect(p,SIGNAL(clicked()),this,SLOT(slotConstruct()));
         }
 
 
@@ -183,10 +186,27 @@ void UHistorySelect::changeEvent(QEvent *e)
     }
 }
 
+#define __CONSTRUCTOR__
 #ifdef __CONSTRUCTOR__
 void UHistorySelect::slotConstruct()
 {
-    TrendConstruct p(s,this);
+    int NnetDev=0,NioDev=0; // значення за замовчанням
+    QString table="trend"; // таблиця за замовчанням
+
+    QStringList param;
+    param=sender()->objectName().split("_");
+
+
+    if(param.size()>3) // ящоє не всі потя то заповнити значеннями за намовчанням
+    {
+        nameTrend=param[0];
+        table=param[1];
+        NnetDev = param[2].toInt();
+        NioDev=param[3].toInt();
+    }
+
+
+    TrendConstruct p(*s[NnetDev],this);
     p.exec();
     QStringList list=p.tegList();
 
@@ -198,15 +218,15 @@ void UHistorySelect::slotConstruct()
         foreach(QString t,list)
         {
             qDebug() << t;
-                if(s[0]->getTags().contains(t)) // якщо задане поле знайдено
+                if((*s[NnetDev])[NioDev]->getTags().contains(t)) // якщо задане поле знайдено
                 {
                     TrendParam->fields[i]=t;
-                    sl<< /*s.getText()[t].size() > 0 ? */s[0]->getText()[t] /*: t */; // завантажити назву поля, якщо не знайдено - назву тега
+                    sl<< /*s.getText()[t].size() > 0 ? */(*s[NnetDev])[NioDev]->getText()[t] /*: t */; // завантажити назву поля, якщо не знайдено - назву тега
 
-                    TrendParam->fScale[i][0]=s[0]->scaleZero(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
-                    TrendParam->fScale[i][1]=s[0]->scaleFull(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
+                    TrendParam->fScale[i][0]=(*s[NnetDev])[NioDev]->scaleZero(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
+                    TrendParam->fScale[i][1]=(*s[NnetDev])[NioDev]->scaleFull(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
 
-                     if(s[0]->fieldType(t)==1) // якщо дискретний сигнал
+                     if((*s[NnetDev])[NioDev]->fieldType(t)==1) // якщо дискретний сигнал
                     {
                             // змінити тип поля
                             TrendParam->fields[i]=QString("((%1!=0)*454+%2)").arg(t).arg(i*499);
@@ -221,7 +241,7 @@ void UHistorySelect::slotConstruct()
         }
 
         TrendParam->numPlot=i; // завантажити кількість графіків
-        TrendParam->table="trend";
+        TrendParam->table=table;
         TrendParam->trend="constract"; // Завантажити ім’я тренда
 
         TrendParam->trendHead=tr("Конструктор"); // заголовок тренда - те, що написано на кнопці

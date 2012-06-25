@@ -23,7 +23,7 @@ public:
     //struct trendinfo* getTrendParam() { return &TrendParam ;}
 private slots:
     void slotAccept();
-    // void slotConstruct();
+    void slotConstruct();
 
 protected:
     void changeEvent(QEvent *e);
