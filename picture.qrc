@@ -1,5 +1,7 @@
 <RCC>
-  <qresource prefix="/butons" >
+  <qresource prefix="/butons">
+    <file>../pict/dozanor_off_39x59.png</file>
+    <file>../pict/dozanor_on_39x59.png</file>
     <file>../pict/alarm_32x32.png</file>
     <file>../pict/exit_32x32.png</file>
     <file>../pict/exit_32x32_revers.png</file>
@@ -25,26 +27,21 @@
     <file>../pict/mdef_39x22.png</file>
     <file>../pict/1sat_27x33.png</file>
     <file>../pict/2sat_27x3.png</file>
-
-
     <file>../pict/lib/div_off_45x90.png</file>
     <file>../pict/lib/div_on_45x90.png</file>
-
     <file>../pict/lib/pump_off_26x30.png</file>
     <file>../pict/lib/pump_on_26x30.png</file>
     <file>../pict/lib/pump_green_26x30.png</file>
     <file>../pict/lib/pump_off_10x11.png</file>
     <file>../pict/lib/pump_on_10x11.png</file>
-
     <file>../pict/lib/pump_off_l_26x30.png</file>
     <file>../pict/lib/pump_on_l_26x30.png</file>
     <file>../pict/lib/pump_green_l_26x30.png</file>
-
   </qresource>
-    <qresource prefix="/slider">
-        <file>../pict/SPR_1.png</file>
-        <file>../pict/SP_3.png</file>
-        <file>../pict/SP_2.png</file>
-        <file>../pict/SP_1.png</file>
-    </qresource>
+  <qresource prefix="/slider">
+    <file>../pict/SPR_1.png</file>
+    <file>../pict/SP_3.png</file>
+    <file>../pict/SP_2.png</file>
+    <file>../pict/SP_1.png</file>
+  </qresource>
 </RCC>
