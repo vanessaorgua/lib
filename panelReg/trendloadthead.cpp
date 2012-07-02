@@ -72,6 +72,7 @@ void TrendLoadThead::run()
                         trChart->loadPoint(v);
                     countRec++;
                 }
+                trChart->addPoint(v);
                 qry.clear();
             }
 //            else
