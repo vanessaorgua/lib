@@ -247,6 +247,14 @@ void UHistorySelect::slotConstruct()
         TrendParam->trendHead=tr("Конструктор"); // заголовок тренда - те, що написано на кнопці
         TrendParam->fieldHead = sl;
 
+        QCoreApplication::setApplicationName((s[NnetDev])->objectName());
+        QSettings set;
+
+        TrendParam->host=set.value("/db/hostname","localhost").toString();
+        TrendParam->db=set.value("/db/dbname","scada").toString();
+        TrendParam->user=set.value("/db/username","scada").toString();
+        TrendParam->passwd=set.value("/db/passwd","").toString();
+
 
         accept(); // для завершення роботи
 

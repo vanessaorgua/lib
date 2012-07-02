@@ -50,6 +50,8 @@ TrendConstruct::TrendConstruct(IoNetClient &source,QWidget *parent) :
             }
         }
     }
+    ui->treeTag->setCurrentItem(ui->treeTag->itemAt(0,0));
+
     connect(ui->treeTag,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),this,SLOT(itemAdd(QTreeWidgetItem*,int)));
     connect(ui->listTag,SIGNAL(itemDoubleClicked(QListWidgetItem*)),this,SLOT(itemRemove(QListWidgetItem*)));
     connect(ui->addButton,SIGNAL(clicked()),this,SLOT(buttonAddItem()));
@@ -119,6 +121,7 @@ void TrendConstruct::itemRemove(QListWidgetItem* item)
 
 void TrendConstruct::buttonAddItem()
 {
+    if(ui->treeTag)
     itemAdd(ui->treeTag->currentItem(),0);
 }
 
