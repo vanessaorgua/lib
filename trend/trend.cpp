@@ -446,8 +446,6 @@ void TrendWindow::plotChange()
 
 void TrendWindow::setCursor(int v)
 {
-    if(mutex->tryLock())
-    {
         int i,step;
         unsigned int pos;
         static int ov=0;
@@ -485,16 +483,19 @@ void TrendWindow::setCursor(int v)
                 s+=pv[i]->checkState()==Qt::Checked?m_trinfo->fields[i]:"-1";
             }
 
-            mState=3;
-            emit execQuery(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step]));
+            if(mutex->tryLock())
+            {
+                mState=3;
+                emit execQuery(QString("SELECT Dt%1 from %2 WHERE Dt= %3").arg(s).arg(m_trinfo->table).arg(m_pnDt[step]));
+            }
+            else
+            {
+                qDebug() << "setCursor: Mutex locked";
+            }
+
 
         }
 
-    }
-    else
-    {
-        qDebug() << "setCursor: Mutex locked";
-    }
 
 
 }
@@ -642,16 +643,16 @@ void TrendWindow::changeState()     // це викликається в кінц
         break;
 
     case 2:
-	QApplication::setOverrideCursor(Qt::ArrowCursor);
 
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
         QTimer::singleShot(0,this,SLOT(setCursor()));
 
 
     default:
 
+        qDebug() << "Mutex unlock";
         mutex->unlock();
 
-        qDebug() << "Mutex unlock";
 
         mState=0; // тут будемо дописувати .....
 

@@ -120,6 +120,7 @@ void QSqlRunner::runQuery(QString v)
      else // інакше можна виконувати запит
      {
         QSqlQuery query(dbs);
+        qDebug() << "Query" << v;
 
         if(query.exec(v))
         {
@@ -135,13 +136,14 @@ void QSqlRunner::runQuery(QString v)
                 emit pullRows(rows);
             }
             query.clear();
-            emit endQuery();
-
         }
         else
         {
             emit dbError(query.lastError().databaseText());
         }
+        qDebug() << "emit endQuery()";
+        emit endQuery();
+
      }
 
 
