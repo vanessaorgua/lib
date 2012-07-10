@@ -599,7 +599,7 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
                 if(ps[i]->isChecked())
                 {
                     m_ui->cursorVal->setValue(row[i+1].toInt());
-                    m_ui->cursorLCD->display(fabs(val)<1.5?ceil(val):val);
+                    m_ui->cursorLCD->display(val); //display(fabs(val)<1.5?ceil(val):val);
 
                 }
             }

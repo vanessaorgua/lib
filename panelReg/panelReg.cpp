@@ -749,10 +749,26 @@ void RpanelReg::updateData() // поновлення даних у віджет�
     // SPR_1
     if(src.getTags().contains(RegDes[RegNum][Ri::SPR_1]))
     {
-        if(src.scaleFull(RegDes[RegNum][Ri::SPR_1])<50.0)
-            ui->leSPR_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::SPR_1]),4,'f',1));
-	else
-            ui->leSPR_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::SPR_1]),3,'f',0));
+        int fw=3,pr=0;
+        int d=src.scaleFull(RegDes[RegNum][Ri::SPR_1])-src.scaleZero(RegDes[RegNum][Ri::SPR_1]);
+        if(d<=10.0)
+        {
+            fw=5;
+            pr=2;
+        }
+        else if(d<=50.0)
+        {
+            fw=4;
+            pr=1;
+        }
+        else
+        {
+            fw=3;
+            pr=0;
+        }
+
+        ui->leSPR_1->setText(QString("%1").arg(src.getValueScaled(RegDes[RegNum][Ri::SPR_1]),fw,'f',pr));
+
         ui->vsSPR_1->setValue(qint32(src.getValueFloat(RegDes[RegNum][Ri::SPR_1])));
         v << src.getValueFloat(RegDes[RegNum][Ri::SPR_1]);
     }
