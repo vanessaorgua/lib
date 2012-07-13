@@ -118,8 +118,14 @@ void UHistorySelect::slotAccept()
                         //QString::fromUtf8(f.readLine()).trimmed(); // прочитати назву поля
                 if((*s[NnetDev])[NioDev]->getTags().contains(t)) // якщо задане поле знайдено
 		{
-                    sl<< /*s.getText()[t].size() > 0 ? */(*s[NnetDev])[NioDev]->getText()[t] /*: t */; // завантажити назву поля, якщо не знайдено - назву тега
-
+                    QString plotName=(*s[NnetDev])[NioDev]->getText()[t];
+                    if(plotName=="-")
+                    {
+                        plotName=t;
+                    }
+                    //sl<< /*s.getText()[t].size() > 0 ? */(*s[NnetDev])[NioDev]->getText()[t] /*: t */; // завантажити назву поля, якщо не знайдено - назву тега
+                    sl << plotName;
+                    //qDebug() << t << plotName;
 
                     TrendParam->fScale[i][0]=(*s[NnetDev])[NioDev]->scaleZero(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
                     TrendParam->fScale[i][1]=(*s[NnetDev])[NioDev]->scaleFull(t); // спробувати розпізнати тип поля та/чи значення шкали мінімуму
