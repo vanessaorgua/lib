@@ -244,7 +244,8 @@ void TrendWindow::startHtr()
     // qDebug() << "htr created";
     htr->setObjectName("HystoryTrendThread");
 
-    connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
+    // connect(htr,SIGNAL(started()),this,SLOT(slotStart()));
+    QTimer::singleShot(1000,this,SLOT(slotStart()));
 
 //    connect(htr,SIGNAL(pullRows(QStringList)),this,SLOT(processRow(QStringList)),Qt::QueuedConnection); // ,Qt::QueuedConnection
 //    connect(htr,SIGNAL(endQuery()),this,SLOT(changeState()),Qt::QueuedConnection);
@@ -386,7 +387,7 @@ void TrendWindow::dataChange()
 
          QApplication::setOverrideCursor(Qt::WaitCursor);
 
-         // qDebug() << "execQuery" << sQuery;
+         qDebug() << "execQuery" << sQuery;
 
          emit execQuery(sQuery);
 
@@ -426,7 +427,7 @@ void TrendWindow::colorChange()
 	
             m_tw->setColors(m_Color);
 	    //dataChange();
-            QTimer::singleShot(0,this,SLOT(dataChange()));
+        QTimer::singleShot(0,this,SLOT(dataChange()));
 
 	}
     }
@@ -528,7 +529,7 @@ void TrendWindow::setColors(QVector<QColor> &colors)
 
     m_tw->setColors(m_Color);
     //dataChange();
-    QTimer::singleShot(0,this,SLOT(dataChange()));
+    //QTimer::singleShot(0,this,SLOT(dataChange()));
 
 }
 
@@ -545,6 +546,7 @@ void TrendWindow::setGrid(bool v)
 
 void TrendWindow::processRow(QStringList row) // це отримує дані
 {
+    qDebug() << sender()->objectName() << "mState="<<mState;
     switch(mState)
     {
         case 0: // це буде потрібне для визначення дати початку і кінця
@@ -562,7 +564,9 @@ void TrendWindow::processRow(QStringList row) // це отримує дані
 
         case 1: // виймати дані і запихати їх на графік
             m_nLen++;
-           m_pnDt << row[0].toUInt(); // зберегти масив точок
+            qDebug() << "row size" << row.size() << row;
+
+            m_pnDt << row[0].toUInt(); // зберегти масив точок
             {
                 QVector<int> v(m_trinfo->numPlot);
 

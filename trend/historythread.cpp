@@ -52,7 +52,7 @@ void HistoryThread::run()
 
     {
         QSqlRunner s;
-
+        s.setObjectName("sqlRunner");
         QSqlDatabase dbs=QSqlDatabase::database("historyThread");
 
 
