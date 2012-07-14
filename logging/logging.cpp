@@ -90,7 +90,7 @@ void Logging::dbStore()
                 }
             }
         }
-        log << QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
+        log << QString("REPLACE INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
         //qDebug() <<  log.size() <<"-" <<  QString("INSERT INTO %1 (%2) VALUE ('%3')").arg(tables[j]).arg(field.join(",")).arg(value.join("\',\'"));
            ++j;
     }
