@@ -33,6 +33,7 @@ public:
         void setHostName(QString hostName);
         void setPort(int Port);
         void start();
+        void setPlcAddr(qint8 v) { plcAddr=v;}
 
 signals:
     void updateData(); // сигнал висилається коли отримано новідані не наслідується

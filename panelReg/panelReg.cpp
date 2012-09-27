@@ -426,7 +426,7 @@ void RpanelReg::changeReg(int Index) // зміна регулятор
 
         ui->vsSP_3->show();
         ui->vsSP_3->blockSignals(true);
-        ui->vsSP_3->setValue(src.getValueFloat(RegDes[RegNum][Ri::SP_2]));
+        ui->vsSP_3->setValue(src.getValueFloat(RegDes[RegNum][Ri::SP_3]));
         ui->vsSP_3->blockSignals(false);
     }
     else
