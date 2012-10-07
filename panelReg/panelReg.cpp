@@ -37,7 +37,7 @@ RpanelReg::RpanelReg(IoDev &source,int n/*=0*/,QWidget *p/*=NULL*/ ,QString cfNa
     //resize(size()-QSize(0,159)); // зменшити розмір вікна
     
     connect(ui->Exit,SIGNAL(clicked()),this,SLOT(close()));
-    //connect(ui->Setting,SIGNAL(clicked()),this,SLOT(Control()));
+    connect(ui->Setting,SIGNAL(clicked(bool)),this,SLOT(Control(bool)));
     connect(ui->Trend,SIGNAL(clicked()),this,SLOT(runTrend()));
 
     // реакції користувацького інтерфейсу
@@ -673,17 +673,38 @@ void RpanelReg::runTrend() // зміна регулятор
 
 }
 
-void RpanelReg::Control() // відображення-приховувавння частини вікна з настройками регулятора
+void RpanelReg::Control(bool v) // відображення-приховувавння частини вікна з настройками регулятора
 {
-    if(ui->RegParm->isHidden()) // якщо сховано
+    bool bAccess=true;
+#ifndef WIN32
+    // перевірка наявності файлу розмежування доступу
+    QFile fAccess("/usr/etc/ac.list");
+
+    if(fAccess.exists())
     {
-        ui->RegParm->show(); // показати область настройки регулятора
-        //resize(size()+QSize(0,155)); // збільшити розмір вікна
+        bAccess=false;
+        QDir dlist("/dev/disk/by-uuid");
+        QStringList list=dlist.entryList();
+        list.removeAt(0); // видалити два перших елементи
+        list.removeAt(0);
+        fAccess.open(QIODevice::ReadOnly);
+        for(;!fAccess.atEnd();)
+        {
+            QString key=fAccess.readLine().trimmed();
+            if(list.contains(key)) bAccess=true;
+        }
+
+        if(!bAccess)
+        {
+            QMessageBox::information(this,tr("Повідомлення"),tr("Ключ доступу не знайдено.\nЗміну параметрів заборонено"));
+        }
+
     }
-    else
-    {
-        ui->RegParm->hide(); // сховати область настройки регулятора
-        //resize(size()-QSize(0,155)); // зменшити розмір вікна
+
+#endif
+    if(bAccess){
+        ui->RegParm->setVisible(v);
+
     }
     //qDebug() << size().height();
 }

@@ -2385,22 +2385,5 @@ p, li { white-space: pre-wrap; }
   <tabstop>rRev</tabstop>
  </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>Setting</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>RegParm</receiver>
-   <slot>setVisible(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>280</x>
-     <y>377</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>455</x>
-     <y>557</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

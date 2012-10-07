@@ -56,7 +56,7 @@ public:
 
 protected slots:
     void changeReg(int Index); // зміна регулятор
-    void Control(); // відображення-приховувавння частини вікна з настройками регулятора
+    void Control(bool); // відображення-приховувавння частини вікна з настройками регулятора
     void runTrend();
     void updateTrend(int);
 
